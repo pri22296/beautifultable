@@ -1,5 +1,27 @@
-Example
--------
+##########################################################################
+ASCII Table Library for Python 3
+##########################################################################
+
+**************************************************************************
+Introduction
+**************************************************************************
+
+This Package provides BeautifulTable class for easily printing
+tabular data in a visually appealing ASCII format to consoles. 
+
+Features include:
+
+* Full customization of the look and feel of the Table
+* Build the Table as you wish, By adding Rows, or by columns or using
+  both method together.
+
+*************************************************************************  
+Quickstart
+*************************************************************************
+
+-------------------------------------------------------------------------
+Building the Table
+-------------------------------------------------------------------------
 
 Let's see BeautifulTable in action.
  
@@ -46,8 +68,9 @@ Now lets move on to see some common use cases. Note that not all features
 are described here. See the API Documentation to get a detailed
 look at all the features.
 
+-------------------------------------------------------------------------
 Accessing Rows
---------------
+-------------------------------------------------------------------------
 
 You can access a row using it's index. It works
 just like a python list.
@@ -71,8 +94,9 @@ just like a python list.
 | Michael  |  3   |  boy   | 2011 |
 +----------+------+--------+------+
 
+-------------------------------------------------------------------------
 Accessing Columns
------------------
+-------------------------------------------------------------------------
 
 Columns can be accessed using their header names.
 But since name of headers can be duplicated, There are
@@ -104,8 +128,9 @@ PLAN : Make setter only applicable for modifying. That should be a better design
 | Michael  |  3   |  boy   |
 +----------+------+--------+
 
+-------------------------------------------------------------------------
 Searching for rows and columns headers
---------------------------------------
+-------------------------------------------------------------------------
 
 Cheking if a header is in the table.
 
@@ -117,8 +142,9 @@ Cheking if a row is in table
 >>> ["Ethan", 2, "boy"] in table
 True
 
+-------------------------------------------------------------------------
 Sorting
--------
+-------------------------------------------------------------------------
 
 You can also sort the table based on a column by
 specifeing it's index or it's header. <-PLAN
@@ -137,8 +163,9 @@ specifeing it's index or it's header. <-PLAN
 | Michael  |  3   |  boy   |
 +----------+------+--------+
 
+-------------------------------------------------------------------------
 Slicing
--------
+-------------------------------------------------------------------------
 
 Slicing creates a new table with it's own copy of data.
 But it retains the properties of the original object.
@@ -157,4 +184,4 @@ But it retains the properties of the original object.
 
 You can do much more with TablePrinter but this much should give you a
 good start. Those of you who are interested to have more control can
-read the API Documentation at <INSERT LINK HERE>.
+read the API Documentation.
