@@ -78,26 +78,26 @@ class BeautifulTable:
         
         It can be one of the following:
 
-        =======================  ===================================================================================
-         Option                   Meaning                                                                
-        =======================  ===================================================================================
-         BeautifulTable.SM_PLUS     A sign should be used for both +ve and -ve numbers.                              
-         BeautifulTable.SM_MINUS    A sign should only be used for -ve numbers.                                      
-         BeautifulTable.SM_SPACE    A leading space should be used for +ve numbers and a minus sign for -ve numbers. 
-        =======================  ===================================================================================
+        ========================  =================================================================================
+         Option                    Meaning                                                                
+        ========================  =================================================================================
+         BeautifulTable.SM_PLUS    A sign should be used for both +ve and -ve numbers.                              
+         BeautifulTable.SM_MINUS   A sign should only be used for -ve numbers.                                      
+         BeautifulTable.SM_SPACE   A leading space should be used for +ve numbers and a minus sign for -ve numbers. 
+        ========================  =================================================================================
 
     width_exceed_policy : enum
         Attribute to control the behaviour of table when items exceed the column width.
         
         It can be one of the following:
 
-        ===========================  =============================================================================
-         Option                       Meaning                                                                      
-        ===========================  =============================================================================
-         BeautifulTable.WEP_WRAP        An item is wrapped so every line fits within it's column width.              
-         BeautifulTable.WEP_STRIP       An item is stripped to fit in it's column.                                   
-         BeautifulTable.WEP_ELLIPSIS    An item is stripped to fit in it's column and appended with ...(Ellipsis).   
-        ===========================  =============================================================================
+        ============================  ===========================================================================
+         Option                        Meaning                                                                      
+        ============================  ===========================================================================
+         BeautifulTable.WEP_WRAP       An item is wrapped so every line fits within it's column width.              
+         BeautifulTable.WEP_STRIP      An item is stripped to fit in it's column.                                   
+         BeautifulTable.WEP_ELLIPSIS   An item is stripped to fit in it's column and appended with ...(Ellipsis).   
+        ============================  ===========================================================================
         
     left_border_char : str
         Character used to draw the left border.
@@ -195,13 +195,13 @@ class BeautifulTable:
         
         It can be one of the following:
 
-        ===========================  =============================================================================
-         Option                       Meaning                                                                      
-        ===========================  =============================================================================
-         BeautifulTable.WEP_WRAP        An item is wrapped so every line fits within it's column width.              
-         BeautifulTable.WEP_STRIP       An item is stripped to fit in it's column.                                   
-         BeautifulTable.WEP_ELLIPSIS    An item is stripped to fit in it's column and appended with ...(Ellipsis).   
-        ===========================  =============================================================================
+        ============================  ===========================================================================
+         Option                        Meaning                                                                      
+        ============================  ===========================================================================
+         BeautifulTable.WEP_WRAP       An item is wrapped so every line fits within it's column width.           
+         BeautifulTable.WEP_STRIP      An item is stripped to fit in it's column.                                
+         BeautifulTable.WEP_ELLIPSIS   An item is stripped to fit in it's column and appended with ...(Ellipsis).   
+        ============================  ===========================================================================
         """
         return self._width_exceed_policy
 
@@ -627,9 +627,9 @@ class BeautifulTable:
         index:
             index of the column. Normal list rules apply.
         """
-        if isinstance(index, int):
+        if isinstance(key, int):
             index = key
-        elif isinstance(index, str):
+        elif isinstance(key, str):
             index = self.get_column_index(key)
         else:
             raise TypeError("'key' must either be 'int' or 'str'")

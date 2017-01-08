@@ -7,7 +7,9 @@
 Welcome to beautifultable's documentation!
 ##########################################
 
-.. include:: ../README.rst
+.. include:: introduction.rst
+   
+.. include:: links.rst
 
 
 ##########################################
@@ -16,6 +18,10 @@ Contents
 
 .. toctree::
    :maxdepth: 2
+   
+   install
+   quickstart
+   
 
  
 ##########################################
