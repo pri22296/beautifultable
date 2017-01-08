@@ -40,6 +40,7 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.napoleon']
 
 napoleon_google_docstring = False
+napoleon_include_special_with_doc = False
 #napoleon_use_param = False
 #napoleon_use_ivar = True
 

@@ -61,43 +61,9 @@ class BeautifulTable:
 
     Attributes
     ----------
-    default_alignment : enum
-        Initial Alignment for new columns.
-        
-        It can be one of the following:
-        
-        * BeautifulTable.ALIGN_LEFT
-        * BeautifulTable.ALIGN_CENTER
-        * BeautifulTable.ALIGN_RIGHT
         
     default_padding : int
         Initial value for Left and Right padding widths for new columns.
-
-    sign_mode : enum
-        Attribute to control how signs are displayed for numerical data.
-        
-        It can be one of the following:
-
-        ========================  =================================================================================
-         Option                    Meaning                                                                
-        ========================  =================================================================================
-         BeautifulTable.SM_PLUS    A sign should be used for both +ve and -ve numbers.                              
-         BeautifulTable.SM_MINUS   A sign should only be used for -ve numbers.                                      
-         BeautifulTable.SM_SPACE   A leading space should be used for +ve numbers and a minus sign for -ve numbers. 
-        ========================  =================================================================================
-
-    width_exceed_policy : enum
-        Attribute to control the behaviour of table when items exceed the column width.
-        
-        It can be one of the following:
-
-        ============================  ===========================================================================
-         Option                        Meaning                                                                      
-        ============================  ===========================================================================
-         BeautifulTable.WEP_WRAP       An item is wrapped so every line fits within it's column width.              
-         BeautifulTable.WEP_STRIP      An item is stripped to fit in it's column.                                   
-         BeautifulTable.WEP_ELLIPSIS   An item is stripped to fit in it's column and appended with ...(Ellipsis).   
-        ============================  ===========================================================================
         
     left_border_char : str
         Character used to draw the left border.
@@ -148,7 +114,6 @@ class BeautifulTable:
     ALIGN_RIGHT = Alignment.ALIGN_RIGHT
 
     def __init__(self, max_width=80, default_alignment=ALIGN_CENTER, default_padding=1):
-        self.default_alignment = default_alignment
         self.default_padding = default_padding
         
         self.left_border_char = '|'
@@ -162,6 +127,7 @@ class BeautifulTable:
         
         self._sign_mode = BeautifulTable.SM_MINUS
         self._width_exceed_policy = BeautifulTable.WEP_WRAP
+        self._default_alignment = default_alignment
         self._column_pad = " "
         self._max_table_width = max_width
 
@@ -179,6 +145,18 @@ class BeautifulTable:
             
     @property
     def sign_mode(self):
+        """Attribute to control how signs are displayed for numerical data.
+        
+        It can be one of the following:
+
+        ========================  =================================================================================
+         Option                    Meaning                                                                
+        ========================  =================================================================================
+         BeautifulTable.SM_PLUS    A sign should be used for both +ve and -ve numbers.                              
+         BeautifulTable.SM_MINUS   A sign should only be used for -ve numbers.                                      
+         BeautifulTable.SM_SPACE   A leading space should be used for +ve numbers and a minus sign for -ve numbers. 
+        ========================  =================================================================================
+        """
         return self._sign_mode
 
     @sign_mode.setter
@@ -213,6 +191,30 @@ class BeautifulTable:
             raise ValueError(error_msg)
         self._width_exceed_policy = value
 
+    @property
+    def default_alignment(self):
+        """Attribute to control the alignment of newly created columns.
+        
+        It can be one of the following:
+
+        ============================  ===========================================================================
+         Option                        Meaning                                                                      
+        ============================  ===========================================================================
+         BeautifulTable.ALIGN_LEFT     New columns are left aligned.        
+         BeautifulTable.ALIGN_CENTER   New columns are center aligned.                              
+         BeautifulTable.ALIGN_RIGHT    New columns are right aligned.   
+        ============================  ===========================================================================
+        """
+        return self._default_alignment
+
+    @default_alignment.setter
+    def default_alignment(self, value):
+        if not isinstance(value, Alignment):
+            error_msg = ("allowed values for width_exceed_policy are: "
+                         + ', '.join("{}.{}".format(type(self).__name__, i.name) for i in Alignment))
+            raise ValueError(error_msg)
+        self._default_alignment = value
+
     def _initialize_table(self, column_count):
         """Sets the column count of the table.
 
@@ -230,24 +232,6 @@ class BeautifulTable:
         self._column_widths = [0] * column_count
         self._left_padding_widths = [self.default_padding] * column_count
         self._right_padding_widths = [self.default_padding] * column_count
-
-    """def begin(self):
-        Performs initial tasks prior to printing table.
-
-        It is recommended to perform all customization to the BeautifulTable
-        instance before calling this method. This method is necessary to call
-        for printing table.
-        
-        pass
-
-    def end(self):
-        Performs clean up tasks after printing table.
-
-        This method should always be called after printing all rows of the
-        table to ensure that all rows have been flushed. It also closes the
-        table visually.
-        
-        pass"""
 
     def _validate_row(self, row):
         if not isinstance(row, collections.Iterable):
@@ -828,9 +812,10 @@ class BeautifulTable:
 
         Raises
         ------
-        ValueError:
+        TypeError:
             If `header` is not of type `str`.
-
+            
+        ValueError:
             If length of `column` is shorter than number of rows.
         """
         if self._column_count == 0:
@@ -838,7 +823,7 @@ class BeautifulTable:
             self._table = [[i] for i in column]
         else:
             if not isinstance(header, str):
-                raise ValueError("header must be of type str")
+                raise TypeError("header must be of type str")
             for i, (row, new_item) in enumerate(zip(self._table, column)):
                 row.insert(index, new_item)
             if i == len(self._table) - 1:

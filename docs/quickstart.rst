@@ -253,6 +253,6 @@ specifying it's index or it's header.
    | Michael  |  3   |  boy   |
    +----------+------+--------+
 
-You can do much more with TablePrinter but this much should give you a
+You can do much more with BeautifulTable but this much should give you a
 good start. Those of you who are interested to have more control can
 read the API Documentation.
