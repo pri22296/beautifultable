@@ -1,4 +1,4 @@
-from beautifultable.beautifultable import BeautifulTable
+from .beautifultable import BeautifulTable
 
 __all__ = ['BeautifulTable']
 

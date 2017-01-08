@@ -1,5 +1,5 @@
-printer_tools package
-=====================
+beautifultable package
+======================
 
 Module contents
 ---------------

@@ -1,5 +1,5 @@
-printer_tools
-=============
+beautifultable
+==============
 
 .. toctree::
    :maxdepth: 2
