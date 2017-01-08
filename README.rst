@@ -29,9 +29,15 @@ Features include:
 Links
 **************************************************************************
 
-TO BE ADDED
+* `Documentation <http://beautifultable.readthedocs.io/en/latest/>`_
+
+* `Source <https://github.com/pri22296/beautifultable>`_
+
+* `API Reference <http://beautifultable.readthedocs.io/en/latest/source/beautifultable.html#module-beautifultable>`_
+
 
 .. inclusion-marker-links-end
+
 
 
 
@@ -43,4 +49,18 @@ Installation
 
 TO BE ADDED
 
+
 .. inclusion-marker-install-end
+
+
+
+.. inclusion-marker-license-start
+
+**************************************************************************
+License
+**************************************************************************
+
+This project is licensed under the MIT License - see the `LICENSE.txt <LICENSE.txt>`_ file for details.
+
+
+.. inclusion-marker-license-end
