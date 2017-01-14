@@ -118,10 +118,10 @@ this purpose.
 .. code:: python
 
    >>> table.insert_row(3, ['Gary', 2, 'boy', 2009])
-   >>> table.insert_column(2, 'Marks', [78, 67, 82, 56, 86, 74])
+   >>> table.insert_column(2, 'marks', [78, 67, 82, 56, 86, 74])
    >>> print(table)
    +----------+------+-------+--------+------+
-   |   name   | rank | Marks | gender | year |
+   |   name   | rank | marks | gender | year |
    +----------+------+-------+--------+------+
    |  Jacob   |  1   |  78   |  boy   | 2010 |
    +----------+------+-------+--------+------+
