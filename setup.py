@@ -11,7 +11,7 @@ setup(name='beautifultable',
       license='MIT',
       install_requires=[
           'enum34;python_version<"3.4"',
-      ]
+      ],
       classifiers=[
           'Development Status :: 3 - Alpha',
           'Environment :: Console',
@@ -21,4 +21,5 @@ setup(name='beautifultable',
           'Programming Language :: Python :: 3.5',
           'Topic :: Printing',
           'Topic :: Text Processing',
-      ])
+      ],
+)
