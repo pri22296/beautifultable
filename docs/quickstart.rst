@@ -13,7 +13,7 @@ in the table. Let's create our first BeautifulTable.
 
    >>> from beautifultable import BeautifulTable
    >>> table = BeautifulTable()
-   >>> table.set_column_headers(["name", "rank", "gender"])
+   >>> table.column_headers = ["name", "rank", "gender"]
    >>> table.append_row(["Jacob", 1, "boy"])
    >>> table.append_row(["Isabella", 1, "girl"])
    >>> table.append_row(["Ethan", 2, "boy"])
@@ -73,7 +73,7 @@ But it retains the properties of the original object.
    |  Ethan   |  2   |  boy   | 2008 |
    +----------+------+--------+------+
 
-As you can see how easy it is to create a Table with TablePrinter.
+As you can see how easy it is to create a Table with BeautifulTable.
 Now lets move on to see some common use cases. Note that not all
 features are described here. See the API Documentation to get a
 detailed look at all the features.

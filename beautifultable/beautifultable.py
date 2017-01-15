@@ -1,10 +1,10 @@
-"""The printer module contains Classes intended for printing Tabular data to terminals.
+"""This module provides BeautifulTable class intended for printing Tabular data to terminals.
 
 Example
 -------
->>> from printer_tools import BeautifulTable
+>>> from beautifultable import BeautifulTable
 >>> table = BeautifulTable()
->>> table.set_column_headers(['1st column', '2nd column'])
+>>> table.column_headers = ['1st column', '2nd column']
 >>> for i in range(5):
 ...    table.append_row([i, i*i])
 ...
@@ -94,14 +94,14 @@ class BaseRow():
 class TableMetaData(BaseRow):
     def __init__(self, table, row):
         for i in row:
-            self._validate(i)
+            self.validate(i)
         super().__init__(table, row)
         
     def __setitem__(self, key, value):
-        self._validate()
+        self.validate()
         super().__setitem__(key, value)
 
-    def _validate(self, value):
+    def validate(self, value):
         pass
 
 
