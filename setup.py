@@ -7,11 +7,9 @@ setup(name='beautifultable',
       author_email='priyamsingh.22296@gmail.com',
       packages=['beautifultable'],
       url='https://github.com/pri22296/beautifultable',
+      download_url='https://github.com/pri22296/beautifultable/tarball/0.1.0',
       keywords='table terminal ascii',
       license='MIT',
-      install_requires=[
-          'enum34;python_version<"3.4"',
-      ],
       classifiers=[
           'Development Status :: 3 - Alpha',
           'Environment :: Console',
