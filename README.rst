@@ -60,7 +60,7 @@ TO BE ADDED
 License
 **************************************************************************
 
-This project is licensed under the MIT License - see the `LICENSE.txt <LICENSE.txt>`_ file for details.
+This project is licensed under the MIT License - see the `LICENSE.txt <https://github.com/pri22296/beautifultable/blob/master/LICENSE.txt>`_ file for details.
 
 
 .. inclusion-marker-license-end
