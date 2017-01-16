@@ -38,14 +38,20 @@ class WidthExceedPolicy(enum.Enum):
     WEP_STRIP = 2
     WEP_ELLIPSIS = 3
 
+    def __repr__(self):
+        return self.name
 
-class SignMode(str, enum.Enum):
+
+class SignMode(enum.Enum):
     SM_PLUS = '+'
     SM_MINUS = '-'
     SM_SPACE = ' '
 
+    def __repr__(self):
+        return self.name
 
-class Alignment(str, enum.Enum):
+
+class Alignment(enum.Enum):
     ALIGN_LEFT = '<'
     ALIGN_CENTER = '^'
     ALIGN_RIGHT = '>'
@@ -98,7 +104,7 @@ class TableMetaData(BaseRow):
         super().__init__(table, row)
         
     def __setitem__(self, key, value):
-        self.validate()
+        self.validate(value)
         super().__setitem__(key, value)
 
     def validate(self, value):
@@ -106,7 +112,6 @@ class TableMetaData(BaseRow):
 
 
 class AlignmentMetaData(TableMetaData):
-
     def validate(self, value):
         if not isinstance(value, Alignment):
             error_msg = ("allowed values for alignment are: "
@@ -116,7 +121,6 @@ class AlignmentMetaData(TableMetaData):
 
 
 class PositiveIntegerMetaData(TableMetaData):
-
     def validate(self, value):
         if isinstance(value, int) and value >= 0:
             pass
@@ -142,6 +146,7 @@ class RowData(BaseRow):
         list_of_rows = []
         if (self._table._width_exceed_policy is BeautifulTable.WEP_STRIP or
                 self._table._width_exceed_policy is BeautifulTable.WEP_ELLIPSIS):
+            # Let's strip the row
             delimiter = '' if self._table._width_exceed_policy is BeautifulTable.WEP_STRIP else '...'
             row_item_list = []
             for index, row_item in enumerate(row):
@@ -151,6 +156,7 @@ class RowData(BaseRow):
                 row_item_list.append(clmp_str)
             list_of_rows.append(row_item_list)
         elif self._table._width_exceed_policy is BeautifulTable.WEP_WRAP:
+            # Let's wrap the row
             row_item_list = []
             for i in itertools.count():
                 line_empty = True
@@ -167,6 +173,7 @@ class RowData(BaseRow):
                 else:
                     list_of_rows.append(row_item_list)
                     row_item_list = []
+                    
         if len(list_of_rows) == 0:
             return [['']*self._table._column_count]
         else:
@@ -175,23 +182,24 @@ class RowData(BaseRow):
     def __str__(self):
         """Return a string representation of a row."""
         row = [utils.convert_to_numeric(item) for item in self._row]
-        width = self._table._column_widths
-        align = self._table._column_alignments
-        sign = self._table._sign_mode
-        for i in range(self._table._column_count):
+        table = self._table
+        width = table._column_widths
+        align = table._column_alignments
+        sign = table._sign_mode
+        for i in range(table._column_count):
             try:
-                row[i] = '{:{sign}}'.format(str(row[i]), sign=sign)
+                row[i] = '{:{sign}}'.format(str(row[i]), sign=sign.value)
             except ValueError:
                 row[i] = str(row[i])
         string = []
         list_of_rows = self._get_row_within_width(row)
         for row_ in list_of_rows:
-            for i in range(self._table._column_count):
+            for i in range(table._column_count):
                 row_[i] = '{:{align}{width}}'.format(
-                    str(row_[i]), align=align[i], width=width[i])
-            content = self._table.column_seperator_char.join(row_)
-            content = self._table.left_border_char + content
-            content += self._table.right_border_char
+                    str(row_[i]), align=align[i].value, width=width[i])
+            content = table.column_seperator_char.join(row_)
+            content = table.left_border_char + content
+            content += table.right_border_char
             string.append(content)
         return '\n'.join(string)
 
@@ -199,19 +207,19 @@ class RowData(BaseRow):
 class HeaderData(RowData):
     def __init__(self, table, row):
         for i in row:
-            self._validate(i)
+            self.validate(i)
         super().__init__(table, row)
         
     def __getitem__(self, key):
         return self._row[key]
 
     def __setitem__(self, key, value):
-        self._validate(value)
+        self.validate(value)
         if not isinstance(key, int):
             raise TypeError("header indices must be integers, not {}".format(type(key).__name__))
         self._row[key] = value
 
-    def _validate(self, value):
+    def validate(self, value):
         if not isinstance(value, str):
             raise TypeError("header must be of type 'str', got {}".format(type(value).__name__))
         
@@ -542,11 +550,26 @@ class BeautifulTable:
             max_length = max(max_length, len(str(self._column_headers[index])))
             #max_length += self._left_padding_widths[index] + self._right_padding_widths[index]
             widths[index] += max_length
-        widths_copy = widths.copy()
-        sum_ = sum(widths)
+        #widths_copy = widths.copy()
         
+        sum_ = sum(widths)
         desired_sum = self._max_table_width - offset
-        self.column_widths = [round(width * desired_sum / sum_) if width > round(desired_sum/self._column_count) else width for i, width in enumerate(widths)]
+
+        temp_sum = 0
+        flag = [0]*len(widths)
+        for i,width in enumerate(widths):
+            if width < desired_sum / self._column_count:
+                temp_sum += width
+                flag[i] = 1
+
+        avail_space = desired_sum - temp_sum
+        actual_space = sum_ - temp_sum
+        for i in range(len(widths)):
+            if not flag[i]:
+                widths[i] = round(width[i] * avail_space / actual_space)
+        self.column_widths = widths
+        #self.column_widths = [round(width * desired_sum / sum_) for width in widths]
+        #self.column_widths = [int(width * desired_sum / sum_) if width > int(desired_sum/self._column_count) else width for i, width in enumerate(widths)]
         #self._column_widths = [round(width * (self._max_table_width - offset) / sum_) if width < widths_copy[i] else width for i, width in enumerate(widths)]
 
     def set_padding_widths(self, pad_width):
