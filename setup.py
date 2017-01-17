@@ -1,13 +1,14 @@
 from setuptools import setup
+_version = '0.1.1'
 
 setup(name='beautifultable',
-      version='0.1.1',
+      version=_version,
       description='Utility package to print visually appealing ASCII tables to terminal',
       author='Priyam Singh',
       author_email='priyamsingh.22296@gmail.com',
       packages=['beautifultable'],
       url='https://github.com/pri22296/beautifultable',
-      download_url='https://github.com/pri22296/beautifultable/tarball/0.1.0',
+      download_url='https://github.com/pri22296/beautifultable/tarball/{}'.format(_version),
       keywords='table terminal ascii',
       license='MIT',
       classifiers=[
