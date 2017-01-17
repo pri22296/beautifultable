@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='beautifultable',
-      version='0.1.0',
+      version='0.1.1',
       description='Utility package to print visually appealing ASCII tables to terminal',
       author='Priyam Singh',
       author_email='priyamsingh.22296@gmail.com',
