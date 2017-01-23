@@ -1,10 +1,10 @@
-*************************************************************************  
+************************************************************************* 
 Quickstart
 *************************************************************************
 
--------------------------------------------------------------------------
+=========================================================================
 Building the Table
--------------------------------------------------------------------------
+=========================================================================
 
 Building a table is very easy. You can append rows and columns
 in the table. Let's create our first BeautifulTable.
@@ -78,21 +78,32 @@ Now lets move on to see some common use cases. Note that not all
 features are described here. See the API Documentation to get a
 detailed look at all the features.
 
--------------------------------------------------------------------------
+
+=========================================================================
 Accessing Rows
--------------------------------------------------------------------------
+=========================================================================
 
 You can access a row using it's index. It works just like a python
-list.
+list. It returns a ``Row`` object.
 
 .. code:: python
 
-   >>> print(table[3])
+   >>> print(list(table[3]))
    ['Sophia', 2, 'girl', '2010']
+   
+To access a particular field of a row, you can use the index, or the header.
 
--------------------------------------------------------------------------
+.. code:: python
+
+   >>> print(table[3][2])
+   girl
+   >>> print(table[3]['gender'])
+   girl
+
+
+=========================================================================
 Accessing Columns
--------------------------------------------------------------------------
+=========================================================================
 
 Columns can be accessed using their header names or their index.
 But since name of headers can be duplicated, There are methods
@@ -108,9 +119,100 @@ an iterator.
    >>> print(list(table['name']))
    ['Jacob', 'Isabella', 'Ethan', 'Sophia', 'Michael']
 
+
+=========================================================================
+Customizing the look of the Table
+=========================================================================
+
 -------------------------------------------------------------------------
+Alignment
+-------------------------------------------------------------------------
+Let's change the way some columns are aligned in our table.
+
+.. code:: python
+
+   >>> table.column_alignments['name'] = BeautifulTable.ALIGN_LEFT
+   >>> table.column_alignments['gender'] = BeautifulTable.ALIGN_RIGHT
+   >>> print(table)
+   +----------+------+--------+------+
+   | name     | rank | gender | year |
+   +----------+------+--------+------+
+   | Jacob    |  1   |    boy | 2010 |
+   +----------+------+--------+------+
+   | Isabella |  1   |   girl | 2012 |
+   +----------+------+--------+------+
+   | Ethan    |  2   |    boy | 2008 |
+   +----------+------+--------+------+
+   | Sophia   |  2   |   girl | 2010 |
+   +----------+------+--------+------+
+   | Michael  |  3   |    boy | 2011 |
+   +----------+------+--------+------+ 
+
+
+-------------------------------------------------------------------------
+Padding
+-------------------------------------------------------------------------
+You can change the padding for individual column similar to
+the alignment.
+
+.. code:: python
+
+   >>> table.left_padding_widths['rank'] = 5
+   >>> table.right_padding_widths['rank'] = 3
+   >>> print(table)
+   +----------+------------+--------+------+
+   | name     |     rank   | gender | year |
+   +----------+------------+--------+------+
+   | Jacob    |      1     |    boy | 2010 |
+   +----------+------------+--------+------+
+   | Isabella |      1     |   girl | 2012 |
+   +----------+------------+--------+------+
+   | Ethan    |      2     |    boy | 2008 |
+   +----------+------------+--------+------+
+   | Sophia   |      2     |   girl | 2010 |
+   +----------+------------+--------+------+
+   | Michael  |      3     |    boy | 2011 |
+   +----------+------------+--------+------+ 
+
+
+You can use a helper method `set_padding_widths` to set the left and right
+padding to a common value.
+
+
+-------------------------------------------------------------------------
+ASCII Characters
+-------------------------------------------------------------------------
+You can customize what characters are used to draw various parts of the
+table. Here we show you an example of how you can use this feature.
+You can read the API Reference for more details.
+
+.. code:: python
+
+   >>> table.left_border_char = 'o'
+   >>> table.right_border_char = 'o'
+   >>> table.top_border_char = '<~>'
+   >>> table.bottom_border_char = '='
+   >>> table.header_seperator_char = '^'
+   >>> table.row_seperator_char = ''
+   >>> table.intersection_char = ''
+   >>> table.column_seperator_char = ':'
+   >>> print(table)
+   <~><~><~><~><~><~><~><~><~><~><~><~
+   o name     : rank : gender : year o
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   o Jacob    :  1   :    boy : 2010 o
+   o Isabella :  1   :   girl : 2012 o
+   o Ethan    :  2   :    boy : 2008 o
+   o Sophia   :  2   :   girl : 2010 o
+   o Michael  :  3   :    boy : 2011 o
+   =================================== 
+   
+As you can see, you can change quite a lot about your *BeautifulTable* instance.
+For further sections, We switch the look of the table to *default* again.
+
+=========================================================================
 Inserting Rows and Columns
--------------------------------------------------------------------------
+=========================================================================
 
 BeautifulTable provides 2 methods, `insert_row` and `insert_column` for
 this purpose.
@@ -136,9 +238,10 @@ this purpose.
    | Michael  |  3   |  74   |  boy   | 2011 |
    +----------+------+-------+--------+------+
 
--------------------------------------------------------------------------
+
+=========================================================================
 Removing Rows and Columns
--------------------------------------------------------------------------
+=========================================================================
 
 Removing a row or column is very easy. Just delete it using `del`
 statement.
@@ -177,9 +280,10 @@ Instead of the index, you can also pass the header of the column to
 
    >>> table.pop_column(2)
 
--------------------------------------------------------------------------
+
+=========================================================================
 Updating data in the Table
--------------------------------------------------------------------------
+=========================================================================
 
 Let's change the name in the 4th row to 'Sophie'.
 
@@ -188,6 +292,23 @@ Let's change the name in the 4th row to 'Sophie'.
    >>> table[3][0] = 'Sophie' # index of 4th row is 3
    >>> print(table[3])
    ['Sophie', 2, 86, 'girl']
+   
+You could have done the same thing using the header.
+
+.. code:: python
+
+   >>> table[3]['name'] = 'Sophie'
+
+
+Or, you can also change the entire row, or even multiple rows
+using slicing.
+
+.. code:: python
+
+   >>> table[3] = ['Sophie', 2, 56, 'girl']
+
+
+You can also update existing columns as shown below.
 
 .. code:: python
 
@@ -207,14 +328,17 @@ Let's change the name in the 4th row to 'Sophie'.
    | Michael  |  3   |  82   |  boy   |
    +----------+------+-------+--------+
 
+The methods `update_row` and `update_column` can be used to
+perform the operations discussed in this section.
+
 Note that you can only update existing columns but can't create
 a new column using this method. For that you need to use the
 methods `append_column` or `insert_column`.
 
 
--------------------------------------------------------------------------
+=========================================================================
 Searching for rows or columns headers
--------------------------------------------------------------------------
+=========================================================================
 
 Cheking if a header is in the table.
 
@@ -230,9 +354,10 @@ Cheking if a row is in table
    >>> ["Ethan", 2, 89, "boy"] in table
    True
 
--------------------------------------------------------------------------
+
+=========================================================================
 Sorting
--------------------------------------------------------------------------
+=========================================================================
 
 You can also sort the table based on a column by
 specifying it's index or it's header.
@@ -241,17 +366,19 @@ specifying it's index or it's header.
 
    >>> table.sort('name')
    >>> print(table)
-   +----------+------+--------+
-   |   name   | rank | gender |
-   +----------+------+--------+
-   |  Ethan   |  2   |  boy   |
-   +----------+------+--------+
-   | Isabella |  1   |  girl  |
-   +----------+------+--------+
-   |  Jacob   |  1   |  boy   |
-   +----------+------+--------+
-   | Michael  |  3   |  boy   |
-   +----------+------+--------+
+   +----------+------+-------+--------+
+   |   name   | rank | marks | gender |
+   +----------+------+-------+--------+
+   |  Ethan   |  2   |  89   |  boy   |
+   +----------+------+-------+--------+
+   | Isabella |  1   |  46   |  girl  |
+   +----------+------+-------+--------+
+   |  Jacob   |  1   |  75   |  boy   |
+   +----------+------+-------+--------+
+   | Michael  |  3   |  82   |  boy   |
+   +----------+------+-------+--------+
+   |  Sophie  |  2   |  56   |  girl  |
+   +----------+------+-------+--------+ 
 
 You can do much more with BeautifulTable but this much should give you a
 good start. Those of you who are interested to have more control can

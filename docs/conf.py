@@ -19,7 +19,7 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('../'))
 
 
 # -- General configuration ------------------------------------------------
@@ -43,6 +43,8 @@ napoleon_google_docstring = False
 napoleon_include_special_with_doc = False
 #napoleon_use_param = False
 #napoleon_use_ivar = True
+
+autodoc_member_order = 'bysource'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -170,4 +172,3 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}
 
-autodoc_member_order = 'bysource'
