@@ -69,6 +69,13 @@ class BaseRow():
     def __iter__(self): return iter(self._row)
     def __next__(self): return next(self._row)
     def __repr__(self): return "{}<{}>".format(type(self).__name__, ', '.join(str(v) for v in self._row))
+    def __eq__(self, other):
+        if len(self) != len(other):
+            return False
+        for i,j in zip(self, other):
+            if i != j:
+                return False
+        return True
 
     def _append(self, item): self._row.append(item)
     def _insert(self, i, item): self._row.insert(i, item)
@@ -252,12 +259,29 @@ class BeautifulTable:
     to an empty string. For example, if Top border should not be drawn,
     set `top_border_char` to ''.
 
+    Parameters
+    ----------
+    max_width: int, optional
+        maximum width of the table in number of characters.
+        
+    default_alignment : int, optional
+        Default alignment for new columns.
+
+    default_padding : int, optional
+        Default width of the left and right padding for new columns.
+    
     Attributes
     ----------
-        
-    default_padding : int
-        Initial value for Left and Right padding widths for new columns.
-        
+    sign_mode
+    width_exceed_policy
+    default_alignment
+    default_padding
+    column_widths
+    column_headers
+    column_alignments
+    left_padding_widths
+    right_padding_widths
+    
     left_border_char : str
         Character used to draw the left border.
         
@@ -281,19 +305,7 @@ class BeautifulTable:
         
     intersection_char : str
         Character used to draw intersection of a vertical and horizontal
-        line.
-        disabling it just draws the horizontal line char in it's place.
-
-    Parameters
-    ----------
-    max_width: int, optional
-        maximum width of the table in number of characters.
-        
-    default_alignment : int, optional
-        Default alignment for new columns.
-
-    default_padding : int, optional
-        Default width of the left and right padding for new columns.
+        line. Disabling it just draws the horizontal line char in it's place.
     """
     
     WEP_WRAP = WidthExceedPolicy.WEP_WRAP
@@ -306,8 +318,8 @@ class BeautifulTable:
     ALIGN_CENTER = Alignment.ALIGN_CENTER
     ALIGN_RIGHT = Alignment.ALIGN_RIGHT
 
-    def __init__(self, max_width=80, default_alignment=ALIGN_CENTER, default_padding=1):
-        self.default_padding = default_padding
+    def __init__(self, max_width=80, default_alignment=ALIGN_CENTER,
+                 default_padding=1):
         
         self.left_border_char = '|'
         self.right_border_char = '|'
@@ -321,6 +333,7 @@ class BeautifulTable:
         self._sign_mode = BeautifulTable.SM_MINUS
         self._width_exceed_policy = BeautifulTable.WEP_WRAP
         self._default_alignment = default_alignment
+        self._default_padding = default_padding
         self._column_pad = " "
         self._max_table_width = max_width
 
@@ -335,20 +348,26 @@ class BeautifulTable:
             raise TypeError("Expected {attr} to be of type 'str', got {attr_type}".format(attr=name, attr_type=type(value).__name__))
         super().__setattr__(name, value)
 
-            
+
+#****************************Properties Begin Here*****************************#
+
     @property
     def sign_mode(self):
         """Attribute to control how signs are displayed for numerical data.
         
         It can be one of the following:
 
-        ========================  =================================================================================
+        ========================  ==============================================
          Option                    Meaning                                                                
-        ========================  =================================================================================
-         BeautifulTable.SM_PLUS    A sign should be used for both +ve and -ve numbers.                              
-         BeautifulTable.SM_MINUS   A sign should only be used for -ve numbers.                                      
-         BeautifulTable.SM_SPACE   A leading space should be used for +ve numbers and a minus sign for -ve numbers. 
-        ========================  =================================================================================
+        ========================  ==============================================
+         BeautifulTable.SM_PLUS    A sign should be used for both +ve and -ve
+                                   numbers.
+                                   
+         BeautifulTable.SM_MINUS   A sign should only be used for -ve numbers.
+         
+         BeautifulTable.SM_SPACE   A leading space should be used for +ve
+                                   numbers and a minus sign for -ve numbers. 
+        ========================  ==============================================
         """
         return self._sign_mode
 
@@ -366,13 +385,18 @@ class BeautifulTable:
         
         It can be one of the following:
 
-        ============================  ===========================================================================
+        ============================  ==========================================
          Option                        Meaning                                                                      
-        ============================  ===========================================================================
-         BeautifulTable.WEP_WRAP       An item is wrapped so every line fits within it's column width.           
-         BeautifulTable.WEP_STRIP      An item is stripped to fit in it's column.                                
-         BeautifulTable.WEP_ELLIPSIS   An item is stripped to fit in it's column and appended with ...(Ellipsis).   
-        ============================  ===========================================================================
+        ============================  ==========================================
+         BeautifulTable.WEP_WRAP       An item is wrapped so every line fits
+                                       within it's column width.
+                                       
+         BeautifulTable.WEP_STRIP      An item is stripped to fit in it's
+                                       column.
+                                       
+         BeautifulTable.WEP_ELLIPSIS   An item is stripped to fit in it's
+                                       column and appended with ...(Ellipsis).   
+        ============================  ==========================================
         """
         return self._width_exceed_policy
 
@@ -390,13 +414,15 @@ class BeautifulTable:
         
         It can be one of the following:
 
-        ============================  ===========================================================================
+        ============================  ==========================================
          Option                        Meaning                                                                      
-        ============================  ===========================================================================
-         BeautifulTable.ALIGN_LEFT     New columns are left aligned.        
-         BeautifulTable.ALIGN_CENTER   New columns are center aligned.                              
-         BeautifulTable.ALIGN_RIGHT    New columns are right aligned.   
-        ============================  ===========================================================================
+        ============================  ==========================================
+         BeautifulTable.ALIGN_LEFT     New columns are left aligned.
+         
+         BeautifulTable.ALIGN_CENTER   New columns are center aligned.
+         
+         BeautifulTable.ALIGN_RIGHT    New columns are right aligned.
+        ============================  ==========================================
         """
         return self._default_alignment
 
@@ -409,18 +435,26 @@ class BeautifulTable:
         self._default_alignment = value
 
     @property
+    def default_padding(self):
+        """Initial value for Left and Right padding widths for new columns."""
+        return self._default_padding
+
+    @default_padding.setter
+    def default_padding(self, value):
+        if not isinstance(value, int):
+            raise TypeError("padding must be an integer")
+        elif value <= 0:
+            raise ValueError("padding must be more than 0")
+        else:
+            self._default_padding = value
+
+    @property
     def column_widths(self):
-        """Set width for the columns of the table.
+        """get/set width for the columns of the table.
 
         Width of the column specifies the max number of characters
         a column can contain. Larger characters are handled according to
-        the WIDTH_EXCEED_POLICY.
-
-        Parameters
-        ----------
-        width
-            width for the columns.
-        
+        the value of `width_exceed_policy`.
         """
         return self._column_widths
 
@@ -431,16 +465,11 @@ class BeautifulTable:
 
     @property
     def column_headers(self):
-        """Set titles for the columns of the table.
+        """get/set titles for the columns of the table.
 
-        `header` can be any iterable having all memebers an instance of `str`.
-
-        Parameters
-        ----------
-        header : array_like
-            titles for the columns.
+        It can be any iterable having all memebers an instance of `str`.
         """
-        return self._column_widths
+        return self._column_headers
 
     @column_headers.setter
     def column_headers(self, value):
@@ -452,17 +481,13 @@ class BeautifulTable:
 
     @property
     def column_alignments(self):
-        """Set titles for the columns of the table.
+        """get/set alignment of the columns of the table.
 
-        Parameters
-        ----------
-        alignment : array_like
-            alignment for the columns. It follows the default alignment
-            rules of the format method.
+        It can be any iterable containing only the following:
 
-            * BeautifulTable.ALIGN_LEFT - left alignment
-            * BeautifulTable.ALIGN_CENTER - center alignment
-            * BeautifulTable.ALIGN_RIGHT - right alignment
+        * BeautifulTable.ALIGN_LEFT
+        * BeautifulTable.ALIGN_CENTER
+        * BeautifulTable.ALIGN_RIGHT
         """
         return self._column_alignments
 
@@ -473,43 +498,35 @@ class BeautifulTable:
 
     @property
     def left_padding_widths(self):
-        """Set width for left padding of the columns of the table.
+        """get/set width for left padding of the columns of the table.
 
         Left Width of the padding specifies the number of characters
         on the left of a column reserved for padding. By Default It is 1.
-
-        Parameters
-        ----------
-        pad_width : array_like
-            left pad widths for the columns.
         """
         return self._left_padding_widths
 
     @left_padding_widths.setter
     def left_padding_widths(self, value):
-        pad_width = self._validate_row(pad_width)
-        self._left_padding_widths = PositiveIntegerMetaData(pad_width)
+        pad_width = self._validate_row(value)
+        self._left_padding_widths = PositiveIntegerMetaData(self, pad_width)
 
     @property
     def right_padding_widths(self):
-        """Set width for right padding of the columns of the table.
+        """get/set width for right padding of the columns of the table.
 
         Right Width of the padding specifies the number of characters
         on the rigth of a column reserved for padding. By default It is 1.
-
-        Parameters
-        ----------
-        pad_width : array_like
-            rigth pad widths for the columns.
         """
         return self._right_padding_widths
 
     @right_padding_widths.setter
     def right_padding_widths(self, value):
-        pad_width = self._validate_row(pad_width)
-        self._right_padding_widths = PositiveIntegerMetaData(pad_width)
+        pad_width = self._validate_row(value)
+        self._right_padding_widths = PositiveIntegerMetaData(self, pad_width)
 
-    def _initialize_table(self, column_count):
+#*****************************Properties End Here******************************#
+
+    def _initialize_table(self, column_count: int):
         """Sets the column count of the table.
 
         This method is called to set the number of columns for the first time.
@@ -521,19 +538,21 @@ class BeautifulTable:
             number of columns in the table
         """
         self._column_count = column_count
-        self._column_headers = HeaderData(self, [''] * self._column_count)
+        self._column_headers = HeaderData(self, [''] * column_count)
         self._column_alignments = AlignmentMetaData(self, [self.default_alignment] * column_count)
         self._column_widths = PositiveIntegerMetaData(self, [0] * column_count)
         self._left_padding_widths = PositiveIntegerMetaData(self, [self.default_padding] * column_count)
         self._right_padding_widths = PositiveIntegerMetaData(self, [self.default_padding] * column_count)
         
-    def _validate_row(self, value):
+    def _validate_row(self, value, init_table_if_required=True):
         #TODO: Rename this method
-        if not isinstance(value, collections.Iterable):
+        # str is also an iterable but it is not a valid row, so
+        # an extra check is required for str
+        if not isinstance(value, collections.Iterable) or isinstance(value, str):
             raise TypeError("parameter must be an iterable")
         
         row = list(value)
-        if self._column_count == 0:
+        if init_table_if_required and self._column_count == 0:
             self._initialize_table(len(row))
             
         if len(row) != self._column_count:
@@ -638,7 +657,17 @@ class BeautifulTable:
         """
         if isinstance(key, slice):
             new_table = copy.copy(self)
-            new_table._table = self._table[key]
+            # All child of BaseRow class needs to be reassigned so that
+            # They contain reference of the new table rather than the old
+            # This was a cause of a nasty bug once.
+            new_table.column_headers = self.column_headers
+            new_table.column_alignments = self.column_alignments
+            new_table.column_widths = self.column_widths
+            new_table.left_padding_widths = self.left_padding_widths
+            new_table.right_padding_widths = self.left_padding_widths
+            new_table._table = []
+            for row in self._table[key]:
+                new_table.append_row(row)
             return new_table
         elif isinstance(key, int):
             return self._table[key]
@@ -690,8 +719,8 @@ class BeautifulTable:
         IndexError
             If `int` key is out of range.
         """
-        if isinstance(key, int) or isinstance(key, slice):
-            self._table[key] = value
+        if isinstance(key, (int, slice)):
+            self.update_row(key, value)
         elif isinstance(key, str):
             self.update_column(key, value)
         else:
@@ -704,7 +733,7 @@ class BeautifulTable:
         if isinstance(key, str):
             return key in self._column_headers
         elif isinstance(key, collections.Iterable):
-            return RowData(self, key) in self._table
+            return key in self._table
         else:
             raise TypeError("'key' must be str or Iterable, not {}".format(type(key).__name__))
 
@@ -737,15 +766,14 @@ class BeautifulTable:
         self._table.sort(key=operator.itemgetter(index))
 
     def copy(self):
-        """Return a deepcopy of the table.
+        """Return a shallow copy of the table.
 
         Returns
         -------
         BeautifulTable:
-            deepcopy of the BeautifulTable instance.
+            shallow copy of the BeautifulTable instance.
         """
-        new_table = copy.deepcopy(self)
-        return new_table
+        return self[:]
 
     def get_column_header(self, index):
         """Get header of a column from it's index.
@@ -840,7 +868,6 @@ class BeautifulTable:
             index = self.get_column_index(index)
         else:
             raise TypeError("column indices must be integers or slices, not {}".format(type(key).__name__))
-        #assert self._column_count > 0
         if self._column_count == 0:
             raise IndexError("pop from empty table")
         if self._column_count == 1:
@@ -899,10 +926,71 @@ class BeautifulTable:
         """
         self.insert_row(len(self._table), row)
 
+    def update_row(self, key, value):
+        """Update a column named `header` in the table.
+
+        If length of column is smaller than number of rows, lets say
+        `k`, only the first `k` values in the column is updated.
+
+        Parameters
+        ----------
+        key : int or slice
+            index of the row, or a slice object.
+
+        value : iterable
+            If an index is specified, `value` should be an iterable
+            of appropriate length. Instead if a slice object is
+            passed as key, value should be an iterable of rows.
+
+        Raises
+        ------
+        IndexError:
+            If index specified is out of range.
+
+        TypeError:
+            If `value` is of incorrect type.
+            
+        ValueError:
+            If length of row does not matches number of columns.
+        """
+        if isinstance(key, int):
+            row = self._validate_row(value, init_table_if_required=False)
+            row_obj = RowData(self, row)
+            self._table[key] = row_obj
+        elif isinstance(key, slice):
+            row_obj_list = []
+            for row in value:
+                row_ = self._validate_row(row, init_table_if_required=True)
+                row_obj_list.append(RowData(self, row_))
+            self._table[key] = row_obj_list
+        else:
+            raise TypeError("key must be an integer or a slice object")
+
     def update_column(self, header, column):
+        """Update a column named `header` in the table.
+
+        If length of column is smaller than number of rows, lets say
+        `k`, only the first `k` values in the column is updated.
+
+        Parameters
+        ----------
+        header : str
+            Header of the column
+
+        column : iterable
+            Any iterable of appropriate length.
+
+        Raises
+        ------
+        TypeError:
+            If length of `column` is shorter than number of rows.
+            
+        ValueError:
+            If no column exists with title `header`.
+        """
         index = self.get_column_index(header)
         if not isinstance(header, str):
-            raise ValueError("header must be of type str")
+            raise TypeError("header must be of type str")
         for i, (row, new_item) in enumerate(zip(self._table, column)):
             row[index] = new_item
 
@@ -938,7 +1026,7 @@ class BeautifulTable:
         """
         if self._column_count == 0:
             self.column_headers = HeaderData([header])
-            self._table = [RowData([i]) for i in column]
+            self._table = [RowData(self, [i]) for i in column]
         else:
             if not isinstance(header, str):
                 raise TypeError("header must be of type str")
