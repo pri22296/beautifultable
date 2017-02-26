@@ -47,7 +47,7 @@ Links
 Installation
 **************************************************************************
 
-TO BE ADDED
+pip install beautifultable
 
 
 .. inclusion-marker-install-end
