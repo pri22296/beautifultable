@@ -585,7 +585,7 @@ class BeautifulTable:
         actual_space = sum_ - temp_sum
         for i in range(len(widths)):
             if not flag[i]:
-                widths[i] = round(width[i] * avail_space / actual_space)
+                widths[i] = round(widths[i] * avail_space / actual_space)
         self.column_widths = widths
         #self.column_widths = [round(width * desired_sum / sum_) for width in widths]
         #self.column_widths = [int(width * desired_sum / sum_) if width > int(desired_sum/self._column_count) else width for i, width in enumerate(widths)]
