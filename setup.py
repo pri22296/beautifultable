@@ -6,7 +6,7 @@ _version = '0.1.2'
 install_requires = []
 
 if sys.version_info < (3, 4):
-install_requires.append('enum34')
+    install_requires.append('enum34')
 
 setup(name='beautifultable',
       version=_version,
