@@ -867,7 +867,7 @@ class BeautifulTable:
         elif isinstance(index, str):
             index = self.get_column_index(index)
         else:
-            raise TypeError("column indices must be integers or slices, not {}".format(type(key).__name__))
+            raise TypeError("column index must be an integer or a string, not {}".format(type(index).__name__))
         if self._column_count == 0:
             raise IndexError("pop from empty table")
         if self._column_count == 1:
@@ -903,14 +903,7 @@ class BeautifulTable:
         ValueError:
             If size of `row` is inconsistent with the current number
             of columns.
-        
         """
-        """row = list(row)
-        if self._column_count == 0:
-            self._initialize_table(len(row))
-
-        if len(row) != self._column_count:
-            raise ValueError("expected 'row' to be of length {}, got {}".format(self._column_count, len(row)))"""
         row = self._validate_row(row)
         row_obj = RowData(self, row)
         self._table.insert(index, row_obj)
