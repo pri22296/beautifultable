@@ -9,6 +9,13 @@ ASCII Table Library for Python 3
 Introduction
 **************************************************************************
 
+.. image:: https://badge.fury.io/py/beautifultable.svg
+    :target: https://badge.fury.io/py/beautifultable
+    
+.. image:: https://readthedocs.org/projects/beautifultable/badge/?version=latest
+    :alt: Documentation Status
+    :target: http://beautifultable.readthedocs.io/en/latest/?badge=latest
+
 This Package provides BeautifulTable class for easily printing
 tabular data in a visually appealing ASCII format to a terminal. 
 
@@ -47,7 +54,9 @@ Links
 Installation
 **************************************************************************
 
-pip install beautifultable
+::
+
+    pip install beautifultable
 
 
 .. inclusion-marker-install-end
