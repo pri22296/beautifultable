@@ -33,6 +33,7 @@ from beautifultable import utils
 
 __all__ = ['BeautifulTable']
 
+
 class WidthExceedPolicy(enum.Enum):
     WEP_WRAP = 1
     WEP_STRIP = 2
@@ -65,25 +66,46 @@ class BaseRow():
         self._row = list(row)
         self._table = table
 
-    def __len__(self): return len(self._row)
-    def __iter__(self): return iter(self._row)
-    def __next__(self): return next(self._row)
-    def __repr__(self): return "{}<{}>".format(type(self).__name__, ', '.join(str(v) for v in self._row))
+    def __len__(self):
+        return len(self._row)
+
+    def __iter__(self):
+        return iter(self._row)
+
+    def __next__(self):
+        return next(self._row)
+
+    def __repr__(self):
+        return "{}<{}>".format(type(self).__name__, ', '.join(str(v) for v in self._row))
+
     def __eq__(self, other):
         if len(self) != len(other):
             return False
-        for i,j in zip(self, other):
+        for i, j in zip(self, other):
             if i != j:
                 return False
         return True
 
-    def _append(self, item): self._row.append(item)
-    def _insert(self, i, item): self._row.insert(i, item)
-    def _pop(self, i=-1): return self._row.pop(i)
-    def _remove(self, item): self._row.remove(item)
-    def _clear(self): self._row.clear()
-    def count(self, item): return self._row.count(item)
-    def index(self, item, *args): return self._row.index(item, *args)
+    def _append(self, item):
+        self._row.append(item)
+
+    def _insert(self, i, item):
+        self._row.insert(i, item)
+
+    def _pop(self, i=-1):
+        return self._row.pop(i)
+
+    def _remove(self, item):
+        self._row.remove(item)
+
+    def _clear(self):
+        self._row.clear()
+
+    def count(self, item):
+        return self._row.count(item)
+
+    def index(self, item, *args):
+        return self._row.index(item, *args)
 
     def __getitem__(self, key):
         if isinstance(key, (int, slice)):
@@ -109,7 +131,7 @@ class TableMetaData(BaseRow):
         for i in row:
             self.validate(i)
         super().__init__(table, row)
-        
+
     def __setitem__(self, key, value):
         self.validate(value)
         super().__setitem__(key, value)
@@ -151,26 +173,26 @@ class RowData(BaseRow):
             to width exceed policy.
         """
         list_of_rows = []
-        if (self._table._width_exceed_policy is BeautifulTable.WEP_STRIP or
-                self._table._width_exceed_policy is BeautifulTable.WEP_ELLIPSIS):
+        if (self._table.width_exceed_policy is BeautifulTable.WEP_STRIP or
+                self._table.width_exceed_policy is BeautifulTable.WEP_ELLIPSIS):
             # Let's strip the row
-            delimiter = '' if self._table._width_exceed_policy is BeautifulTable.WEP_STRIP else '...'
+            delimiter = '' if self._table.width_exceed_policy is BeautifulTable.WEP_STRIP else '...'
             row_item_list = []
             for index, row_item in enumerate(row):
-                left_pad = self._table._column_pad * self._table._left_padding_widths[index]
-                right_pad = self._table._column_pad * self._table._right_padding_widths[index]
-                clmp_str = left_pad + self._table._clamp_string(row_item, index, delimiter) + right_pad
+                left_pad = self._table._column_pad * self._table.left_padding_widths[index]
+                right_pad = self._table._column_pad * self._table.right_padding_widths[index]
+                clmp_str = left_pad + self._clamp_string(row_item, index, delimiter) + right_pad
                 row_item_list.append(clmp_str)
             list_of_rows.append(row_item_list)
-        elif self._table._width_exceed_policy is BeautifulTable.WEP_WRAP:
+        elif self._table.width_exceed_policy is BeautifulTable.WEP_WRAP:
             # Let's wrap the row
             row_item_list = []
             for i in itertools.count():
                 line_empty = True
                 for index, row_item in enumerate(row):
-                    width = self._table._column_widths[index] - self._table._left_padding_widths[index] - self._table._right_padding_widths[index]
-                    left_pad = self._table._column_pad * self._table._left_padding_widths[index]
-                    right_pad = self._table._column_pad * self._table._right_padding_widths[index]
+                    width = self._table.column_widths[index] - self._table.left_padding_widths[index] - self._table.right_padding_widths[index]
+                    left_pad = self._table._column_pad * self._table.left_padding_widths[index]
+                    right_pad = self._table._column_pad * self._table.right_padding_widths[index]
                     clmp_str = row_item[i*width:(i+1)*width]
                     if len(clmp_str) != 0:
                         line_empty = False
@@ -180,20 +202,54 @@ class RowData(BaseRow):
                 else:
                     list_of_rows.append(row_item_list)
                     row_item_list = []
-                    
+
         if len(list_of_rows) == 0:
-            return [['']*self._table._column_count]
+            return [['']*self._table.column_count]
         else:
             return list_of_rows
-        
+
+    def _clamp_string(self, row_item: str, column_index: int, delimiter='')-> str:
+        """Clamp `row_item` to fit in column referred by column_index.
+
+        This method considers padding and appends the delimiter if `row_item`
+        needs to be truncated.
+
+        Parameters
+        ----------
+        row_item
+            String which should be clamped.
+
+        column_index
+            Index of the column `row_item` belongs to.
+
+        delimiter
+            String which is to be appended to the clamped string.
+
+        Returns
+        -------
+        str
+            The modified string which fits in it's column.
+        """
+        width = (self._table.column_widths[column_index]
+                 - self._table.left_padding_widths[column_index]
+                 - self._table.right_padding_widths[column_index])
+        if len(row_item) <= width:
+            return row_item
+        else:
+            assert width-len(delimiter) >= 0
+            clamped_string = (row_item[:width-len(delimiter)]
+                              + delimiter)
+            assert len(clamped_string) == width
+            return clamped_string
+
     def __str__(self):
         """Return a string representation of a row."""
         row = [utils.convert_to_numeric(item) for item in self._row]
         table = self._table
-        width = table._column_widths
-        align = table._column_alignments
-        sign = table._sign_mode
-        for i in range(table._column_count):
+        width = table.column_widths
+        align = table.column_alignments
+        sign = table.sign_mode
+        for i in range(table.column_count):
             try:
                 row[i] = '{:{sign}}'.format(str(row[i]), sign=sign.value)
             except ValueError:
@@ -201,7 +257,7 @@ class RowData(BaseRow):
         string = []
         list_of_rows = self._get_row_within_width(row)
         for row_ in list_of_rows:
-            for i in range(table._column_count):
+            for i in range(table.column_count):
                 row_[i] = '{:{align}{width}}'.format(
                     str(row_[i]), align=align[i].value, width=width[i])
             content = table.column_seperator_char.join(row_)
@@ -216,7 +272,7 @@ class HeaderData(RowData):
         for i in row:
             self.validate(i)
         super().__init__(table, row)
-        
+
     def __getitem__(self, key):
         return self._row[key]
 
@@ -229,7 +285,7 @@ class HeaderData(RowData):
     def validate(self, value):
         if not isinstance(value, str):
             raise TypeError("header must be of type 'str', got {}".format(type(value).__name__))
-        
+
 
 class Column:
     def __init__(self, table, column):
@@ -263,13 +319,13 @@ class BeautifulTable:
     ----------
     max_width: int, optional
         maximum width of the table in number of characters.
-        
+
     default_alignment : int, optional
         Default alignment for new columns.
 
     default_padding : int, optional
         Default width of the left and right padding for new columns.
-    
+
     Attributes
     ----------
     sign_mode
@@ -281,33 +337,33 @@ class BeautifulTable:
     column_alignments
     left_padding_widths
     right_padding_widths
-    
+
     left_border_char : str
         Character used to draw the left border.
-        
+
     right_border_char : str
         Character used to draw the right border.
-        
+
     top_border_char : str
         Character used to draw the top border.
-        
+
     bottom_border_char : str
         Character used to draw the bottom border.
-        
+
     header_seperator_char : str
         Character used to draw the line seperating Header from data.
-        
+
     row_seperator_char : str
         Character used to draw the line seperating two rows.
-        
+
     column_seperator_char : str
         Character used to draw the line seperating two columns.
-        
+
     intersection_char : str
         Character used to draw intersection of a vertical and horizontal
         line. Disabling it just draws the horizontal line char in it's place.
     """
-    
+
     WEP_WRAP = WidthExceedPolicy.WEP_WRAP
     WEP_STRIP = WidthExceedPolicy.WEP_STRIP
     WEP_ELLIPSIS = WidthExceedPolicy.WEP_ELLIPSIS
@@ -320,7 +376,7 @@ class BeautifulTable:
 
     def __init__(self, max_width=80, default_alignment=ALIGN_CENTER,
                  default_padding=1):
-        
+
         self.left_border_char = '|'
         self.right_border_char = '|'
         self.top_border_char = '-'
@@ -329,7 +385,7 @@ class BeautifulTable:
         self.column_seperator_char = '|'
         self.row_seperator_char = '-'
         self.intersection_char = '+'
-        
+
         self._sign_mode = BeautifulTable.SM_MINUS
         self._width_exceed_policy = BeautifulTable.WEP_WRAP
         self._default_alignment = default_alignment
@@ -349,24 +405,29 @@ class BeautifulTable:
         super().__setattr__(name, value)
 
 
-#****************************Properties Begin Here*****************************#
+# ****************************Properties Begin Here*****************************
+
+    @property
+    def column_count(self):
+        """Get the number of columns in the table(read only)"""
+        return self._column_count
 
     @property
     def sign_mode(self):
         """Attribute to control how signs are displayed for numerical data.
-        
+
         It can be one of the following:
 
         ========================  ==============================================
-         Option                    Meaning                                                                
+         Option                    Meaning
         ========================  ==============================================
          BeautifulTable.SM_PLUS    A sign should be used for both +ve and -ve
                                    numbers.
-                                   
+
          BeautifulTable.SM_MINUS   A sign should only be used for -ve numbers.
-         
+
          BeautifulTable.SM_SPACE   A leading space should be used for +ve
-                                   numbers and a minus sign for -ve numbers. 
+                                   numbers and a minus sign for -ve numbers.
         ========================  ==============================================
         """
         return self._sign_mode
@@ -382,20 +443,20 @@ class BeautifulTable:
     @property
     def width_exceed_policy(self):
         """Attribute to control the behaviour of table when items exceed the column width.
-        
+
         It can be one of the following:
 
         ============================  ==========================================
-         Option                        Meaning                                                                      
+         Option                        Meaning
         ============================  ==========================================
          BeautifulTable.WEP_WRAP       An item is wrapped so every line fits
                                        within it's column width.
-                                       
+
          BeautifulTable.WEP_STRIP      An item is stripped to fit in it's
                                        column.
-                                       
+
          BeautifulTable.WEP_ELLIPSIS   An item is stripped to fit in it's
-                                       column and appended with ...(Ellipsis).   
+                                       column and appended with ...(Ellipsis).
         ============================  ==========================================
         """
         return self._width_exceed_policy
@@ -411,16 +472,16 @@ class BeautifulTable:
     @property
     def default_alignment(self):
         """Attribute to control the alignment of newly created columns.
-        
+
         It can be one of the following:
 
         ============================  ==========================================
-         Option                        Meaning                                                                      
+         Option                        Meaning
         ============================  ==========================================
          BeautifulTable.ALIGN_LEFT     New columns are left aligned.
-         
+
          BeautifulTable.ALIGN_CENTER   New columns are center aligned.
-         
+
          BeautifulTable.ALIGN_RIGHT    New columns are right aligned.
         ============================  ==========================================
         """
@@ -524,7 +585,7 @@ class BeautifulTable:
         pad_width = self._validate_row(value)
         self._right_padding_widths = PositiveIntegerMetaData(self, pad_width)
 
-#*****************************Properties End Here******************************#
+# *****************************Properties End Here******************************
 
     def _initialize_table(self, column_count: int):
         """Sets the column count of the table.
@@ -543,18 +604,18 @@ class BeautifulTable:
         self._column_widths = PositiveIntegerMetaData(self, [0] * column_count)
         self._left_padding_widths = PositiveIntegerMetaData(self, [self.default_padding] * column_count)
         self._right_padding_widths = PositiveIntegerMetaData(self, [self.default_padding] * column_count)
-        
+
     def _validate_row(self, value, init_table_if_required=True):
-        #TODO: Rename this method
+        # TODO: Rename this method
         # str is also an iterable but it is not a valid row, so
         # an extra check is required for str
         if not isinstance(value, collections.Iterable) or isinstance(value, str):
             raise TypeError("parameter must be an iterable")
-        
+
         row = list(value)
         if init_table_if_required and self._column_count == 0:
             self._initialize_table(len(row))
-            
+
         if len(row) != self._column_count:
             raise ValueError("'Expected iterable of length {}, got {}".format(self._column_count, len(row)))
         return row
@@ -563,33 +624,28 @@ class BeautifulTable:
         """Calculate width of column automatically based on data."""
         table_width = self.get_table_width()
         offset = table_width - sum(self._column_widths)
-        widths= [(self._left_padding_widths[index] + self._right_padding_widths[index]) for index in range(self._column_count)]
+        widths = [(self._left_padding_widths[index] + self._right_padding_widths[index]) for index in range(self._column_count)]
         for index, column in enumerate(zip(*self._table)):
             max_length = (max(len(str(i)) for i in column))
             max_length = max(max_length, len(str(self._column_headers[index])))
-            #max_length += self._left_padding_widths[index] + self._right_padding_widths[index]
             widths[index] += max_length
-        #widths_copy = widths.copy()
-        
+
         sum_ = sum(widths)
         desired_sum = self._max_table_width - offset
 
         temp_sum = 0
-        flag = [0]*len(widths)
-        for i,width in enumerate(widths):
+        flag = [0] * len(widths)
+        for i, width in enumerate(widths):
             if width < desired_sum / self._column_count:
                 temp_sum += width
                 flag[i] = 1
 
         avail_space = desired_sum - temp_sum
         actual_space = sum_ - temp_sum
-        for i in range(len(widths)):
+        for i, _ in enumerate(widths):
             if not flag[i]:
                 widths[i] = round(widths[i] * avail_space / actual_space)
         self.column_widths = widths
-        #self.column_widths = [round(width * desired_sum / sum_) for width in widths]
-        #self.column_widths = [int(width * desired_sum / sum_) if width > int(desired_sum/self._column_count) else width for i, width in enumerate(widths)]
-        #self._column_widths = [round(width * (self._max_table_width - offset) / sum_) if width < widths_copy[i] else width for i, width in enumerate(widths)]
 
     def set_padding_widths(self, pad_width):
         """Set width for left and rigth padding of the columns of the table.
@@ -601,40 +657,6 @@ class BeautifulTable:
         """
         self.left_padding_widths = pad_width
         self.right_padding_widths = pad_width
-
-    def _clamp_string(self, row_item: str, column_index: int, delimiter='')-> str:
-        """Clamp `row_item` to fit in column referred by column_index.
-
-        This method considers padding and appends the delimiter if `row_item`
-        needs to be truncated.
-
-        Parameters
-        ----------
-        row_item
-            String which should be clamped.
-
-        column_index
-            Index of the column `row_item` belongs to.
-
-        delimiter
-            String which is to be appended to the clamped string.
-
-        Returns
-        -------
-        str
-            The modified string which fits in it's column.
-        """
-        width = (self._column_widths[column_index]
-                 - self._left_padding_widths[column_index]
-                 - self._right_padding_widths[column_index])
-        if len(row_item) <= width:
-            return row_item
-        else:
-            assert width-len(delimiter) >= 0
-            clamped_string = (row_item[:width-len(delimiter)]
-                              + delimiter)
-            assert len(clamped_string) == width
-            return clamped_string
 
     def __getitem__(self, key):
         """Get a row, or a column, or a new table by slicing.
@@ -844,6 +866,7 @@ class BeautifulTable:
             index of the row. Normal list rules apply.
         """
         row = self._table.pop(index)
+        return row
 
     def pop_column(self, index=-1):
         """Remove and return row at index (default last).
@@ -891,7 +914,7 @@ class BeautifulTable:
         ----------
         index : int
             List index rules apply
-            
+
         row : iterable
             Any iterable of appropriate length.
 
@@ -915,7 +938,7 @@ class BeautifulTable:
         ----------
         row : iterable
             Any iterable of appropriate length.
-        
+
         """
         self.insert_row(len(self._table), row)
 
@@ -942,7 +965,7 @@ class BeautifulTable:
 
         TypeError:
             If `value` is of incorrect type.
-            
+
         ValueError:
             If length of row does not matches number of columns.
         """
@@ -977,14 +1000,14 @@ class BeautifulTable:
         ------
         TypeError:
             If length of `column` is shorter than number of rows.
-            
+
         ValueError:
             If no column exists with title `header`.
         """
         index = self.get_column_index(header)
         if not isinstance(header, str):
             raise TypeError("header must be of type str")
-        for i, (row, new_item) in enumerate(zip(self._table, column)):
+        for row, new_item in zip(self._table, column):
             row[index] = new_item
 
     def insert_column(self, index, header, column):
@@ -993,7 +1016,7 @@ class BeautifulTable:
         If length of column is bigger than number of rows, lets say
         `k`, only the first `k` values of `column` is considered.
         If column is shorter than 'k', ValueError is raised.
-        
+
         Note that Table remains in consistent state even if column
         is too short. Any changes made by this method is rolled back
         before raising the exception.
@@ -1002,7 +1025,7 @@ class BeautifulTable:
         ----------
         index : int
             List index rules apply.
-            
+
         header : str
             Title of the column.
 
@@ -1013,19 +1036,21 @@ class BeautifulTable:
         ------
         TypeError:
             If `header` is not of type `str`.
-            
+
         ValueError:
             If length of `column` is shorter than number of rows.
         """
         if self._column_count == 0:
-            self.column_headers = HeaderData([header])
+            self.column_headers = HeaderData(self, [header])
             self._table = [RowData(self, [i]) for i in column]
         else:
             if not isinstance(header, str):
                 raise TypeError("header must be of type str")
+            column_length = 0
             for i, (row, new_item) in enumerate(zip(self._table, column)):
                 row._insert(index, new_item)
-            if i == len(self._table) - 1:
+                column_length = i
+            if column_length == len(self._table) - 1:
                 self._column_count += 1
                 self._column_headers._insert(index, header)
                 self._column_alignments._insert(index, self.default_alignment)
@@ -1034,10 +1059,9 @@ class BeautifulTable:
                 self._right_padding_widths._insert(index, self.default_padding)
             else:
                 # Roll back changes so that table remains in consistent state
-                for j in range(i, -1, -1):
+                for j in range(column_length, -1, -1):
                     self._table[j]._pop(index)
-                    #row.pop(index)
-                raise ValueError("length of 'column' should be atleast {}, got {}".format(len(self._table), i+1))
+                raise ValueError("length of 'column' should be atleast {}, got {}".format(len(self._table), column_length + 1))
 
     def append_column(self, header, column):
         """Append a column to end of the table.
@@ -1112,7 +1136,7 @@ class BeautifulTable:
                     for i in range(length):
                         line[index+i] = intersection[i]
                     index += len(self.column_seperator_char)
-                    
+
         return ''.join(line)
 
     def get_top_border(self):
@@ -1174,9 +1198,9 @@ class BeautifulTable:
             Width of the table as number of characters.
         """
         width = sum(self._column_widths)
-        
+
         width += ((self._column_count - 1)
-                    * len(self.column_seperator_char))
+                  * len(self.column_seperator_char))
         width += len(self.left_border_char)
         width += len(self.right_border_char)
         return width
@@ -1217,7 +1241,6 @@ class BeautifulTable:
             string_.append(
                 self.get_top_border())
 
-        #headers = self._get_row_as_str(self._column_headers)
         headers = str(self._column_headers)
         string_.append(headers)
 
@@ -1226,12 +1249,11 @@ class BeautifulTable:
                 self.get_header_seperator())
 
         first_row_encountered = False
-        for i, row in enumerate(self._table):
+        for row in self._table:
             if first_row_encountered and self.row_seperator_char:
                 string_.append(
                     self.get_row_seperator())
             first_row_encountered = True
-            #content = self._get_row_as_str(row)
             content = str(row)
             string_.append(content)
 
@@ -1297,4 +1319,3 @@ class _BufferedPrinter:
         self._buffer.append(sep.join(args) + end)
         if len(self._buffer) == self._max_buffer_size:
             self.flush()
-
