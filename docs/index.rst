@@ -7,6 +7,8 @@
 Welcome to beautifultable's documentation!
 ##########################################
 
+.. include:: badges.rst
+
 .. include:: introduction.rst
    
 .. include:: links.rst
