@@ -8,7 +8,7 @@ if sys.version_info < (3, 4):
     install_requires.append('enum34')
 
 setup(name='beautifultable',
-      version=_version,
+      version=version,
       description='Utility package to print visually appealing ASCII tables to terminal',
       install_requires=install_requires,
       long_description=open('README.rst', 'rt').read(),
@@ -16,7 +16,7 @@ setup(name='beautifultable',
       author_email='priyamsingh.22296@gmail.com',
       packages=['beautifultable'],
       url='https://github.com/pri22296/beautifultable',
-      download_url='https://github.com/pri22296/beautifultable/tarball/{}'.format(_version),
+      download_url='https://github.com/pri22296/beautifultable/tarball/{}'.format(version),
       keywords='table terminal ascii',
       license='MIT',
       classifiers=[
