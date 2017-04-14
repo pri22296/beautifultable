@@ -1,7 +1,7 @@
 """Module containing some utility methods"""
 
 
-def convert_to_numeric(item):
+def convert_to_numeric(item, precision):
     """
     Helper method to convert a string to float or int if possible.
 
@@ -11,6 +11,6 @@ def convert_to_numeric(item):
         num = float(item)
         if num.is_integer():
             return int(num)
-        return num
+        return round(num, precision)
     except (ValueError, TypeError):
         return item
