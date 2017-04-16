@@ -112,6 +112,10 @@ class BeautifulTable:
     intersection_char : str
         Character used to draw intersection of a vertical and horizontal
         line. Disabling it just draws the horizontal line char in it's place.
+
+    numeric_precision : int
+        All float values will have maximum number of digits after the decimal,
+        capped by this value(Default 3).
     """
 
     WEP_WRAP = WidthExceedPolicy.WEP_WRAP
