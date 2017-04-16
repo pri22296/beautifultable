@@ -436,7 +436,7 @@ class BeautifulTable:
         """
         if isinstance(key, slice):
             new_table = copy.copy(self)
-            # All child of BaseRow class needs to be reassigned so that
+            # Every child of BaseRow class needs to be reassigned so that
             # They contain reference of the new table rather than the old
             # This was a cause of a nasty bug once.
             new_table.column_headers = self.column_headers
