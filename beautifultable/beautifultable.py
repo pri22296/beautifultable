@@ -78,6 +78,7 @@ class BeautifulTable:
 
     Attributes
     ----------
+    column_count
     sign_mode
     width_exceed_policy
     default_alignment
@@ -1019,60 +1020,3 @@ class BeautifulTable:
                 self.get_bottom_border())
 
         return '\n'.join(string_)
-
-
-class _BufferedPrinter:
-    """Utility Class to print to terminal with a fixed buffer size.
-
-    Parameters
-    ----------
-
-    max_buffer_size
-        maximum size of the internal buffer after which buffer is
-        emptied by flushing it's content. Larger buffer size usually leads
-        to efficient printing.
-    """
-    def __init__(self, max_buffer_size: int):
-        self._max_buffer_size = max_buffer_size
-        self._buffer = []
-
-    def set_max_buffer_size(self, max_buffer_size: int):
-        """Set max buffer size.
-
-        Parameters
-        ----------
-
-        max_buffer_size
-            new size for the internal buffer.
-        """
-        self._max_buffer_size = max_buffer_size
-
-    def flush(self):
-        """flush the buffer to a stream, or to sys.stdout by default.
-
-        Note
-        ----
-        It is recommended to always call this method before exiting otherwise
-        you could lose important information.
-        """
-        print(''.join(self._buffer), end='', flush=True)
-        self._buffer = []
-
-    def print(self, *args, sep=' ', end='\n'):
-        """Prints the values to the internal buffer.
-
-        Parameters
-        ----------
-
-        *args
-            values to be printed
-
-        sep : str, optional
-            string inserted between values, default a space.
-
-        end : str, optional
-            string appended after the last value, default a newline.
-        """
-        self._buffer.append(sep.join(args) + end)
-        if len(self._buffer) == self._max_buffer_size:
-            self.flush()
