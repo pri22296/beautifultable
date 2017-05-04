@@ -652,7 +652,8 @@ class BeautifulTable:
         if self._column_count == 0:
             raise IndexError("pop from empty table")
         if self._column_count == 1:
-            # This is the last column. So we should clear the table to avoid empty rows
+            # This is the last column. So we should clear the table to avoid
+            # empty rows
             self.clear(clear_column_properties=True)
         else:
             # Not the last column. safe to pop from row
