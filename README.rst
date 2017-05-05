@@ -13,6 +13,9 @@ BeautifulTable
 .. image:: https://landscape.io/github/pri22296/beautifultable/master/landscape.svg?style=flat
    :target: https://landscape.io/github/pri22296/beautifultable/master
    :alt: Code Health
+   
+.. image:: https://travis-ci.org/pri22296/beautifultable.svg?branch=master
+    :target: https://travis-ci.org/pri22296/beautifultable
 
 .. image:: https://readthedocs.org/projects/beautifultable/badge/?version=latest
     :alt: Documentation Status

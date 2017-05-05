@@ -1,10 +1,10 @@
 from setuptools import setup
 import sys
 
-version = '0.1.3'
+version = '0.2.0'
 install_requires = []
 
-if sys.version_info < (3, 4):
+if sys.version_info[:2] < (3, 4):
     install_requires.append('enum34')
 
 setup(name='beautifultable',
@@ -25,7 +25,12 @@ setup(name='beautifultable',
           'Intended Audience :: Developers',
           'License :: OSI Approved :: MIT License',
           'Programming Language :: Python',
+          'Programming Language :: Python :: 2.7',
+          'Programming Language :: Python :: 3.2',
+          'Programming Language :: Python :: 3.3',
+          'Programming Language :: Python :: 3.4',
           'Programming Language :: Python :: 3.5',
+          'Programming Language :: Python :: 3.6',
           'Topic :: Printing',
           'Topic :: Text Processing',
       ],
