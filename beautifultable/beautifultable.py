@@ -964,16 +964,6 @@ class BeautifulTable:
         width += len(self.right_border_char)
         return width
 
-    def get_number_of_columns(self):
-        """Get the current number of columns.
-
-        Returns
-        -------
-        int:
-            Current number of columns in the Table.
-        """
-        return self._column_count
-
     def get_string(self, recalculate_width=True):
         """Get the table as a String.
 
