@@ -29,7 +29,7 @@ import copy
 import operator
 import collections
 
-from .utils import convert_to_numeric
+from .utils import convert_to_numeric, raise_suppressed
 from .rows import RowData, HeaderData
 from .meta import AlignmentMetaData, PositiveIntegerMetaData
 from .enums import WidthExceedPolicy, Alignment, SignMode
@@ -57,7 +57,7 @@ class Column:
             raise TypeError("column indices must be integers or slices, not {}".format(type(key).__name__))
 
 
-class BeautifulTable:
+class BeautifulTable(object):
     """Utility Class to print data in tabular format to terminal.
 
     The instance attributes can be used to customize the look of the
@@ -159,7 +159,7 @@ class BeautifulTable:
                     'column_seperator_char', 'row_seperator_char',
                     'intersection_char') and not isinstance(value, str):
             raise TypeError("Expected {attr} to be of type 'str', got {attr_type}".format(attr=name, attr_type=type(value).__name__))
-        super().__setattr__(name, value)
+        super(BeautifulTable, self).__setattr__(name, value)
 
 
 # ****************************Properties Begin Here*****************************
@@ -344,7 +344,7 @@ class BeautifulTable:
 
 # *****************************Properties End Here******************************
 
-    def _initialize_table(self, column_count: int):
+    def _initialize_table(self, column_count):
         """Sets the column count of the table.
 
         This method is called to set the number of columns for the first time.
@@ -582,7 +582,7 @@ class BeautifulTable:
             index = self._column_headers.index(header)
             return index
         except ValueError:
-            raise KeyError("'{}' is not a header for any column".format(header)) from None
+            raise_suppressed(KeyError("'{}' is not a header for any column".format(header)))
 
     def get_column(self, key):
         """Return an iterator to a column.

@@ -1,4 +1,4 @@
-class BaseRow():
+class BaseRow(object):
     def __init__(self, table, row):
         self._row = list(row)
         self._table = table

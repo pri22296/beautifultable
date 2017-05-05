@@ -6,11 +6,11 @@ class TableMetaData(BaseRow):
     def __init__(self, table, row):
         for i in row:
             self.validate(i)
-        super().__init__(table, row)
+        super(TableMetaData, self).__init__(table, row)
 
     def __setitem__(self, key, value):
         self.validate(value)
-        super().__setitem__(key, value)
+        super(TableMetaData, self).__setitem__(key, value)
 
     def validate(self, value):
         pass

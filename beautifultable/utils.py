@@ -14,3 +14,8 @@ def convert_to_numeric(item, precision):
         return round(num, precision)
     except (ValueError, TypeError):
         return item
+
+
+def raise_suppressed(exp):
+    exp.__cause__ = None
+    raise exp

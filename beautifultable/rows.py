@@ -54,7 +54,7 @@ class RowData(BaseRow):
         else:
             return list_of_rows
 
-    def _clamp_string(self, row_item: str, column_index: int, delimiter='')-> str:
+    def _clamp_string(self, row_item, column_index, delimiter=''):
         """Clamp `row_item` to fit in column referred by column_index.
 
         This method considers padding and appends the delimiter if `row_item`
@@ -62,13 +62,13 @@ class RowData(BaseRow):
 
         Parameters
         ----------
-        row_item
+        row_item: str
             String which should be clamped.
 
-        column_index
+        column_index: int
             Index of the column `row_item` belongs to.
 
-        delimiter
+        delimiter: str
             String which is to be appended to the clamped string.
 
         Returns
@@ -118,7 +118,7 @@ class HeaderData(RowData):
     def __init__(self, table, row):
         for i in row:
             self.validate(i)
-        super().__init__(table, row)
+        RowData.__init__(self, table, row)
 
     def __getitem__(self, key):
         return self._row[key]
