@@ -164,16 +164,6 @@ class TableOperationsTestCase(unittest.TestCase):
         self.assertTrue(["Isabella", 1, "girl"] in self.table)
         self.assertFalse(['Ethan', 3, 'boy'] in self.table)
 
-    # Test for general methods
-
-    def test_get_column_index(self):
-        index = self.table.get_column_index('rank')
-        self.assertEqual(index, 1)
-
-    def test_get_column_header(self):
-        header = self.table.get_column_header(1)
-        self.assertEqual(header, 'rank')
-
     # Test for printing operations
 
     def test_get_string(self):
@@ -191,7 +181,7 @@ class TableOperationsTestCase(unittest.TestCase):
 | Michael  |  3   |  boy   |
 +----------+------+--------+"""
         self.assertEqual(string, self.table.get_string())
-    
+
 
 if __name__ == '__main__':
     unittest.main()
