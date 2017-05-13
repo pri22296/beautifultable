@@ -7,6 +7,9 @@ BeautifulTable
 .. image:: https://badge.fury.io/py/beautifultable.svg
     :target: https://badge.fury.io/py/beautifultable
     
+.. image:: https://img.shields.io/pypi/pyversions/beautifultable.svg
+    :target: https://pypi.python.org/pypi/beautifultable/
+    
 .. image:: https://api.codacy.com/project/badge/Grade/7a76eb35ad4e450eaf00339e98381511
     :target: https://www.codacy.com/app/pri22296/beautifultable?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pri22296/beautifultable&amp;utm_campaign=Badge_Grade
 
