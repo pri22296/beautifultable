@@ -1,15 +1,26 @@
 language: python
 
 python:
-    - "2.7"
-    - "3.2"
-    - "3.3"
-    - "3.4"
-    - "3.5"
-    - "3.6"
+    - '2.7'
+    - '3.2'
+    - '3.3'
+    - '3.4'
+    - '3.5'
+    - '3.6'
 
 install:
     - python setup.py --quiet install
-    
+
 script:
     - python test.py
+
+deploy:
+  provider: pypi
+  user: pri22296
+  password:
+    secure: JKycjMBOYUsE4QkxsWYRpZkmctQeai5GG9Ia6Kyp9AMaNconlBydTkJa2m39RmJ3JTC5WnQNAGQSn2cPNlAS8fHKgjjiRk8MMQGydwBhQ5dHXTv3hwP1IfpbCDyX25iQYGtzJVzaA9CoV/+1ucJb3B15GalBPSv/+n8kcOmwrOgQMymUTOJs6qNKcpdVJv+ZLTRa1ROwTMSWmVYAy1I35DR8AWNYgGuZG7A4OwsG3dQJf8kigGxtSp3rLEVLSyFpqRdVOSPDF4W+SAlOvYcLhWr6wQk/79BJcYfZFKVVT/FAP+dCibvmHd8uxruMSTukFQfzi+Ui8DlP1Z4qoKipv2ex1mZdDv9fDs1d2bDsAyQUVikvGYPh5LUquk9PCAXVLf9BcM/Ro9s7mW/5KAGRQVz6KsHsTTeaZV/N6xTlWdCIPRk6LlnKr1+Hnra8BbsBf4jOALp1aEiRuuipDfQ9B+uSGDYe9fuIMSNUfHYSWeTR+IC4/aK4uGZBllTjBvQmVlmrUnGh4YwGNZ1uvpYs7tV6qmdRaq1z+6hTK13TMyARx3OqqhGY4GLR/ydTRrldEeYv/W2sYa+U5Sr1AVGU/TPrQZy2Y73pMgKZdXQEVba/ImIfvoG7U53PW2IIb8Bo0hE22sxJpxO5etOum8GxRGxR4dhJbX1QkYASOhbEf08=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: pri22296/beautifultable
+    condition: $TRAVIS_PYTHON_VERSION = '3.6'
