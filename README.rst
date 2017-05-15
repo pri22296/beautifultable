@@ -42,9 +42,8 @@ tabular data in a visually appealing ASCII format to a terminal.
 Features include:
 
 * Full customization of the look and feel of the Table
-* Build the Table as you wish, By adding Rows, or by columns or using
-  both method together.
-  
+* Build the Table as you wish, By adding Rows, or by columns or even
+  mixing both these approaches.  
   
 .. inclusion-marker-introduction-end
 
@@ -67,6 +66,42 @@ Links
 
 
 
+.. inclusion-marker-usage-start
+
+**************************************************************************
+Usage
+**************************************************************************
+
+Here is an example of how you can use beautifultable::
+
+    >>> from beautifultable import BeautifulTable
+    >>> table = BeautifulTable()
+    >>> table.column_headers = ["name", "rank", "gender"]
+    >>> table.append_row(["Jacob", 1, "boy"])
+    >>> table.append_row(["Isabella", 1, "girl"])
+    >>> table.append_row(["Ethan", 2, "boy"])
+    >>> table.append_row(["Sophia", 2, "girl"])
+    >>> table.append_row(["Michael", 3, "boy"])
+    >>> print(table)
+    +----------+------+--------+
+    |   name   | rank | gender |
+    +----------+------+--------+
+    |  Jacob   |  1   |  boy   |
+    +----------+------+--------+
+    | Isabella |  1   |  girl  |
+    +----------+------+--------+
+    |  Ethan   |  2   |  boy   |
+    +----------+------+--------+
+    |  Sophia  |  2   |  girl  |
+    +----------+------+--------+
+    | Michael  |  3   |  boy   |
+    +----------+------+--------+
+
+You can learn more about beautifultable at this `Tutorial <http://beautifultable.readthedocs.io/en/latest/quickstart.html>`_
+
+.. inclusion-marker-usage-end
+
+
 
 .. inclusion-marker-install-start
 
@@ -78,8 +113,20 @@ Installation
 
     pip install beautifultable
 
-
 .. inclusion-marker-install-end
+
+
+
+.. inclusion-marker-contribution-start
+
+**************************************************************************
+Contribute
+**************************************************************************
+
+If you have any suggestions or bug reports, Please create a Issue. Pull
+Requests are always welcome.
+
+.. inclusion-marker-contribution-end
 
 
 
