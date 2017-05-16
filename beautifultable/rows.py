@@ -102,15 +102,16 @@ class RowData(BaseRow):
             except ValueError:
                 row[i] = str(row[i])
         string = []
-        list_of_rows = self._get_row_within_width(row)
-        for row_ in list_of_rows:
-            for i in range(table.column_count):
-                row_[i] = '{:{align}{width}}'.format(
-                    str(row_[i]), align=align[i].value, width=width[i])
-            content = table.column_seperator_char.join(row_)
-            content = table.left_border_char + content
-            content += table.right_border_char
-            string.append(content)
+        if len(row) > 0:
+            list_of_rows = self._get_row_within_width(row)
+            for row_ in list_of_rows:
+                for i in range(table.column_count):
+                    row_[i] = '{:{align}{width}}'.format(
+                        str(row_[i]), align=align[i].value, width=width[i])
+                content = table.column_seperator_char.join(row_)
+                content = table.left_border_char + content
+                content += table.right_border_char
+                string.append(content)
         return '\n'.join(string)
 
 

@@ -654,7 +654,7 @@ class BeautifulTable(object):
         if self._column_count == 1:
             # This is the last column. So we should clear the table to avoid
             # empty rows
-            self.clear(clear_column_properties=True)
+            self.clear(clear_metadata=True)
         else:
             # Not the last column. safe to pop from row
             self._column_count -= 1
@@ -835,19 +835,19 @@ class BeautifulTable(object):
         """
         self.insert_column(self._column_count, header, column)
 
-    def clear(self, clear_column_properties=False):
+    def clear(self, clear_metadata=False):
         """Clear the contents of the table.
 
         Clear all rows of the table, and if specified clears all column specific data.
 
         Parameters
         ----------
-        clear_column_properties : bool, optional
+        clear_metadata : bool, optional
             If it is true(default False), all metadata of columns such as their alignment,
             padding, width, etc. are also cleared and number of columns is set to 0.
         """
         self._table.clear()
-        if clear_column_properties:
+        if clear_metadata:
             self._initialize_table(0)
 
     def _get_horizontal_line(self, char):
@@ -874,16 +874,22 @@ class BeautifulTable(object):
             line = list(char * (int(table_width/len(char)) + 1))[:table_width]
         except ZeroDivisionError:
             line = [' '] * table_width
-        # Only if Special Intersection is enabled and horizontal line is visible
+
+        if len(line) == 0:
+            return ''
+        # Only if Special Intersection is enabled and horizontal line is
+        # visible
         if self.intersection_char and not char.isspace():
             # If left border is enabled and it is visible
             if self.left_border_char and not self.left_border_char.isspace():
-                length = min(len(self.left_border_char), len(self.intersection_char))
+                length = min(len(self.left_border_char),
+                             len(self.intersection_char))
                 for i in range(length):
                     line[i] = intersection[i]
             # If right border is enabled and it is visible
             if self.right_border_char and not self.right_border_char.isspace():
-                length = min(len(self.right_border_char), len(self.intersection_char))
+                length = min(len(self.right_border_char),
+                             len(self.intersection_char))
                 for i in range(length):
                     line[-i-1] = intersection[-i-1]
             # If column seperator is enabled and it is visible
@@ -891,7 +897,8 @@ class BeautifulTable(object):
                 index = len(self.left_border_char)
                 for i in range(self._column_count-1):
                     index += (self._column_widths[i])
-                    length = min(len(self.column_seperator_char), len(self.intersection_char))
+                    length = min(len(self.column_seperator_char),
+                                 len(self.intersection_char))
                     for i in range(length):
                         line[index+i] = intersection[i]
                     index += len(self.column_seperator_char)
@@ -956,8 +963,9 @@ class BeautifulTable(object):
         int
             Width of the table as number of characters.
         """
+        if self.column_count == 0:
+            return 0
         width = sum(self._column_widths)
-
         width += ((self._column_count - 1)
                   * len(self.column_seperator_char))
         width += len(self.left_border_char)
@@ -983,6 +991,9 @@ class BeautifulTable(object):
 
         if recalculate_width or sum(self._column_widths) == 0:
             self.auto_calculate_width()
+
+        if len(self._table) == 0:
+            return ''
 
         string_ = []
 
