@@ -82,9 +82,11 @@ class RowData(BaseRow):
         if len(row_item) <= width:
             return row_item
         else:
-            assert width-len(delimiter) >= 0
-            clamped_string = (row_item[:width-len(delimiter)]
-                              + delimiter)
+            if width-len(delimiter) >= 0:
+                clamped_string = (row_item[:width-len(delimiter)]
+                                  + delimiter)
+            else:
+                clamped_string = delimiter[:width]
             assert len(clamped_string) == width
             return clamped_string
 
