@@ -23,7 +23,7 @@ Example
 |     4      |     16     |
 +------------+------------+
 """
-
+from __future__ import division
 import itertools
 import copy
 import operator
@@ -402,7 +402,7 @@ class BeautifulTable(object):
         actual_space = sum_ - temp_sum
         for i, _ in enumerate(widths):
             if not flag[i]:
-                widths[i] = round(widths[i] * avail_space / actual_space)
+                widths[i] = int(round(widths[i] * avail_space / actual_space))
         self.column_widths = widths
 
     def set_padding_widths(self, pad_width):
@@ -846,7 +846,8 @@ class BeautifulTable(object):
             If it is true(default False), all metadata of columns such as their alignment,
             padding, width, etc. are also cleared and number of columns is set to 0.
         """
-        self._table.clear()
+        # Cannot use clear method to support Python 2.7
+        del self._table[:]
         if clear_metadata:
             self._initialize_table(0)
 
