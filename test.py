@@ -3,7 +3,10 @@ from beautifultable import BeautifulTable
 
 class TableOperationsTestCase(unittest.TestCase):
     def setUp(self):
-        table = BeautifulTable()
+        self.create_table()
+
+    def create_table(self, max_width=80):
+        table = BeautifulTable(max_width)
         table.column_headers = ["name", "rank", "gender"]
         table.append_row(["Jacob", 1, "boy"])
         table.append_row(["Isabella", 1, "girl"])
@@ -181,6 +184,154 @@ class TableOperationsTestCase(unittest.TestCase):
 | Michael  |  3   |  boy   |
 +----------+------+--------+"""
         self.assertEqual(string, self.table.get_string())
+
+    def test_left_align(self):
+        self.table.column_alignments[0] = self.table.ALIGN_LEFT
+        string = """+----------+------+--------+
+| name     | rank | gender |
++----------+------+--------+
+| Jacob    |  1   |  boy   |
++----------+------+--------+
+| Isabella |  1   |  girl  |
++----------+------+--------+
+| Ethan    |  2   |  boy   |
++----------+------+--------+
+| Sophia   |  2   |  girl  |
++----------+------+--------+
+| Michael  |  3   |  boy   |
++----------+------+--------+"""
+        self.assertEqual(string, self.table.get_string())
+
+    def test_right_align(self):
+        self.table.column_alignments[0] = self.table.ALIGN_RIGHT
+        string = """+----------+------+--------+
+|     name | rank | gender |
++----------+------+--------+
+|    Jacob |  1   |  boy   |
++----------+------+--------+
+| Isabella |  1   |  girl  |
++----------+------+--------+
+|    Ethan |  2   |  boy   |
++----------+------+--------+
+|   Sophia |  2   |  girl  |
++----------+------+--------+
+|  Michael |  3   |  boy   |
++----------+------+--------+"""
+        self.assertEqual(string, self.table.get_string())
+
+    def test_mixed_align(self):
+        self.table.column_alignments = [self.table.ALIGN_LEFT,
+                                        self.table.ALIGN_CENTER,
+                                        self.table.ALIGN_RIGHT]
+        string = """+----------+------+--------+
+| name     | rank | gender |
++----------+------+--------+
+| Jacob    |  1   |    boy |
++----------+------+--------+
+| Isabella |  1   |   girl |
++----------+------+--------+
+| Ethan    |  2   |    boy |
++----------+------+--------+
+| Sophia   |  2   |   girl |
++----------+------+--------+
+| Michael  |  3   |    boy |
++----------+------+--------+"""
+        self.assertEqual(string, self.table.get_string())
+
+    def test_signmode_plus(self):
+        self.table.sign_mode = self.table.SM_PLUS
+        string = """+----------+------+--------+
+|   name   | rank | gender |
++----------+------+--------+
+|  Jacob   |  +1  |  boy   |
++----------+------+--------+
+| Isabella |  +1  |  girl  |
++----------+------+--------+
+|  Ethan   |  +2  |  boy   |
++----------+------+--------+
+|  Sophia  |  +2  |  girl  |
++----------+------+--------+
+| Michael  |  +3  |  boy   |
++----------+------+--------+"""
+        self.assertEqual(string, self.table.get_string())
+
+    def test_wep_wrap(self):
+        self.create_table(20)
+        self.table.width_exceed_policy = self.table.WEP_WRAP
+        string = """+-------+----+-----+
+| name  | ra | gen |
+|       | nk | der |
++-------+----+-----+
+| Jacob | 1  | boy |
++-------+----+-----+
+| Isabe | 1  | gir |
+|  lla  |    |  l  |
++-------+----+-----+
+| Ethan | 2  | boy |
++-------+----+-----+
+| Sophi | 2  | gir |
+|   a   |    |  l  |
++-------+----+-----+
+| Micha | 3  | boy |
+|  el   |    |     |
++-------+----+-----+"""
+        self.assertEqual(string, self.table.get_string())
+
+    def test_wep_strip(self):
+        self.create_table(20)
+        self.table.width_exceed_policy = self.table.WEP_STRIP
+        string = """+-------+----+-----+
+| name  | ra | gen |
++-------+----+-----+
+| Jacob | 1  | boy |
++-------+----+-----+
+| Isabe | 1  | gir |
++-------+----+-----+
+| Ethan | 2  | boy |
++-------+----+-----+
+| Sophi | 2  | gir |
++-------+----+-----+
+| Micha | 3  | boy |
++-------+----+-----+"""
+        self.assertEqual(string, self.table.get_string())
+
+    def test_wep_ellipsis(self):
+        self.create_table(20)
+        self.table.width_exceed_policy = self.table.WEP_ELLIPSIS
+        string = """+-------+----+-----+
+| name  | .. | ... |
++-------+----+-----+
+| Jacob | 1  | boy |
++-------+----+-----+
+| Is... | 1  | ... |
++-------+----+-----+
+| Ethan | 2  | boy |
++-------+----+-----+
+| So... | 2  | ... |
++-------+----+-----+
+| Mi... | 3  | boy |
++-------+----+-----+"""
+        self.assertEqual(string, self.table.get_string())
+
+    # Test on empty table
+
+    def test_empty_table_by_column(self):
+        self.create_table(20)
+        for i in range(3):
+            self.table.pop_column()
+        self.assertEqual(self.table.get_string(), '')
+
+    def test_empty_table_by_row(self):
+        self.create_table(20)
+        for i in range(5):
+            self.table.pop_row()
+        self.assertEqual(self.table.get_string(), '')
+
+    def test_table_width_zero(self):
+        self.create_table(20)
+        self.table.clear(True)
+        width = self.table.get_table_width()
+        self.assertEqual(width, 0)
 
 
 if __name__ == '__main__':
