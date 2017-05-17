@@ -100,7 +100,7 @@ class RowData(BaseRow):
         sign = table.sign_mode
         for i in range(table.column_count):
             try:
-                row[i] = '{:{sign}}'.format(str(row[i]), sign=sign.value)
+                row[i] = '{:{sign}}'.format(row[i], sign=sign.value)
             except ValueError:
                 row[i] = str(row[i])
         string = []
