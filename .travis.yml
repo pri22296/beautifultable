@@ -30,4 +30,4 @@ deploy:
   on:
     tags: true
     repo: pri22296/beautifultable
-    condition: $TRAVIS_PYTHON_VERSION = '3.6'
+    python: '3.6'
