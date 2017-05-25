@@ -348,7 +348,6 @@ class BeautifulTable(object):
         """Sets the column count of the table.
 
         This method is called to set the number of columns for the first time.
-        It should only be called when `self._column_count` is 0.
 
         Parameters
         ----------
@@ -989,26 +988,31 @@ class BeautifulTable(object):
         str:
             Table as a string.
         """
-
+        # Should widths of column be recalculated
         if recalculate_width or sum(self._column_widths) == 0:
             self.auto_calculate_width()
 
+        # Empty table. returning empty string.
         if len(self._table) == 0:
             return ''
 
         string_ = []
 
+        # Drawing the top border
         if self.top_border_char:
             string_.append(
                 self.get_top_border())
 
-        headers = str(self._column_headers)
-        string_.append(headers)
+        # Print headers if not empty or only spaces
+        if ''.join(self._column_headers).strip():
+            headers = str(self._column_headers)
+            string_.append(headers)
 
-        if self.header_seperator_char:
-            string_.append(
-                self.get_header_seperator())
+            if self.header_seperator_char:
+                string_.append(
+                    self.get_header_seperator())
 
+        # Printing rows
         first_row_encountered = False
         for row in self._table:
             if first_row_encountered and self.row_seperator_char:
@@ -1018,6 +1022,7 @@ class BeautifulTable(object):
             content = str(row)
             string_.append(content)
 
+        # Drawing the bottom border
         if self.bottom_border_char:
             string_.append(
                 self.get_bottom_border())

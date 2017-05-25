@@ -313,6 +313,21 @@ class TableOperationsTestCase(unittest.TestCase):
 +-------+----+-----+"""
         self.assertEqual(string, self.table.get_string())
 
+    def test_empty_header(self):
+        self.table.column_headers = ['', ' ', '  ']
+        string = """+----------+---+------+
+|  Jacob   | 1 | boy  |
++----------+---+------+
+| Isabella | 1 | girl |
++----------+---+------+
+|  Ethan   | 2 | boy  |
++----------+---+------+
+|  Sophia  | 2 | girl |
++----------+---+------+
+| Michael  | 3 | boy  |
++----------+---+------+"""
+        self.assertEqual(string, self.table.get_string())
+
     # Test on empty table
 
     def test_empty_table_by_column(self):
