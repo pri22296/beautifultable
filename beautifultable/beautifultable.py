@@ -423,7 +423,8 @@ class BeautifulTable(object):
         key : int, slice, str
             If key is an `int`, returns a row.
             If key is an `str`, returns iterator to a column with heading `key`.
-            If key is a slice object, returns a new table sliced according to rows.
+            If key is a slice object, returns a new table sliced according to
+            rows.
 
         Raises
         ------
@@ -488,8 +489,10 @@ class BeautifulTable(object):
         ----------
         key : int, slice, str
             If key is an `int`, updates a row.
-            If key is an `str`, appends `column` to the list with header as `key`.
-            If key is a slice object, updates multiple rows according to slice rules.
+            If key is an `str`, appends `column` to the list with header as
+            `key`.
+            If key is a slice object, updates multiple rows according to slice
+            rules.
 
         Raises
         ------
@@ -837,13 +840,15 @@ class BeautifulTable(object):
     def clear(self, clear_metadata=False):
         """Clear the contents of the table.
 
-        Clear all rows of the table, and if specified clears all column specific data.
+        Clear all rows of the table, and if specified clears all column specific
+        data.
 
         Parameters
         ----------
         clear_metadata : bool, optional
-            If it is true(default False), all metadata of columns such as their alignment,
-            padding, width, etc. are also cleared and number of columns is set to 0.
+            If it is true(default False), all metadata of columns such as their
+            alignment, padding, width, etc. are also cleared and number of
+            columns is set to 0.
         """
         # Cannot use clear method to support Python 2.7
         del self._table[:]

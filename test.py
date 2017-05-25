@@ -89,6 +89,12 @@ class TableOperationsTestCase(unittest.TestCase):
         with self.assertRaises(IndexError):
             self.table[len(self.table)]
 
+    def test_access_row_element_by_index(self):
+        self.assertEqual(self.table[2][0], 'Ethan')
+
+    def test_access_row_element_by_header(self):
+        self.assertEqual(self.table[2]['name'], 'Ethan')
+
     def test_append_row(self):
         row = ['Gary', 2, 'boy']
         self.table.append_row(row)
