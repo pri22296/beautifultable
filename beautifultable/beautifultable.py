@@ -117,6 +117,10 @@ class BeautifulTable(object):
     numeric_precision : int
         All float values will have maximum number of digits after the decimal,
         capped by this value(Default 3).
+
+    serialno : bool
+        Whether automatically generated serial number should be printed for
+        each row(Default False).
     """
 
     WEP_WRAP = WidthExceedPolicy.WEP_WRAP
@@ -142,6 +146,7 @@ class BeautifulTable(object):
         self.intersection_char = '+'
 
         self.numeric_precision = 3
+        self.serialno = False
 
         self._sign_mode = BeautifulTable.SM_MINUS
         self._width_exceed_policy = BeautifulTable.WEP_WRAP
@@ -993,13 +998,16 @@ class BeautifulTable(object):
         str:
             Table as a string.
         """
-        # Should widths of column be recalculated
-        if recalculate_width or sum(self._column_widths) == 0:
-            self.auto_calculate_width()
-
         # Empty table. returning empty string.
         if len(self._table) == 0:
             return ''
+
+        if self.serialno and self.column_count > 0:
+            self.insert_column(0, 'SN', range(1, len(self) + 1))
+
+        # Should widths of column be recalculated
+        if recalculate_width or sum(self._column_widths) == 0:
+            self.auto_calculate_width()
 
         string_ = []
 
@@ -1031,5 +1039,8 @@ class BeautifulTable(object):
         if self.bottom_border_char:
             string_.append(
                 self.get_bottom_border())
+
+        if self.serialno and self.column_count > 0:
+            self.pop_column(0)
 
         return '\n'.join(string_)

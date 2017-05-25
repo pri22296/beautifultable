@@ -334,6 +334,23 @@ class TableOperationsTestCase(unittest.TestCase):
 +----------+---+------+"""
         self.assertEqual(string, self.table.get_string())
 
+    def test_serialno(self):
+        self.table.serialno = True
+        string = """+----+----------+------+--------+
+| SN |   name   | rank | gender |
++----+----------+------+--------+
+| 1  |  Jacob   |  1   |  boy   |
++----+----------+------+--------+
+| 2  | Isabella |  1   |  girl  |
++----+----------+------+--------+
+| 3  |  Ethan   |  2   |  boy   |
++----+----------+------+--------+
+| 4  |  Sophia  |  2   |  girl  |
++----+----------+------+--------+
+| 5  | Michael  |  3   |  boy   |
++----+----------+------+--------+"""
+        self.assertEqual(string, self.table.get_string())
+
     # Test on empty table
 
     def test_empty_table_by_column(self):
