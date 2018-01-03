@@ -2,15 +2,12 @@ from setuptools import setup
 import sys
 
 version = '0.3.0'
-install_requires = []
-
-if sys.version_info[:2] < (3, 4):
-    install_requires.append('enum34')
+extras_require = {':python_version<"3.4"': ['enum34']}
 
 setup(name='beautifultable',
       version=version,
       description='Utility package to print visually appealing ASCII tables to terminal',
-      install_requires=install_requires,
+      extras_require=extras_require,
       long_description=open('README.rst', 'rt').read(),
       author='Priyam Singh',
       author_email='priyamsingh.22296@gmail.com',
