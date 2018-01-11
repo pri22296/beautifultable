@@ -536,13 +536,15 @@ class BeautifulTable(object):
     def __str__(self):
         return self.get_string()
 
-    def sort(self, key):
+    def sort(self, key, reverse=False):
         """Stable sort of the table *IN-PLACE* with respect to a column.
 
         Parameters
         ----------
-        index:
-            index of the column. Normal list rules apply.
+        key: int, str
+            index or header of the column. Normal list rules apply.
+        reverse : bool
+            If `True` then table is sorted as if each comparison was reversed.
         """
         if isinstance(key, int):
             index = key
@@ -550,7 +552,7 @@ class BeautifulTable(object):
             index = self.get_column_index(key)
         else:
             raise TypeError("'key' must either be 'int' or 'str'")
-        self._table.sort(key=operator.itemgetter(index))
+        self._table.sort(key=operator.itemgetter(index), reverse=reverse)
 
     def copy(self):
         """Return a shallow copy of the table.
