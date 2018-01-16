@@ -32,7 +32,7 @@ import collections
 from .utils import convert_to_numeric, raise_suppressed
 from .rows import RowData, HeaderData
 from .meta import AlignmentMetaData, PositiveIntegerMetaData
-from .enums import WidthExceedPolicy, Alignment, SignMode
+from .enums import WidthExceedPolicy, Alignment, SignMode, Style
 
 __all__ = ['BeautifulTable']
 
@@ -132,18 +132,18 @@ class BeautifulTable(object):
     ALIGN_LEFT = Alignment.ALIGN_LEFT
     ALIGN_CENTER = Alignment.ALIGN_CENTER
     ALIGN_RIGHT = Alignment.ALIGN_RIGHT
+    STYLE_DEFAULT = Style.STYLE_DEFAULT
+    STYLE_DOTTED = Style.STYLE_DOTTED
+    STYLE_SEPERATED = Style.STYLE_SEPERATED
+    STYLE_COMPACT = Style.STYLE_COMPACT
+    STYLE_MYSQL = Style.STYLE_MYSQL
+    STYLE_MARKDOWN = Style.STYLE_MARKDOWN
+    STYLE_RESTRUCTURED_TEXT = Style.STYLE_RESTRUCTURED_TEXT
 
     def __init__(self, max_width=80, default_alignment=ALIGN_CENTER,
                  default_padding=1):
 
-        self.left_border_char = '|'
-        self.right_border_char = '|'
-        self.top_border_char = '-'
-        self.bottom_border_char = '-'
-        self.header_seperator_char = '-'
-        self.column_seperator_char = '|'
-        self.row_seperator_char = '-'
-        self.intersection_char = '+'
+        self.set_style(BeautifulTable.STYLE_DEFAULT)
 
         self.numeric_precision = 3
         self.serialno = False
@@ -381,45 +381,6 @@ class BeautifulTable(object):
             raise ValueError("'Expected iterable of length {}, got {}".format(self._column_count, len(row)))
         return row
 
-    def auto_calculate_width(self):
-        """Calculate width of column automatically based on data."""
-        table_width = self.get_table_width()
-        offset = table_width - sum(self._column_widths)
-        widths = [(self._left_padding_widths[index] + self._right_padding_widths[index]) for index in range(self._column_count)]
-        for index, column in enumerate(zip(*self._table)):
-            max_length = (max(len(str(convert_to_numeric(i, self.numeric_precision)))
-                          for i in column))
-            max_length = max(max_length, len(str(self._column_headers[index])))
-            widths[index] += max_length
-
-        sum_ = sum(widths)
-        desired_sum = self._max_table_width - offset
-
-        temp_sum = 0
-        flag = [0] * len(widths)
-        for i, width in enumerate(widths):
-            if width < desired_sum / self._column_count:
-                temp_sum += width
-                flag[i] = 1
-
-        avail_space = desired_sum - temp_sum
-        actual_space = sum_ - temp_sum
-        for i, _ in enumerate(widths):
-            if not flag[i]:
-                widths[i] = int(round(widths[i] * avail_space / actual_space))
-        self.column_widths = widths
-
-    def set_padding_widths(self, pad_width):
-        """Set width for left and rigth padding of the columns of the table.
-
-        Parameters
-        ----------
-        pad_width : array_like
-            pad widths for the columns.
-        """
-        self.left_padding_widths = pad_width
-        self.right_padding_widths = pad_width
-
     def __getitem__(self, key):
         """Get a row, or a column, or a new table by slicing.
 
@@ -535,6 +496,76 @@ class BeautifulTable(object):
 
     def __str__(self):
         return self.get_string()
+
+    def set_style(self, style):
+        """Set the style of the table from a predefined set of styles.
+
+        Parameters
+        ----------
+        style: Style
+
+        It can be one of the following:
+
+        * BeautifulTable.STYLE_DEFAULT
+        * BeautifulTable.STYLE_DOTTED
+        * BeautifulTable.STYLE_MYSQL
+        * BeautifulTable.STYLE_SEPERATED
+        * BeautifulTable.STYLE_COMPACT
+        * BeautifulTable.STYLE_MARKDOWN
+        * BeautifulTable.STYLE_RESTRUCTURED_TEXT
+        """
+        if not isinstance(style, Style):
+            error_msg = ("allowed values for style are: "
+                         + ', '.join("{}.{}".format(type(self).__name__, i.name) for i in Style))
+            raise ValueError(error_msg)
+        style_template = style.value
+        self.left_border_char = style_template.left_border_char
+        self.right_border_char = style_template.right_border_char
+        self.top_border_char = style_template.top_border_char
+        self.bottom_border_char = style_template.bottom_border_char
+        self.header_seperator_char = style_template.header_seperator_char
+        self.column_seperator_char = style_template.column_seperator_char
+        self.row_seperator_char = style_template.row_seperator_char
+        self.intersection_char = style_template.intersection_char
+
+    def auto_calculate_width(self):
+        """Calculate width of column automatically based on data."""
+        table_width = self.get_table_width()
+        offset = table_width - sum(self._column_widths)
+        widths = [(self._left_padding_widths[index] + self._right_padding_widths[index]) for index in range(self._column_count)]
+        for index, column in enumerate(zip(*self._table)):
+            max_length = (max(len(str(convert_to_numeric(i, self.numeric_precision)))
+                          for i in column))
+            max_length = max(max_length, len(str(self._column_headers[index])))
+            widths[index] += max_length
+
+        sum_ = sum(widths)
+        desired_sum = self._max_table_width - offset
+
+        temp_sum = 0
+        flag = [0] * len(widths)
+        for i, width in enumerate(widths):
+            if width < desired_sum / self._column_count:
+                temp_sum += width
+                flag[i] = 1
+
+        avail_space = desired_sum - temp_sum
+        actual_space = sum_ - temp_sum
+        for i, _ in enumerate(widths):
+            if not flag[i]:
+                widths[i] = int(round(widths[i] * avail_space / actual_space))
+        self.column_widths = widths
+
+    def set_padding_widths(self, pad_width):
+        """Set width for left and rigth padding of the columns of the table.
+
+        Parameters
+        ----------
+        pad_width : array_like
+            pad widths for the columns.
+        """
+        self.left_padding_widths = pad_width
+        self.right_padding_widths = pad_width
 
     def sort(self, key, reverse=False):
         """Stable sort of the table *IN-PLACE* with respect to a column.
@@ -893,27 +924,30 @@ class BeautifulTable(object):
         # visible
         if self.intersection_char and not char.isspace():
             # If left border is enabled and it is visible
-            if self.left_border_char and not self.left_border_char.isspace():
-                length = min(len(self.left_border_char),
-                             len(self.intersection_char))
-                for i in range(length):
-                    line[i] = intersection[i]
-            # If right border is enabled and it is visible
-            if self.right_border_char and not self.right_border_char.isspace():
-                length = min(len(self.right_border_char),
-                             len(self.intersection_char))
-                for i in range(length):
-                    line[-i-1] = intersection[-i-1]
-            # If column seperator is enabled and it is visible
-            if self.column_seperator_char and not self.column_seperator_char.isspace():
-                index = len(self.left_border_char)
-                for i in range(self._column_count-1):
-                    index += (self._column_widths[i])
-                    length = min(len(self.column_seperator_char),
+            if self.left_border_char:
+                if not self.left_border_char.isspace() or self.intersection_char.isspace():
+                    length = min(len(self.left_border_char),
                                  len(self.intersection_char))
                     for i in range(length):
-                        line[index+i] = intersection[i]
-                    index += len(self.column_seperator_char)
+                        line[i] = intersection[i]
+            # If right border is enabled and it is visible
+            if self.right_border_char:
+                if not self.right_border_char.isspace() or self.intersection_char.isspace():
+                    length = min(len(self.right_border_char),
+                                 len(self.intersection_char))
+                    for i in range(length):
+                        line[-i-1] = intersection[-i-1]
+            # If column seperator is enabled and it is visible
+            if self.column_seperator_char:
+                if not self.column_seperator_char.isspace() or self.intersection_char.isspace():
+                    index = len(self.left_border_char)
+                    for i in range(self._column_count-1):
+                        index += (self._column_widths[i])
+                        length = min(len(self.column_seperator_char),
+                                     len(self.intersection_char))
+                        for i in range(length):
+                            line[index+i] = intersection[i]
+                        index += len(self.column_seperator_char)
 
         return ''.join(line)
 
