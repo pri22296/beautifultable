@@ -504,15 +504,15 @@ class BeautifulTable(object):
         ----------
         style: Style
 
-        It can be one of the following:
+            It can be one of the following:
 
-        * BeautifulTable.STYLE_DEFAULT
-        * BeautifulTable.STYLE_DOTTED
-        * BeautifulTable.STYLE_MYSQL
-        * BeautifulTable.STYLE_SEPERATED
-        * BeautifulTable.STYLE_COMPACT
-        * BeautifulTable.STYLE_MARKDOWN
-        * BeautifulTable.STYLE_RESTRUCTURED_TEXT
+            * BeautifulTable.STYLE_DEFAULT
+            * BeautifulTable.STYLE_DOTTED
+            * BeautifulTable.STYLE_MYSQL
+            * BeautifulTable.STYLE_SEPERATED
+            * BeautifulTable.STYLE_COMPACT
+            * BeautifulTable.STYLE_MARKDOWN
+            * BeautifulTable.STYLE_RESTRUCTURED_TEXT
         """
         if not isinstance(style, Style):
             error_msg = ("allowed values for style are: "
