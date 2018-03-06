@@ -68,7 +68,10 @@ class BeautifulTable(object):
     Parameters
     ----------
     max_width: int, optional
-        maximum width of the table in number of characters.
+        maximum width of the table in number of characters. this is ignored
+        when manually setting the width of the columns. if this value is too
+        low with respect to the number of columns and width of padding, the
+        resulting table may override it.
 
     default_alignment : int, optional
         Default alignment for new columns.
@@ -532,7 +535,9 @@ class BeautifulTable(object):
         """Calculate width of column automatically based on data."""
         table_width = self.get_table_width()
         offset = table_width - sum(self._column_widths)
+
         widths = [(self._left_padding_widths[index] + self._right_padding_widths[index]) for index in range(self._column_count)]
+        self._max_table_width = max(self._max_table_width, offset + sum(widths) + self._column_count)
         for index, column in enumerate(zip(*self._table)):
             max_length = (max(len(str(convert_to_numeric(i, self.numeric_precision)))
                           for i in column))
