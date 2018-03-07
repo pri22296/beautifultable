@@ -3,9 +3,9 @@ class DefaultStyle(object):
     right_border_char = '|'
     top_border_char = '-'
     bottom_border_char = '-'
-    header_seperator_char = '-'
-    column_seperator_char = '|'
-    row_seperator_char = '-'
+    header_separator_char = '-'
+    column_separator_char = '|'
+    row_separator_char = '-'
     intersection_char = '+'
 
 
@@ -15,7 +15,7 @@ class MySQLStyle(DefaultStyle):
 
 class SeperatedStyle(DefaultStyle):
     top_border_char = '='
-    header_seperator_char = '='
+    header_separator_char = '='
 
 
 class CompactStyle(DefaultStyle):
@@ -23,9 +23,9 @@ class CompactStyle(DefaultStyle):
     right_border_char = ''
     top_border_char = ''
     bottom_border_char = ''
-    header_seperator_char = '-'
-    column_seperator_char = ' '
-    row_seperator_char = ''
+    header_separator_char = '-'
+    column_separator_char = ' '
+    row_separator_char = ''
     intersection_char = ' '
 
 
@@ -34,20 +34,20 @@ class DottedStyle(object):
     right_border_char = ':'
     top_border_char = '.'
     bottom_border_char = '.'
-    header_seperator_char = '.'
-    column_seperator_char = ':'
-    row_seperator_char = ''
+    header_separator_char = '.'
+    column_separator_char = ':'
+    row_separator_char = ''
     intersection_char = ''
 
 
 class MarkdownStyle(DefaultStyle):
     top_border_char = ''
     bottom_border_char = ''
-    row_seperator_char = ''
+    row_separator_char = ''
     intersection_char = '|'
 
 
 class RestructuredTextStyle(CompactStyle):
     top_border_char = '='
     bottom_border_char = '='
-    header_seperator_char = '='
+    header_separator_char = '='
