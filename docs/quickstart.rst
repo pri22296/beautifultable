@@ -192,10 +192,10 @@ You can read the API Reference for more details.
    >>> table.right_border_char = 'o'
    >>> table.top_border_char = '<~>'
    >>> table.bottom_border_char = '='
-   >>> table.header_seperator_char = '^'
-   >>> table.row_seperator_char = ''
+   >>> table.header_separator_char = '^'
+   >>> table.row_separator_char = ''
    >>> table.intersection_char = ''
-   >>> table.column_seperator_char = ':'
+   >>> table.column_separator_char = ':'
    >>> print(table)
    <~><~><~><~><~><~><~><~><~><~><~><~
    o name     : rank : gender : year o
