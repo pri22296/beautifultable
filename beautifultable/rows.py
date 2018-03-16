@@ -101,7 +101,7 @@ class RowData(BaseRow):
         for i in range(table.column_count):
             try:
                 row[i] = '{:{sign}}'.format(row[i], sign=sign.value)
-            except ValueError:
+            except (ValueError, TypeError):
                 row[i] = str(row[i])
         string = []
         if len(row) > 0:
