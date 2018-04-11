@@ -92,15 +92,19 @@ class RowData(BaseRow):
 
     def __str__(self):
         """Return a string representation of a row."""
-        row = [convert_to_numeric(item, self._table.numeric_precision)
-               for item in self._row]
+        if self._table.detect_numerics:
+            row = [convert_to_numeric(str(item), self._table.numeric_precision)
+                   for item in self._row]
+        else:
+            row = self._row
         table = self._table
         width = table.column_widths
         align = table.column_alignments
         sign = table.sign_mode
         for i in range(table.column_count):
             try:
-                row[i] = '{:{sign}}'.format(row[i], sign=sign.value)
+                row[i] = '{:{sign}}'.format(round(row[i], self._table.numeric_precision),
+                                            sign=sign.value)
             except (ValueError, TypeError):
                 row[i] = str(row[i])
         string = []
