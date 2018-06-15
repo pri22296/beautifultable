@@ -1,5 +1,5 @@
 import itertools
-from .utils import convert_to_numeric
+from .utils import get_output_str
 from .base import BaseRow
 from .enums import WidthExceedPolicy
 
@@ -92,21 +92,14 @@ class RowData(BaseRow):
 
     def __str__(self):
         """Return a string representation of a row."""
-        if self._table.detect_numerics:
-            row = [convert_to_numeric(str(item), self._table.numeric_precision)
-                   for item in self._row]
-        else:
-            row = self._row
+        row = [i for i in self._row]
         table = self._table
         width = table.column_widths
         align = table.column_alignments
         sign = table.sign_mode
-        for i in range(table.column_count):
-            try:
-                row[i] = '{:{sign}}'.format(round(row[i], self._table.numeric_precision),
-                                            sign=sign.value)
-            except (ValueError, TypeError):
-                row[i] = str(row[i])
+        for i, item in enumerate(self._row):
+            row[i] = get_output_str(item, table.detect_numerics,
+                                    table.numeric_precision, sign.value)
         string = []
         if len(row) > 0:
             list_of_rows = self._get_row_within_width(row)

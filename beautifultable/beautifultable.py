@@ -30,7 +30,7 @@ import operator
 import collections
 import warnings
 
-from .utils import convert_to_numeric, raise_suppressed
+from .utils import get_output_str, raise_suppressed
 from .rows import RowData, HeaderData
 from .meta import AlignmentMetaData, PositiveIntegerMetaData
 from .enums import WidthExceedPolicy, Alignment, SignMode, Style
@@ -595,11 +595,9 @@ class BeautifulTable(object):
         widths = [(self._left_padding_widths[index] + self._right_padding_widths[index]) for index in range(self._column_count)]
         self._max_table_width = max(self._max_table_width, offset + sum(widths) + self._column_count)
         for index, column in enumerate(zip(*self._table)):
-            if self.detect_numerics:
-                max_length = (max(len(str(convert_to_numeric(i, self.numeric_precision)))
-                              for i in column))
-            else:
-                max_length = max(len(str(i)) for i in column)
+            max_length = max(len(get_output_str(i, self.detect_numerics,
+                                                self.numeric_precision,
+                                                self.sign_mode.value)) for i in column)
             max_length = max(max_length, len(str(self._column_headers[index])))
             widths[index] += max_length
 
