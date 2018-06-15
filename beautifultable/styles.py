@@ -9,6 +9,17 @@ class DefaultStyle(object):
     intersection_char = '+'
 
 
+class NoStyle(object):
+    left_border_char = ''
+    right_border_char = ''
+    top_border_char = ''
+    bottom_border_char = ''
+    header_separator_char = ''
+    column_separator_char = ''
+    row_separator_char = ''
+    intersection_char = ''
+
+
 class MySQLStyle(DefaultStyle):
     pass
 

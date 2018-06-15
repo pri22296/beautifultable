@@ -30,6 +30,7 @@ class Alignment(enum.Enum):
 
 class Style(enum.Enum):
     STYLE_DEFAULT = DefaultStyle
+    STYLE_NONE = NoStyle
     STYLE_DOTTED = DottedStyle
     STYLE_MYSQL = MySQLStyle
     STYLE_SEPERATED = SeperatedStyle
