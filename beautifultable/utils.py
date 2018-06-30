@@ -1,5 +1,8 @@
 """Module containing some utility methods"""
 
+import sys
+PY3 = sys.version_info[0] == 3
+
 
 def _convert_to_numeric(item):
     """
@@ -7,11 +10,22 @@ def _convert_to_numeric(item):
 
     If the conversion is not possible, it simply returns the string.
     """
+    if PY3:
+        num_types = (int, float)
+    else:
+        num_types = (int, long, float)
+    # We don't wan't to perform any conversions if item is already a number
+    if isinstance(item , num_types):
+        return item
+
+    # First try for an int conversion so that strings like "5" are converted
+    # to 5 instead of 5.0 . This is safe as a direct int cast for a non integer
+    # string raises a ValueError.
     try:
-        num = int(item)
+        num = int(str(item))
     except ValueError:
         try:
-            num = float(item)
+            num = float(str(item))
         except ValueError:
             return item
         else:
