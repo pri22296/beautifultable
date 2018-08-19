@@ -27,8 +27,14 @@ from __future__ import division
 import itertools
 import copy
 import operator
-import collections
 import warnings
+
+try:
+    # Python 3
+    from collections.abc import Iterable
+except ImportError:
+    # Python 2.7
+    from collections import Iterable
 
 from .utils import get_output_str, raise_suppressed
 from .rows import RowData, HeaderData
@@ -430,7 +436,7 @@ class BeautifulTable(object):
         # TODO: Rename this method
         # str is also an iterable but it is not a valid row, so
         # an extra check is required for str
-        if not isinstance(value, collections.Iterable) or isinstance(value, str):
+        if not isinstance(value, Iterable) or isinstance(value, str):
             raise TypeError("parameter must be an iterable")
 
         row = list(value)
@@ -540,7 +546,7 @@ class BeautifulTable(object):
     def __contains__(self, key):
         if isinstance(key, str):
             return key in self._column_headers
-        elif isinstance(key, collections.Iterable):
+        elif isinstance(key, Iterable):
             return key in self._table
         else:
             raise TypeError("'key' must be str or Iterable, not {}".format(type(key).__name__))
