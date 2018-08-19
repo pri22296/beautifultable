@@ -117,6 +117,87 @@ Installation
 
 
 
+.. inclusion-marker-changelog-start
+
+**************************************************************************
+Changelog
+**************************************************************************
+
+==========
+Unreleased
+==========
+
+==========
+0.5.2
+==========
+
+* Added new style `STYLE_NONE`
+* Fixed issue regarding improper conversion of non-string floats
+
+==========
+0.5.1
+==========
+
+* Added `detect_numerics` boolean for toggling automatic numeric conversion
+
+==========
+0.5.0
+==========
+
+* Added new property `serialno_header`
+* Deprecated methods with misspelled `seperator` in their name.
+  Legacy methods will be removed in 0.7.0
+* Fixed an issue where table was corrupted when column_count was too high
+
+
+==========
+0.4.0
+==========
+
+* Added predefined styles for easier customization
+* Added `reverse` argument to `sort` method
+* Fixed `enum34` dependency for python versions prior to 3.4
+
+==========
+0.3.0
+==========
+
+* Added property `serialno` for auto printing serial number
+* Fixed an issue with `sign_mode` related to str conversion
+* Fixed bugs related to python version prior to 3.3
+* Fixed exception on WEP_ELLIPSIS and token length less than 3
+* Fixed printing issues with empty table
+
+==========
+0.2.0
+==========
+
+* Added python 2 support
+
+==========
+0.1.3
+==========
+
+* Bug fixes
+
+==========
+0.1.2
+==========
+
+* Added new property `default_padding`
+* Added new method `update_row`
+* Fixed an issue in `auto_calculate_width`
+
+==========
+0.1.1
+==========
+
+* Initial release on PyPI
+
+
+.. inclusion-marker-changelog-end
+
+
 .. inclusion-marker-contribution-start
 
 **************************************************************************
