@@ -36,7 +36,7 @@ except ImportError:
     # Python 2.7
     from collections import Iterable
 
-from .utils import get_output_str, raise_suppressed
+from .utils import get_output_str, raise_suppressed, ansilen
 from .rows import RowData, HeaderData
 from .meta import AlignmentMetaData, PositiveIntegerMetaData
 from .enums import WidthExceedPolicy, Alignment, SignMode, Style
@@ -602,10 +602,10 @@ class BeautifulTable(object):
         widths = [(self._left_padding_widths[index] + self._right_padding_widths[index]) for index in range(self._column_count)]
         self._max_table_width = max(self._max_table_width, offset + sum(widths) + self._column_count)
         for index, column in enumerate(zip(*self._table)):
-            max_length = max(len(get_output_str(i, self.detect_numerics,
-                                                self.numeric_precision,
-                                                self.sign_mode.value)) for i in column)
-            max_length = max(max_length, len(str(self._column_headers[index])))
+            max_length = max(ansilen(get_output_str(i, self.detect_numerics,
+                                                    self.numeric_precision,
+                                                    self.sign_mode.value)) for i in column)
+            max_length = max(max_length, ansilen(str(self._column_headers[index])))
             widths[index] += max_length
 
         sum_ = sum(widths)
@@ -983,7 +983,7 @@ class BeautifulTable(object):
         table_width = self.get_table_width()
         intersection = self.intersection_char
         try:
-            line = list(char * (int(table_width/len(char)) + 1))[:table_width]
+            line = list(char * (int(table_width/ansilen(char)) + 1))[:table_width]
         except ZeroDivisionError:
             line = [' '] * table_width
 
@@ -991,32 +991,32 @@ class BeautifulTable(object):
             return ''
         # Only if Special Intersection is enabled and horizontal line is
         # visible
-        if self.intersection_char and not char.isspace():
+        if ansilen(self.intersection_char) > 0 and not char.isspace():
             # If left border is enabled and it is visible
-            if self.left_border_char:
+            if ansilen(self.left_border_char) > 0:
                 if not self.left_border_char.isspace() or self.intersection_char.isspace():
-                    length = min(len(self.left_border_char),
-                                 len(self.intersection_char))
+                    length = min(ansilen(self.left_border_char),
+                                 ansilen(self.intersection_char))
                     for i in range(length):
                         line[i] = intersection[i]
             # If right border is enabled and it is visible
-            if self.right_border_char:
+            if ansilen(self.right_border_char) > 0:
                 if not self.right_border_char.isspace() or self.intersection_char.isspace():
-                    length = min(len(self.right_border_char),
-                                 len(self.intersection_char))
+                    length = min(ansilen(self.right_border_char),
+                                 ansilen(self.intersection_char))
                     for i in range(length):
                         line[-i-1] = intersection[-i-1]
             # If column separator is enabled and it is visible
-            if self.column_separator_char:
+            if ansilen(self.column_separator_char):
                 if not self.column_separator_char.isspace() or self.intersection_char.isspace():
-                    index = len(self.left_border_char)
+                    index = ansilen(self.left_border_char)
                     for i in range(self._column_count-1):
                         index += (self._column_widths[i])
-                        length = min(len(self.column_separator_char),
-                                     len(self.intersection_char))
+                        length = min(ansilen(self.column_separator_char),
+                                     ansilen(self.intersection_char))
                         for i in range(length):
                             line[index+i] = intersection[i]
-                        index += len(self.column_separator_char)
+                        index += ansilen(self.column_separator_char)
 
         return ''.join(line)
 
@@ -1100,9 +1100,9 @@ class BeautifulTable(object):
             return 0
         width = sum(self._column_widths)
         width += ((self._column_count - 1)
-                  * len(self.column_separator_char))
-        width += len(self.left_border_char)
-        width += len(self.right_border_char)
+                  * ansilen(self.column_separator_char))
+        width += ansilen(self.left_border_char)
+        width += ansilen(self.right_border_char)
         return width
 
     def get_string(self, recalculate_width=True):

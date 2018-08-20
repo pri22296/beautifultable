@@ -1,7 +1,11 @@
 """Module containing some utility methods"""
 
+import re
 import sys
+
+
 PY3 = sys.version_info[0] == 3
+ANSI_REGEX = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
 
 
 def _convert_to_numeric(item):
@@ -37,8 +41,7 @@ def _convert_to_numeric(item):
 
 
 def get_output_str(item, detect_numerics, precision, sign_value):
-    """Returns the final string which should be displayed
-    """
+    """Returns the final string which should be displayed"""
     if detect_numerics:
         item = _convert_to_numeric(item)
     if isinstance(item, float):
@@ -48,6 +51,11 @@ def get_output_str(item, detect_numerics, precision, sign_value):
     except (ValueError, TypeError):
         pass
     return str(item)
+
+
+def ansilen(item):
+    """Returns the length of the string after stripping ansi escape sequences"""
+    return len(ANSI_REGEX.sub('', item))
 
 
 def raise_suppressed(exp):
