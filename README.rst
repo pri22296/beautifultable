@@ -127,8 +127,12 @@ Changelog
 Unreleased
 ==========
 
-* Added support for handing color codes using ANSI escape sequences
+==========
+0.5.3
+==========
+
 * Fixed collections ABCs deprecation warning
+* Added support for handing color codes using ANSI escape sequences(experimental)
 
 ==========
 0.5.2
