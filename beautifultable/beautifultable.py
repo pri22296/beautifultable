@@ -622,7 +622,8 @@ class BeautifulTable(object):
         actual_space = sum_ - temp_sum
         for i, _ in enumerate(widths):
             if not flag[i]:
-                widths[i] = int(round(widths[i] * avail_space / actual_space))
+                new_width = int(round(widths[i] * avail_space / actual_space))
+                widths[i] = min(widths[i], new_width)
         self.column_widths = widths
 
     def set_padding_widths(self, pad_width):

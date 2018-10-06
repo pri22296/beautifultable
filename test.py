@@ -371,6 +371,18 @@ class TableOperationsTestCase(unittest.TestCase):
         width = self.table.get_table_width()
         self.assertEqual(width, 0)
 
+    def test_table_auto_width(self):
+        row_list = ['abcdefghijklmopqrstuvwxyz', 1234, 'none']
+
+        self.create_table(200)
+        self.table.append_row(row_list)
+        len_for_max_width_200 = len(str(self.table))
+
+        self.create_table(80)
+        self.table.append_row(row_list)
+        len_for_max_width_80 = len(str(self.table))
+
+        self.assertEqual(len_for_max_width_80, len_for_max_width_200)
 
 if __name__ == '__main__':
     unittest.main()
