@@ -1,12 +1,17 @@
 """Module containing some utility methods"""
 
-import re
 import sys
-
+from unicodedata import east_asian_width
 
 PY3 = sys.version_info[0] == 3
-ANSI_REGEX = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
-
+EAST_ASIAN_WIDTH_DICT = {
+    'F': 2,  # Full-width
+    'H': 1,  # Half-width
+    'W': 2,  # Wide
+    'Na': 1,  # Narrow
+    'A': 2,  # Ambiguous
+    'N': 1  # Neutral
+}
 
 def _convert_to_numeric(item):
     """
@@ -55,7 +60,9 @@ def get_output_str(item, detect_numerics, precision, sign_value):
 
 def ansilen(item):
     """Returns the length of the string after stripping ansi escape sequences"""
-    return len(ANSI_REGEX.sub('', item))
+    east_asian_width_list = [east_asian_width(char) for char in item]
+    width_list = [EAST_ASIAN_WIDTH_DICT[east_asian_width] for east_asian_width in east_asian_width_list]
+    return sum(width_list)
 
 
 def raise_suppressed(exp):

@@ -1,5 +1,5 @@
 import itertools
-from .utils import get_output_str
+from .utils import ansilen, get_output_str
 from .base import BaseRow
 from .enums import WidthExceedPolicy
 
@@ -105,8 +105,9 @@ class RowData(BaseRow):
             list_of_rows = self._get_row_within_width(row)
             for row_ in list_of_rows:
                 for i in range(table.column_count):
+                    full_width_char_count = ansilen(row_[i]) - len(row_[i])
                     row_[i] = '{:{align}{width}}'.format(
-                        str(row_[i]), align=align[i].value, width=width[i])
+                        str(row_[i]), align=align[i].value, width=width[i] - full_width_char_count)
                 content = table.column_separator_char.join(row_)
                 content = table.left_border_char + content
                 content += table.right_border_char
