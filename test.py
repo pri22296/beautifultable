@@ -1,5 +1,6 @@
 import unittest
 from beautifultable import BeautifulTable
+from beautifultable.utils import ansilen
 
 class TableOperationsTestCase(unittest.TestCase):
     def setUp(self):
@@ -383,6 +384,16 @@ class TableOperationsTestCase(unittest.TestCase):
         len_for_max_width_80 = len(str(self.table))
 
         self.assertEqual(len_for_max_width_80, len_for_max_width_200)
+
+
+class UtilsTestCase(unittest.TestCase):
+    def test_ansilen(self):
+        self.assertEqual(ansilen('Hello'), 5)  # English
+        self.assertEqual(ansilen('こんにちは'), 10)  # Japanese
+        self.assertEqual(ansilen('你好'), 4)  # Chinese
+        self.assertEqual(ansilen('😉'), 2)  # Emoji
+        self.assertEqual(ansilen('привет там'), 10)  # Russian
+        self.assertEqual(ansilen('Γεια σας'), 8)  # Greek
 
 if __name__ == '__main__':
     unittest.main()
