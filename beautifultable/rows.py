@@ -1,5 +1,10 @@
-import itertools
-from .utils import get_output_str
+try:
+    from itertools import zip_longest
+except ImportError:
+    from itertools import izip_longest as zip_longest
+
+from .utils import get_output_str, termwidth
+from .ansi import ANSIMultiByteString
 from .base import BaseRow
 from .enums import WidthExceedPolicy
 
@@ -19,40 +24,40 @@ class RowData(BaseRow):
             to width exceed policy.
         """
         list_of_rows = []
+        lpw, rpw = self._table.left_padding_widths, self._table.right_padding_widths
         if (self._table.width_exceed_policy is WidthExceedPolicy.WEP_STRIP or
                 self._table.width_exceed_policy is WidthExceedPolicy.WEP_ELLIPSIS):
+
             # Let's strip the row
             delimiter = '' if self._table.width_exceed_policy is WidthExceedPolicy.WEP_STRIP else '...'
             row_item_list = []
             for index, row_item in enumerate(row):
-                left_pad = self._table._column_pad * self._table.left_padding_widths[index]
-                right_pad = self._table._column_pad * self._table.right_padding_widths[index]
+                left_pad = self._table._column_pad * lpw[index]
+                right_pad = self._table._column_pad * rpw[index]
                 clmp_str = left_pad + self._clamp_string(row_item, index, delimiter) + right_pad
                 row_item_list.append(clmp_str)
             list_of_rows.append(row_item_list)
         elif self._table.width_exceed_policy is WidthExceedPolicy.WEP_WRAP:
+
             # Let's wrap the row
-            row_item_list = []
-            for i in itertools.count():
-                line_empty = True
-                for index, row_item in enumerate(row):
-                    width = self._table.column_widths[index] - self._table.left_padding_widths[index] - self._table.right_padding_widths[index]
-                    left_pad = self._table._column_pad * self._table.left_padding_widths[index]
-                    right_pad = self._table._column_pad * self._table.right_padding_widths[index]
-                    clmp_str = row_item[i*width:(i+1)*width]
-                    if len(clmp_str) != 0:
-                        line_empty = False
-                    row_item_list.append(left_pad + clmp_str + right_pad)
-                if line_empty:
-                    break
-                else:
-                    list_of_rows.append(row_item_list)
-                    row_item_list = []
+            ansi_string_partition = []
+            for index, row_item in enumerate(row):
+                width = self._table.column_widths[index] - lpw[index] - rpw[index]
+                ansi_string_partition.append(ANSIMultiByteString(row_item).partition(width))
+
+            for row_items in zip_longest(*ansi_string_partition, fillvalue=''):
+                row_item_list = []
+                for index, row_item in enumerate(row_items):
+                    left_pad = self._table._column_pad * lpw[index]
+                    right_pad = self._table._column_pad * rpw[index]
+                    row_item_list.append(left_pad + row_item + right_pad)
+                list_of_rows.append(row_item_list)
 
         if len(list_of_rows) == 0:
             return [['']*self._table.column_count]
         else:
             return list_of_rows
+
 
     def _clamp_string(self, row_item, column_index, delimiter=''):
         """Clamp `row_item` to fit in column referred by column_index.
@@ -79,16 +84,17 @@ class RowData(BaseRow):
         width = (self._table.column_widths[column_index]
                  - self._table.left_padding_widths[column_index]
                  - self._table.right_padding_widths[column_index])
-        if len(row_item) <= width:
+
+        obj = ANSIMultiByteString(row_item)
+        if obj.termwidth() <= width:
             return row_item
         else:
-            if width-len(delimiter) >= 0:
-                clamped_string = (row_item[:width-len(delimiter)]
-                                  + delimiter)
+            if width - len(delimiter) >= 0:
+                clamped_string = obj[:width-len(delimiter)] + delimiter
             else:
                 clamped_string = delimiter[:width]
-            assert len(clamped_string) == width
             return clamped_string
+
 
     def __str__(self):
         """Return a string representation of a row."""
@@ -105,8 +111,20 @@ class RowData(BaseRow):
             list_of_rows = self._get_row_within_width(row)
             for row_ in list_of_rows:
                 for i in range(table.column_count):
-                    row_[i] = '{:{align}{width}}'.format(
-                        str(row_[i]), align=align[i].value, width=width[i])
+                    # str.format method doesn't work for multibyte strings
+                    # hence, we need to manually align the texts instead
+                    # of using the align property of the str.format method
+                    pad_len = width[i] - termwidth(row_[i])
+                    if align[i].value == '<':
+                        right_pad = ' ' * pad_len
+                        row_[i] = str(row_[i]) + right_pad
+                    elif align[i].value == '>':
+                        left_pad = ' ' * pad_len
+                        row_[i] = left_pad + str(row_[i])
+                    else:
+                        left_pad = ' ' * (pad_len//2)
+                        right_pad = ' ' * (pad_len - pad_len//2)
+                        row_[i] = left_pad + str(row_[i]) + right_pad
                 content = table.column_separator_char.join(row_)
                 content = table.left_border_char + content
                 content += table.right_border_char

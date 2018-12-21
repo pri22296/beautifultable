@@ -1,11 +1,17 @@
 """Module containing some utility methods"""
 
+try:
+    from builtins import str
+except ImportError:
+    from __builtin__ import str
+
 import re
 import sys
 
+from .ansi import ANSIMultiByteString
+
 
 PY3 = sys.version_info[0] == 3
-ANSI_REGEX = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
 
 
 def _convert_to_numeric(item):
@@ -53,9 +59,10 @@ def get_output_str(item, detect_numerics, precision, sign_value):
     return str(item)
 
 
-def ansilen(item):
-    """Returns the length of the string after stripping ansi escape sequences"""
-    return len(ANSI_REGEX.sub('', item))
+def termwidth(item):
+    """Returns the visible width of the string as shown on the terminal"""
+    obj = ANSIMultiByteString(str(item))
+    return obj.termwidth()
 
 
 def raise_suppressed(exp):

@@ -1,5 +1,8 @@
+from __future__ import unicode_literals
+
 import unittest
 from beautifultable import BeautifulTable
+
 
 class TableOperationsTestCase(unittest.TestCase):
     def setUp(self):
@@ -18,6 +21,7 @@ class TableOperationsTestCase(unittest.TestCase):
     def compare_iterable(self, iterable1, iterable2):
         for item1, item2 in zip(iterable1, iterable2):
             self.assertEqual(item1, item2)
+
 
     # Tests for column operations
 
@@ -78,6 +82,7 @@ class TableOperationsTestCase(unittest.TestCase):
         self.assertEqual(self.table.column_count, 3)
         self.compare_iterable(column, self.table.get_column(header))
 
+
     # Tests for row operations
 
     def test_row_count(self):
@@ -126,6 +131,7 @@ class TableOperationsTestCase(unittest.TestCase):
         self.compare_iterable(self.table[3], rows[0])
         self.compare_iterable(self.table[4], rows[1])
 
+
     # Tests for special methods
 
     def test_getitem_slice(self):
@@ -172,6 +178,7 @@ class TableOperationsTestCase(unittest.TestCase):
         self.assertFalse('rankk' in self.table)
         self.assertTrue(["Isabella", 1, "girl"] in self.table)
         self.assertFalse(['Ethan', 3, 'boy'] in self.table)
+
 
     # Test for printing operations
 
@@ -350,6 +357,60 @@ class TableOperationsTestCase(unittest.TestCase):
 | 5  | Michael  |  3   |  boy   |
 +----+----------+------+--------+"""
         self.assertEqual(string, self.table.get_string())
+
+    def test_eastasian_characters(self):
+        string = """+------------+------+--------+
+|    name    | rank | gender |
++------------+------+--------+
+|   Jacob    |  1   |  boy   |
++------------+------+--------+
+|  Isabella  |  1   |  girl  |
++------------+------+--------+
+|   Ethan    |  2   |  boy   |
++------------+------+--------+
+|   Sophia   |  2   |  girl  |
++------------+------+--------+
+|  Michael   |  3   |  boy   |
++------------+------+--------+
+| こんにちは |  2   |  boy   |
++------------+------+--------+"""
+        self.table.append_row(['こんにちは', 2, 'boy'])
+        self.assertEqual(string, self.table.get_string())
+
+
+    # Test for ANSI sequences
+
+    def test_ansi_sequences(self):
+        string = """+----------+------+--------+
+|   name   | rank | gender |
++----------+------+--------+
+|  Jacob   |  1   |  boy   |
++----------+------+--------+
+| Isabella |  1   |  girl  |
++----------+------+--------+
+|  Ethan   |  2   |  boy   |
++----------+------+--------+
+|  Sophia  |  2   |  girl  |
++----------+------+--------+
+| Michael  |  3   |  boy   |
++----------+------+--------+
+|   \x1b[31mAdam\x1b[0m   |  2   |  boy   |
++----------+------+--------+"""
+        self.table.append_row(['\x1b[31mAdam\x1b[0m', 2, 'boy'])
+        self.assertEqual(string, self.table.get_string())
+
+    def test_ansi_wrap(self):
+        table = BeautifulTable(max_width=30)
+        string = """+-----------------+---+------+
+|      \x1b[31mAdam\x1b[0m       | 2 | boy  |
++-----------------+---+------+
+| \x1b[31mThis is a very \x1b[0m | 2 | girl |
+|    \x1b[32mlong name\x1b[0m    |   |      |
++-----------------+---+------+"""
+        table.append_row(['\x1b[31mAdam\x1b[0m', 2, 'boy'])
+        table.append_row(['\x1b[31mThis is a very \x1b[0m\x1b[32mlong name\x1b[0m', 2, 'girl'])
+        self.assertEqual(string, table.get_string())
+
 
     # Test on empty table
 
