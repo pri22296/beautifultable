@@ -3,3 +3,6 @@ __pycache__/
 docs/_build/
 dist/
 build/
+.tox/
+*.pyc
+tox.ini

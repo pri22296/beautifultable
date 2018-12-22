@@ -1,17 +1,10 @@
 """Module containing some utility methods"""
 
-try:
-    from builtins import str
-except ImportError:
-    from __builtin__ import str
-
 import re
 import sys
 
 from .ansi import ANSIMultiByteString
-
-
-PY3 = sys.version_info[0] == 3
+from .compat import str, PY3
 
 
 def _convert_to_numeric(item):

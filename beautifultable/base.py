@@ -1,3 +1,6 @@
+from .compat import str
+
+
 class BaseRow(object):
     def __init__(self, table, row):
         self._row = list(row)

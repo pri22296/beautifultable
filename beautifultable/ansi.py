@@ -1,11 +1,12 @@
 """Module Containing class required for handling ANSI and east asian chars"""
 
+from __future__ import unicode_literals
+
 
 import re
-try:
-    from wcwidth import wcwidth
-except ImportError:
-    wcwidth = len
+from wcwidth import wcwidth
+
+from .compat import str
 
 
 class ANSIMultiByteString(object):

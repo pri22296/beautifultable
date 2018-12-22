@@ -1,12 +1,9 @@
-try:
-    from itertools import zip_longest
-except ImportError:
-    from itertools import izip_longest as zip_longest
-
 from .utils import get_output_str, termwidth
 from .ansi import ANSIMultiByteString
 from .base import BaseRow
 from .enums import WidthExceedPolicy
+from .compat import str, zip_longest
+
 
 class RowData(BaseRow):
     def _get_row_within_width(self, row):

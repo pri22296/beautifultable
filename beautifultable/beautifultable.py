@@ -24,23 +24,19 @@ Example
 +------------+------------+
 """
 from __future__ import division
+from __future__ import unicode_literals
 
 import itertools
 import copy
 import operator
 import warnings
 
-from .utils import get_output_str, raise_suppressed, termwidth, PY3
+from .utils import get_output_str, raise_suppressed, termwidth
 from .rows import RowData, HeaderData
 from .meta import AlignmentMetaData, PositiveIntegerMetaData
 from .enums import WidthExceedPolicy, Alignment, SignMode, Style
+from .compat import str, Iterable
 
-if PY3:
-    from builtins import str
-    from collections.abc import Iterable
-else:
-    from __builtin__ import str
-    from collections import Iterable
 
 __all__ = ['BeautifulTable']
 
@@ -226,11 +222,12 @@ class BeautifulTable(object):
             self.row_separator_char = value
             return
         warnings.resetwarnings()
-        if name in ('left_border_char', 'right_border_char', 'top_border_char',
+        if str(name) in ('left_border_char', 'right_border_char', 'top_border_char',
                     'bottom_border_char', 'header_separator_char',
                     'column_separator_char', 'row_separator_char',
                     'intersection_char') and not isinstance(value, str):
-            raise TypeError("Expected {attr} to be of type 'str', got {attr_type}".format(attr=name, attr_type=type(value).__name__))
+            raise TypeError("Expected {attr} to be of type 'str', got '{attr_type}' {name}".format(attr=name,
+                                                                                                   attr_type=type(value).__name__))
         super(BeautifulTable, self).__setattr__(name, value)
 
 
@@ -366,7 +363,7 @@ class BeautifulTable(object):
         header = self._validate_row(value)
         for i in header:
             if not isinstance(i, str):
-                raise TypeError("Headers should be of type 'str'")
+                raise TypeError("Headers should be of type 'str', not {}".format(type(i)))
         self._column_headers = HeaderData(self, header)
 
     @property

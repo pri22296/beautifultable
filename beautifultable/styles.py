@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+
+
 class DefaultStyle(object):
     left_border_char = '|'
     right_border_char = '|'
