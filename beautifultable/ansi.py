@@ -20,7 +20,7 @@ class ANSIMultiByteString(object):
         self._state = []
         self._width = []
         self._termwidth = 0
-        
+
         state = set()
 
         for token in re.split(self.ANSI_REGEX, str(string)):
@@ -35,7 +35,7 @@ class ANSIMultiByteString(object):
                     for char in token:
                         w = wcwidth(char)
                         if w == -1:
-                            raise ValueError("Unsupported Literal {}".format(char))
+                            raise ValueError("Unsupported Literal {} in string {}".format(repr(char), repr(token)))
                         self._termwidth += w
                         self._string.append(char)
                         self._width.append(w)

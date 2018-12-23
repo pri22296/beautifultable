@@ -226,8 +226,8 @@ class BeautifulTable(object):
                     'bottom_border_char', 'header_separator_char',
                     'column_separator_char', 'row_separator_char',
                     'intersection_char') and not isinstance(value, str):
-            raise TypeError("Expected {attr} to be of type 'str', got '{attr_type}' {name}".format(attr=name,
-                                                                                                   attr_type=type(value).__name__))
+            raise TypeError("Expected {attr} to be of type 'str', got '{attr_type}'".format(attr=name,
+                                                                                            attr_type=type(value).__name__))
         super(BeautifulTable, self).__setattr__(name, value)
 
 

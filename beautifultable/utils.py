@@ -1,8 +1,5 @@
 """Module containing some utility methods"""
 
-import re
-import sys
-
 from .ansi import ANSIMultiByteString
 from .compat import str, PY3
 

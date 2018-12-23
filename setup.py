@@ -1,5 +1,4 @@
 from setuptools import setup
-import sys
 
 version = '0.5.3'
 extras_require = {':python_version<"3.4"': ['enum34']}
