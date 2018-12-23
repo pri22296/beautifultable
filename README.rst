@@ -127,9 +127,14 @@ Changelog
 Unreleased
 ==========
 
+==========
+0.6.0
+==========
+
 * Fixed an issue where sometimes width was calculated as higher than intended
 * Added support for handling Multi byte strings
 * Added support for colored strings using ANSI escape sequences
+* On Python 2.7, all strings must be unicode
 
 ==========
 0.5.3

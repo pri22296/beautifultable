@@ -1,6 +1,6 @@
 from setuptools import setup
 
-version = '0.5.3'
+version = '0.6.0'
 extras_require = {':python_version<"3.4"': ['enum34']}
 
 setup(name='beautifultable',
