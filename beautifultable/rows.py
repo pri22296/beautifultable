@@ -87,7 +87,7 @@ class RowData(BaseRow):
             return row_item
         else:
             if width - len(delimiter) >= 0:
-                clamped_string = obj[:width-len(delimiter)] + delimiter
+                clamped_string = obj.partition(width-len(delimiter))[0] + delimiter
             else:
                 clamped_string = delimiter[:width]
             return clamped_string

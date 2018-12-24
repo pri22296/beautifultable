@@ -127,6 +127,8 @@ Changelog
 Unreleased
 ==========
 
+* Fixed an issue with WEP_ELLIPSIS and WEP_STRIP when using multibyte characters
+
 ==========
 0.6.0
 ==========
