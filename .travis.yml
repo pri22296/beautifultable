@@ -16,7 +16,7 @@ matrix:
       sudo: true
 
 before_install:
-    - pip install coveralls
+    - pip install codecov
 
 install:
     - python setup.py --quiet install
@@ -25,7 +25,7 @@ script:
     - coverage run test.py
     
 after_success:
-    - coveralls
+    - codecov
 
 deploy:
   provider: pypi
