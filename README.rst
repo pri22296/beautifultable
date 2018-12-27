@@ -128,6 +128,8 @@ Unreleased
 ==========
 
 * Fixed an issue with WEP_ELLIPSIS and WEP_STRIP when using multibyte characters
+* Added support for handling newline character
+* Now also accepts bytestrings instead of unicode
 
 ==========
 0.6.0

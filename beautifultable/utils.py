@@ -1,7 +1,7 @@
 """Module containing some utility methods"""
 
 from .ansi import ANSIMultiByteString
-from .compat import str, PY3
+from .compat import basestring, to_unicode, PY3
 
 
 def _convert_to_numeric(item):
@@ -22,10 +22,10 @@ def _convert_to_numeric(item):
     # to 5 instead of 5.0 . This is safe as a direct int cast for a non integer
     # string raises a ValueError.
     try:
-        num = int(str(item))
+        num = int(to_unicode(item))
     except ValueError:
         try:
-            num = float(str(item))
+            num = float(to_unicode(item))
         except ValueError:
             return item
         else:
@@ -46,12 +46,12 @@ def get_output_str(item, detect_numerics, precision, sign_value):
         item = '{:{sign}}'.format(item, sign=sign_value)
     except (ValueError, TypeError):
         pass
-    return str(item)
+    return to_unicode(item)
 
 
 def termwidth(item):
     """Returns the visible width of the string as shown on the terminal"""
-    obj = ANSIMultiByteString(str(item))
+    obj = ANSIMultiByteString(to_unicode(item))
     return obj.termwidth()
 
 

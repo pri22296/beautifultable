@@ -1,4 +1,4 @@
-from .compat import str
+from .compat import basestring
 
 
 class BaseRow(object):
@@ -50,7 +50,7 @@ class BaseRow(object):
     def __getitem__(self, key):
         if isinstance(key, (int, slice)):
             return self._row[key]
-        elif isinstance(key, str):
+        elif isinstance(key, basestring):
             index = self._table.get_column_index(key)
             return self._row[index]
         else:
@@ -59,7 +59,7 @@ class BaseRow(object):
     def __setitem__(self, key, value):
         if isinstance(key, int):
             self._row[key] = value
-        elif isinstance(key, str):
+        elif isinstance(key, basestring):
             index = self._table.get_column_index(key)
             self._row[index] = value
         else:

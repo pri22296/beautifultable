@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
 
 import unittest
 from beautifultable import BeautifulTable
-from beautifultable.compat import str
 
 
 class TableOperationsTestCase(unittest.TestCase):
@@ -362,7 +360,7 @@ class TableOperationsTestCase(unittest.TestCase):
         self.assertEqual(string, self.table.get_string())
 
     def test_eastasian_characters(self):
-        string = """+------------+------+--------+
+        string = u"""+------------+------+--------+
 |    name    | rank | gender |
 +------------+------+--------+
 |   Jacob    |  1   |  boy   |
@@ -377,8 +375,27 @@ class TableOperationsTestCase(unittest.TestCase):
 +------------+------+--------+
 | こんにちは |  2   |  boy   |
 +------------+------+--------+"""
-        self.table.append_row(['こんにちは', 2, 'boy'])
+        self.table.append_row([u'こんにちは', 2, 'boy'])
         self.assertEqual(string, self.table.get_string())
+
+    def test_newline(self):
+        string = """+---+---+
+| 0 | a |
+|   | b |
++---+---+"""
+        table = BeautifulTable()
+        table.append_row(["0", "a\nb"])
+        self.assertEqual(string, table.get_string())
+
+    def test_newline_multiple_columns(self):
+        string = """+---+---+
+| a | p |
+| b | q |
+| c |   |
++---+---+"""
+        table = BeautifulTable()
+        table.append_row(["a\nb\nc", "p\nq"])
+        self.assertEqual(string, table.get_string())
 
 
     # Test for ANSI sequences
@@ -402,11 +419,11 @@ class TableOperationsTestCase(unittest.TestCase):
 
     def test_ansi_wrap_mb(self):
         table = BeautifulTable(max_width=30)
-        string = """+-----------------+---+------+
+        string = u"""+-----------------+---+------+
 | \x1b[31mこれは非常に長\x1b[0m  | 2 | girl |
 |   \x1b[31mい\x1b[0m\x1b[32m名前です\x1b[0m    |   |      |
 +-----------------+---+------+"""
-        table.append_row(['\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m', 2, 'girl'])
+        table.append_row([u'\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m', 2, 'girl'])
         self.assertEqual(string, table.get_string())
 
     def test_ansi_ellipsis(self):
@@ -421,10 +438,10 @@ class TableOperationsTestCase(unittest.TestCase):
     def test_ansi_ellipsis_mb(self):
         table = BeautifulTable(max_width=30)
         table.width_exceed_policy = table.WEP_ELLIPSIS
-        string = """+-----------------+---+------+
+        string = u"""+-----------------+---+------+
 | \x1b[31mこれは非常に\x1b[0m... | 2 | girl |
 +-----------------+---+------+"""
-        table.append_row(['\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m', 2, 'girl'])
+        table.append_row([u'\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m', 2, 'girl'])
         self.assertEqual(string, table.get_string())
 
     def test_ansi_strip(self):
@@ -439,10 +456,10 @@ class TableOperationsTestCase(unittest.TestCase):
     def test_ansi_strip_mb(self):
         table = BeautifulTable(max_width=30)
         table.width_exceed_policy = table.WEP_STRIP
-        string = """+-----------------+---+------+
+        string = u"""+-----------------+---+------+
 | \x1b[31mこれは非常に長\x1b[0m  | 2 | girl |
 +-----------------+---+------+"""
-        table.append_row(['\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m', 2, 'girl'])
+        table.append_row([u'\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m', 2, 'girl'])
         self.assertEqual(string, table.get_string())
 
 

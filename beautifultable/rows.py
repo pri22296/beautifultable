@@ -1,8 +1,9 @@
+from __future__ import unicode_literals
 from .utils import get_output_str, termwidth
 from .ansi import ANSIMultiByteString
 from .base import BaseRow
 from .enums import WidthExceedPolicy
-from .compat import str, zip_longest
+from .compat import basestring, to_unicode, zip_longest
 
 
 class RowData(BaseRow):
@@ -95,16 +96,18 @@ class RowData(BaseRow):
 
     def __str__(self):
         """Return a string representation of a row."""
-        row = [i for i in self._row]
+        rows = []
         table = self._table
         width = table.column_widths
         align = table.column_alignments
         sign = table.sign_mode
-        for i, item in enumerate(self._row):
-            row[i] = get_output_str(item, table.detect_numerics,
-                                    table.numeric_precision, sign.value)
         string = []
-        if len(row) > 0:
+        for item in self._row:
+            rows.append(to_unicode(item).split('\n'))
+        for row in map(list, zip_longest(*rows, fillvalue='')):
+            for i in range(len(row)):
+                row[i] = get_output_str(row[i], table.detect_numerics,
+                                        table.numeric_precision, sign.value)
             list_of_rows = self._get_row_within_width(row)
             for row_ in list_of_rows:
                 for i in range(table.column_count):
@@ -114,14 +117,14 @@ class RowData(BaseRow):
                     pad_len = width[i] - termwidth(row_[i])
                     if align[i].value == '<':
                         right_pad = ' ' * pad_len
-                        row_[i] = str(row_[i]) + right_pad
+                        row_[i] = to_unicode(row_[i]) + right_pad
                     elif align[i].value == '>':
                         left_pad = ' ' * pad_len
-                        row_[i] = left_pad + str(row_[i])
+                        row_[i] = left_pad + to_unicode(row_[i])
                     else:
                         left_pad = ' ' * (pad_len//2)
                         right_pad = ' ' * (pad_len - pad_len//2)
-                        row_[i] = left_pad + str(row_[i]) + right_pad
+                        row_[i] = left_pad + to_unicode(row_[i]) + right_pad
                 content = table.column_separator_char.join(row_)
                 content = table.left_border_char + content
                 content += table.right_border_char
@@ -145,5 +148,5 @@ class HeaderData(RowData):
         self._row[key] = value
 
     def validate(self, value):
-        if not isinstance(value, str):
+        if not isinstance(value, basestring):
             raise TypeError("header must be of type 'str', got {}".format(type(value).__name__))

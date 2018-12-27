@@ -1,4 +1,6 @@
+from __future__ import unicode_literals
 import enum
+
 from .styles import *
 
 class WidthExceedPolicy(enum.Enum):

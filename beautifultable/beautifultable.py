@@ -23,8 +23,7 @@ Example
 |     4      |     16     |
 +------------+------------+
 """
-from __future__ import division
-from __future__ import unicode_literals
+from __future__ import division, unicode_literals
 
 import itertools
 import copy
@@ -35,7 +34,7 @@ from .utils import get_output_str, raise_suppressed, termwidth
 from .rows import RowData, HeaderData
 from .meta import AlignmentMetaData, PositiveIntegerMetaData
 from .enums import WidthExceedPolicy, Alignment, SignMode, Style
-from .compat import str, Iterable
+from .compat import basestring, Iterable, to_unicode
 
 
 __all__ = ['BeautifulTable']
@@ -222,10 +221,10 @@ class BeautifulTable(object):
             self.row_separator_char = value
             return
         warnings.resetwarnings()
-        if str(name) in ('left_border_char', 'right_border_char', 'top_border_char',
+        if to_unicode(name) in ('left_border_char', 'right_border_char', 'top_border_char',
                     'bottom_border_char', 'header_separator_char',
                     'column_separator_char', 'row_separator_char',
-                    'intersection_char') and not isinstance(value, str):
+                    'intersection_char') and not isinstance(value, basestring):
             raise TypeError("Expected {attr} to be of type 'str', got '{attr_type}'".format(attr=name,
                                                                                             attr_type=type(value).__name__))
         super(BeautifulTable, self).__setattr__(name, value)
@@ -362,7 +361,7 @@ class BeautifulTable(object):
     def column_headers(self, value):
         header = self._validate_row(value)
         for i in header:
-            if not isinstance(i, str):
+            if not isinstance(i, basestring):
                 raise TypeError("Headers should be of type 'str', not {}".format(type(i)))
         self._column_headers = HeaderData(self, header)
 
@@ -434,7 +433,7 @@ class BeautifulTable(object):
         # TODO: Rename this method
         # str is also an iterable but it is not a valid row, so
         # an extra check is required for str
-        if not isinstance(value, Iterable) or isinstance(value, str):
+        if not isinstance(value, Iterable) or isinstance(value, basestring):
             raise TypeError("parameter must be an iterable")
 
         row = list(value)
@@ -481,7 +480,7 @@ class BeautifulTable(object):
             return new_table
         elif isinstance(key, int):
             return self._table[key]
-        elif isinstance(key, str):
+        elif isinstance(key, basestring):
             return self.get_column(key)
         else:
             raise TypeError("table indices must be integers, strings or slices, not {}".format(type(key).__name__))
@@ -507,7 +506,7 @@ class BeautifulTable(object):
         """
         if isinstance(key, int) or isinstance(key, slice):
             del self._table[key]
-        elif isinstance(key, str):
+        elif isinstance(key, basestring):
             return self.pop_column(key)
         else:
             raise TypeError("table indices must be integers, strings or slices, not {}".format(type(key).__name__))
@@ -533,7 +532,7 @@ class BeautifulTable(object):
         """
         if isinstance(key, (int, slice)):
             self.update_row(key, value)
-        elif isinstance(key, str):
+        elif isinstance(key, basestring):
             self.update_column(key, value)
         else:
             raise TypeError("table indices must be integers, strings or slices, not {}".format(type(key).__name__))
@@ -542,7 +541,7 @@ class BeautifulTable(object):
         return len(self._table)
 
     def __contains__(self, key):
-        if isinstance(key, str):
+        if isinstance(key, basestring):
             return key in self._column_headers
         elif isinstance(key, Iterable):
             return key in self._table
@@ -600,10 +599,18 @@ class BeautifulTable(object):
         widths = [(self._left_padding_widths[index] + self._right_padding_widths[index]) for index in range(self._column_count)]
         self._max_table_width = max(self._max_table_width, offset + sum(widths) + self._column_count)
         for index, column in enumerate(zip(*self._table)):
-            max_length = max(termwidth(get_output_str(i, self.detect_numerics,
-                                                    self.numeric_precision,
-                                                    self.sign_mode.value)) for i in column)
-            max_length = max(max_length, termwidth(str(self._column_headers[index])))
+            max_length = 0
+            for i in column:
+                for j in to_unicode(i).split('\n'):
+                    output_str = get_output_str(j, self.detect_numerics, self.numeric_precision, self.sign_mode.value)
+                    max_length = max(max_length, termwidth(output_str))
+            #max_length = max(termwidth(get_output_str(i, self.detect_numerics,
+            #                                          self.numeric_precision,
+            #                                          self.sign_mode.value)) for i in column)
+            for i in to_unicode(self._column_headers[index]).split('\n'):
+                output_str = get_output_str(i, self.detect_numerics, self.numeric_precision, self.sign_mode.value)
+                max_length = max(max_length, termwidth(output_str))
+            #max_length = max(max_length, termwidth(str(self._column_headers[index])))
             widths[index] += max_length
 
         sum_ = sum(widths)
@@ -647,7 +654,7 @@ class BeautifulTable(object):
         """
         if isinstance(key, int):
             index = key
-        elif isinstance(key, str):
+        elif isinstance(key, basestring):
             index = self.get_column_index(key)
         else:
             raise TypeError("'key' must either be 'int' or 'str'")
@@ -713,7 +720,7 @@ class BeautifulTable(object):
         """
         if isinstance(key, int):
             index = key
-        elif isinstance(key, str):
+        elif isinstance(key, basestring):
             index = self.get_column_index(key)
         else:
             raise TypeError("key must be an int or str, not {}".format(type(key).__name__))
@@ -753,7 +760,7 @@ class BeautifulTable(object):
         """
         if isinstance(index, int):
             pass
-        elif isinstance(index, str):
+        elif isinstance(index, basestring):
             index = self.get_column_index(index)
         else:
             raise TypeError("column index must be an integer or a string, not {}".format(type(index).__name__))
@@ -872,7 +879,7 @@ class BeautifulTable(object):
             If no column exists with title `header`.
         """
         index = self.get_column_index(header)
-        if not isinstance(header, str):
+        if not isinstance(header, basestring):
             raise TypeError("header must be of type str")
         for row, new_item in zip(self._table, column):
             row[index] = new_item
@@ -911,7 +918,7 @@ class BeautifulTable(object):
             self.column_headers = HeaderData(self, [header])
             self._table = [RowData(self, [i]) for i in column]
         else:
-            if not isinstance(header, str):
+            if not isinstance(header, basestring):
                 raise TypeError("header must be of type str")
             column_length = 0
             for i, (row, new_item) in enumerate(zip(self._table, column)):
@@ -988,8 +995,7 @@ class BeautifulTable(object):
 
         if len(line) == 0:
             return ''
-        # Only if Special Intersection is enabled and horizontal line is
-        # visible
+        # Only if Special Intersection is enabled and horizontal line is visible
         if termwidth(self.intersection_char) > 0 and not char.isspace():
             # If left border is enabled and it is visible
             if termwidth(self.left_border_char) > 0:
@@ -1140,7 +1146,7 @@ class BeautifulTable(object):
 
         # Print headers if not empty or only spaces
         if ''.join(self._column_headers).strip():
-            headers = str(self._column_headers)
+            headers = to_unicode(self._column_headers)
             string_.append(headers)
 
             if self.header_separator_char:
@@ -1154,7 +1160,7 @@ class BeautifulTable(object):
                 string_.append(
                     self.get_row_separator())
             first_row_encountered = True
-            content = str(row)
+            content = to_unicode(row)
             string_.append(content)
 
         # Drawing the bottom border

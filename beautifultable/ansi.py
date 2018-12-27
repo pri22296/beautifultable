@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import re
 from wcwidth import wcwidth
 
-from .compat import str
+from .compat import to_unicode
 
 
 class ANSIMultiByteString(object):
@@ -23,7 +23,7 @@ class ANSIMultiByteString(object):
 
         state = set()
 
-        for token in re.split(self.ANSI_REGEX, str(string)):
+        for token in re.split(self.ANSI_REGEX, to_unicode(string)):
             if token:
                 if re.match(self.ANSI_REGEX, token):
                     if token == self.ANSI_RESET:
