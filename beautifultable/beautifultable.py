@@ -594,42 +594,66 @@ class BeautifulTable(object):
     def auto_calculate_width(self):
         """Calculate width of column automatically based on data."""
         table_width = self.get_table_width()
-        offset = table_width - sum(self._column_widths)
+        pad_widths = [(self._left_padding_widths[index] + self._right_padding_widths[index]) for index in range(self._column_count)]
+        max_widths = [0 for index in range(self._column_count)]
+        offset = table_width - sum(self._column_widths) + sum(pad_widths)
+        self._max_table_width = max(self._max_table_width, offset + self._column_count)
 
-        widths = [(self._left_padding_widths[index] + self._right_padding_widths[index]) for index in range(self._column_count)]
-        self._max_table_width = max(self._max_table_width, offset + sum(widths) + self._column_count)
         for index, column in enumerate(zip(*self._table)):
             max_length = 0
             for i in column:
                 for j in to_unicode(i).split('\n'):
                     output_str = get_output_str(j, self.detect_numerics, self.numeric_precision, self.sign_mode.value)
                     max_length = max(max_length, termwidth(output_str))
-            #max_length = max(termwidth(get_output_str(i, self.detect_numerics,
-            #                                          self.numeric_precision,
-            #                                          self.sign_mode.value)) for i in column)
             for i in to_unicode(self._column_headers[index]).split('\n'):
                 output_str = get_output_str(i, self.detect_numerics, self.numeric_precision, self.sign_mode.value)
                 max_length = max(max_length, termwidth(output_str))
-            #max_length = max(max_length, termwidth(str(self._column_headers[index])))
-            widths[index] += max_length
+            max_widths[index] += max_length
 
-        sum_ = sum(widths)
+        sum_ = sum(max_widths)
         desired_sum = self._max_table_width - offset
 
+        # Set flag for columns who are within their fair share
         temp_sum = 0
-        flag = [0] * len(widths)
-        for i, width in enumerate(widths):
-            if width < desired_sum / self._column_count:
+        flag = [0] * len(max_widths)
+        for i, width in enumerate(max_widths):
+            if width <= int(desired_sum / self._column_count):
                 temp_sum += width
                 flag[i] = 1
+            else:
+                # Allocate atleast 1 character width to the column
+                temp_sum += 1
 
         avail_space = desired_sum - temp_sum
         actual_space = sum_ - temp_sum
-        for i, _ in enumerate(widths):
+        shrinked_columns = {}
+
+        # Columns which exceed their fair share should be shrinked based on how much
+        # space is left for the table
+        for i, width in enumerate(max_widths):
+            self.column_widths[i] = width
             if not flag[i]:
-                new_width = int(round(widths[i] * avail_space / actual_space))
-                widths[i] = min(widths[i], new_width)
-        self.column_widths = widths
+                new_width = 1 + int((width-1) * avail_space / actual_space)
+                if new_width < width:
+                    self.column_widths[i] = new_width
+                    shrinked_columns[new_width] = i
+
+        # Divide any remaining space among shrinked columns
+        if shrinked_columns:
+            extra_space = self._max_table_width - offset - sum(self.column_widths)
+            actual_space = sum(shrinked_columns)
+
+            if extra_space > 0:
+                for i, width in enumerate(sorted(shrinked_columns)):
+                    index = shrinked_columns[width]
+                    extra_width = int(width * extra_space / actual_space)
+                    self.column_widths[i] += extra_width
+                    if i == (len(shrinked_columns) - 1):
+                        extra_space = self._max_table_width - offset - sum(self.column_widths)
+                        self.column_widths[index] += extra_space
+
+        for i in range(self.column_count):
+            self.column_widths[i] += pad_widths[i]
 
     def set_padding_widths(self, pad_width):
         """Set width for left and rigth padding of the columns of the table.

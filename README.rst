@@ -10,8 +10,8 @@ BeautifulTable
 .. image:: https://img.shields.io/pypi/pyversions/beautifultable.svg
     :target: https://pypi.python.org/pypi/beautifultable/
 
-.. image:: https://coveralls.io/repos/github/pri22296/beautifultable/badge.svg?branch=master
-    :target: https://coveralls.io/github/pri22296/beautifultable?branch=master
+.. image:: https://codecov.io/gh/pri22296/beautifultable/branch/master/graphs/badge.svg
+    :target: https://codecov.io/gh/pri22296/beautifultable/branch/master/
 
 .. image:: https://api.codacy.com/project/badge/Grade/7a76eb35ad4e450eaf00339e98381511
     :target: https://www.codacy.com/app/pri22296/beautifultable?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pri22296/beautifultable&amp;utm_campaign=Badge_Grade
@@ -127,25 +127,27 @@ Changelog
 Unreleased
 ==========
 
-* Fixed an issue with WEP_ELLIPSIS and WEP_STRIP when using multibyte characters
+* Updated the algorithm for calculating width of columns(better division of space among columns)
 * Added support for handling newline character
-* Now also accepts bytestrings instead of unicode
+* Added the ability to also accept bytestrings instead of unicode
+* Fixed an issue with WEP_ELLIPSIS and WEP_STRIP when using multibyte characters
+* Fixed an issue where table would not be in proper form if column_width is too low
 
 ==========
 0.6.0
 ==========
 
-* Fixed an issue where sometimes width was calculated as higher than intended
 * Added support for handling Multi byte strings
 * Added support for colored strings using ANSI escape sequences
-* On Python 2.7, all strings must be unicode
+* Added constraint where all strings must be unicode
+* Fixed an issue where sometimes width was calculated as higher than intended
 
 ==========
 0.5.3
 ==========
 
-* Fixed collections ABCs deprecation warning
 * Added support for handing color codes using ANSI escape sequences(experimental)
+* Fixed collections ABCs deprecation warning
 
 ==========
 0.5.2
@@ -198,7 +200,7 @@ Unreleased
 0.1.3
 ==========
 
-* Bug fixes
+* Fixed minor issues
 
 ==========
 0.1.2
