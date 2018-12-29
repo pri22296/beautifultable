@@ -19,8 +19,10 @@ class TableMetaData(BaseRow):
 class AlignmentMetaData(TableMetaData):
     def validate(self, value):
         if not isinstance(value, Alignment):
+            allowed = ("{}.{}".format(type(self).__name__, i.name)
+                       for i in Alignment)
             error_msg = ("allowed values for alignment are: "
-                         + ', '.join("{}.{}".format(type(self).__name__, i.name) for i in Alignment)
+                         + ', '.join(allowed)
                          + ', was {}'.format(value))
             raise TypeError(error_msg)
 
@@ -30,4 +32,5 @@ class PositiveIntegerMetaData(TableMetaData):
         if isinstance(value, int) and value >= 0:
             pass
         else:
-            raise TypeError("Value must a non-negative integer, was {}".format(value))
+            raise TypeError(("Value must a non-negative integer, "
+                             "was {}").format(value))

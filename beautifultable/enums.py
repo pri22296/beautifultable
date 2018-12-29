@@ -1,7 +1,10 @@
 from __future__ import unicode_literals
 import enum
 
-from .styles import *
+from .styles import (DefaultStyle, NoStyle, DottedStyle, MySQLStyle,
+                     SeparatedStyle, CompactStyle, MarkdownStyle,
+                     RestructuredTextStyle)
+
 
 class WidthExceedPolicy(enum.Enum):
     WEP_WRAP = 1
@@ -35,7 +38,7 @@ class Style(enum.Enum):
     STYLE_NONE = NoStyle
     STYLE_DOTTED = DottedStyle
     STYLE_MYSQL = MySQLStyle
-    STYLE_SEPERATED = SeperatedStyle
+    STYLE_SEPARATED = SeparatedStyle
     STYLE_COMPACT = CompactStyle
     STYLE_MARKDOWN = MarkdownStyle
     STYLE_RESTRUCTURED_TEXT = RestructuredTextStyle

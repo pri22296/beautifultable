@@ -10,10 +10,9 @@ from .compat import to_unicode
 
 
 class ANSIMultiByteString(object):
-    
+
     ANSI_REGEX = re.compile(r'(\x1B\[[0-?]*[ -/]*[@-~])')
     ANSI_RESET = '\x1b[0m'
-
 
     def __init__(self, string):
         self._string = []
@@ -35,28 +34,30 @@ class ANSIMultiByteString(object):
                     for char in token:
                         w = wcwidth(char)
                         if w == -1:
-                            raise ValueError("Unsupported Literal {} in string {}".format(repr(char), repr(token)))
+                            raise ValueError(("Unsupported Literal {} in "
+                                              "string {}").format(repr(char),
+                                                                  repr(token)))
                         self._termwidth += w
                         self._string.append(char)
                         self._width.append(w)
                         self._state.append(s_copy)
 
-
     def __len__(self):
         return len(self._string)
-
 
     def __getitem__(self, key):
         if isinstance(key, int):
             if self._state[key]:
-                return "".join(self._state[key]) + self._string[key] + self.ANSI_RESET
+                return ("".join(self._state[key])
+                        + self._string[key]
+                        + self.ANSI_RESET)
             else:
                 return self._string[key]
         elif isinstance(key, slice):
             return self._slice(key)
         else:
-            raise TypeError("table indices must be integers or slices, not {}".format(type(key).__name__))
-
+            raise TypeError(("table indices must be integers or slices, "
+                             "not {}").format(type(key).__name__))
 
     def _slice(self, key):
         res = []
@@ -75,13 +76,11 @@ class ANSIMultiByteString(object):
             res.append(self.ANSI_RESET)
         return "".join(res)
 
-
     def termwidth(self):
         """Returns the width of string as when printed to a terminal"""
         return self._termwidth
 
-
-    def partition(self, width):
+    def wrap(self, width):
         """Returns a partition of the string based on `width`"""
         res = []
         prev_state = set()
@@ -110,4 +109,3 @@ class ANSIMultiByteString(object):
         if part:
             res.append("".join(part))
         return res
-

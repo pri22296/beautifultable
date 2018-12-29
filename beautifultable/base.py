@@ -16,7 +16,9 @@ class BaseRow(object):
         return next(self._row)
 
     def __repr__(self):
-        return "{}<{}>".format(type(self).__name__, ', '.join(str(v) for v in self._row))
+        class_ = type(self).__name__
+        data = ', '.join(str(v) for v in self._row)
+        return "{}<{}>".format(class_, data)
 
     def __eq__(self, other):
         if len(self) != len(other):
@@ -54,7 +56,8 @@ class BaseRow(object):
             index = self._table.get_column_index(key)
             return self._row[index]
         else:
-            raise TypeError("row indices must be integers or slices, not {}".format(type(key).__name__))
+            raise TypeError(("row indices must be integers or slices, "
+                             "not {}").format(type(key).__name__))
 
     def __setitem__(self, key, value):
         if isinstance(key, int):
@@ -63,4 +66,5 @@ class BaseRow(object):
             index = self._table.get_column_index(key)
             self._row[index] = value
         else:
-            raise TypeError("row indices must be integers or slices, not {}".format(type(key).__name__))
+            raise TypeError(("row indices must be integers or slices, "
+                             "not {}").format(type(key).__name__))

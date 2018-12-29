@@ -1,7 +1,7 @@
 """Module containing some utility methods"""
 
 from .ansi import ANSIMultiByteString
-from .compat import basestring, to_unicode, PY3
+from .compat import to_unicode, PY3
 
 
 def _convert_to_numeric(item):
@@ -13,9 +13,9 @@ def _convert_to_numeric(item):
     if PY3:
         num_types = (int, float)
     else:
-        num_types = (int, long, float)
+        num_types = (int, long, float)    # noqa: F821
     # We don't wan't to perform any conversions if item is already a number
-    if isinstance(item , num_types):
+    if isinstance(item, num_types):
         return item
 
     # First try for an int conversion so that strings like "5" are converted
@@ -53,6 +53,11 @@ def termwidth(item):
     """Returns the visible width of the string as shown on the terminal"""
     obj = ANSIMultiByteString(to_unicode(item))
     return obj.termwidth()
+
+
+def textwrap(item, width):
+    obj = ANSIMultiByteString(to_unicode(item))
+    return obj.wrap(width)
 
 
 def raise_suppressed(exp):

@@ -27,7 +27,7 @@ class MySQLStyle(DefaultStyle):
     pass
 
 
-class SeperatedStyle(DefaultStyle):
+class SeparatedStyle(DefaultStyle):
     top_border_char = '='
     header_separator_char = '='
 

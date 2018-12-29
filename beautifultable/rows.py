@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
-from .utils import get_output_str, termwidth
-from .ansi import ANSIMultiByteString
+from .utils import get_output_str, termwidth, textwrap
 from .base import BaseRow
 from .enums import WidthExceedPolicy
 from .compat import basestring, to_unicode, zip_longest
@@ -18,44 +17,50 @@ class RowData(BaseRow):
         Returns
         -------
         list of list:
-            List representation of the `row` after it has been processed according
-            to width exceed policy.
+            List representation of the `row` after it has been processed
+            according to width exceed policy.
         """
+        table = self._table
+        lpw, rpw = table.left_padding_widths, table.right_padding_widths
+        wep = table.width_exceed_policy
+
         list_of_rows = []
-        lpw, rpw = self._table.left_padding_widths, self._table.right_padding_widths
-        if (self._table.width_exceed_policy is WidthExceedPolicy.WEP_STRIP or
-                self._table.width_exceed_policy is WidthExceedPolicy.WEP_ELLIPSIS):
+
+        if (wep is WidthExceedPolicy.WEP_STRIP or
+                wep is WidthExceedPolicy.WEP_ELLIPSIS):
 
             # Let's strip the row
-            delimiter = '' if self._table.width_exceed_policy is WidthExceedPolicy.WEP_STRIP else '...'
+            delimiter = '' if wep is WidthExceedPolicy.WEP_STRIP else '...'
             row_item_list = []
             for index, row_item in enumerate(row):
-                left_pad = self._table._column_pad * lpw[index]
-                right_pad = self._table._column_pad * rpw[index]
-                clmp_str = left_pad + self._clamp_string(row_item, index, delimiter) + right_pad
+                left_pad = table._column_pad * lpw[index]
+                right_pad = table._column_pad * rpw[index]
+                clmp_str = (left_pad
+                            + self._clamp_string(row_item, index, delimiter)
+                            + right_pad)
                 row_item_list.append(clmp_str)
             list_of_rows.append(row_item_list)
-        elif self._table.width_exceed_policy is WidthExceedPolicy.WEP_WRAP:
+        elif wep is WidthExceedPolicy.WEP_WRAP:
 
             # Let's wrap the row
-            ansi_string_partition = []
-            for index, row_item in enumerate(row):
-                width = self._table.column_widths[index] - lpw[index] - rpw[index]
-                ansi_string_partition.append(ANSIMultiByteString(row_item).partition(width))
+            string_partition = []
 
-            for row_items in zip_longest(*ansi_string_partition, fillvalue=''):
+            for index, row_item in enumerate(row):
+                width = table.column_widths[index] - lpw[index] - rpw[index]
+                string_partition.append(textwrap(row_item, width))
+
+            for row_items in zip_longest(*string_partition, fillvalue=''):
                 row_item_list = []
                 for index, row_item in enumerate(row_items):
-                    left_pad = self._table._column_pad * lpw[index]
-                    right_pad = self._table._column_pad * rpw[index]
+                    left_pad = table._column_pad * lpw[index]
+                    right_pad = table._column_pad * rpw[index]
                     row_item_list.append(left_pad + row_item + right_pad)
                 list_of_rows.append(row_item_list)
 
         if len(list_of_rows) == 0:
-            return [['']*self._table.column_count]
+            return [[''] * table.column_count]
         else:
             return list_of_rows
-
 
     def _clamp_string(self, row_item, column_index, delimiter=''):
         """Clamp `row_item` to fit in column referred by column_index.
@@ -83,16 +88,15 @@ class RowData(BaseRow):
                  - self._table.left_padding_widths[column_index]
                  - self._table.right_padding_widths[column_index])
 
-        obj = ANSIMultiByteString(row_item)
-        if obj.termwidth() <= width:
+        if termwidth(row_item) <= width:
             return row_item
         else:
             if width - len(delimiter) >= 0:
-                clamped_string = obj.partition(width-len(delimiter))[0] + delimiter
+                clamped_string = (textwrap(row_item, width-len(delimiter))[0]
+                                  + delimiter)
             else:
                 clamped_string = delimiter[:width]
             return clamped_string
-
 
     def __str__(self):
         """Return a string representation of a row."""
@@ -144,9 +148,11 @@ class HeaderData(RowData):
     def __setitem__(self, key, value):
         self.validate(value)
         if not isinstance(key, int):
-            raise TypeError("header indices must be integers, not {}".format(type(key).__name__))
+            raise TypeError(("header indices must be integers, "
+                             "not {}").format(type(key).__name__))
         self._row[key] = value
 
     def validate(self, value):
         if not isinstance(value, basestring):
-            raise TypeError("header must be of type 'str', got {}".format(type(value).__name__))
+            raise TypeError(("header must be of type 'str', "
+                             "got {}").format(type(value).__name__))
