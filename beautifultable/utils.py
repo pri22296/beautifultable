@@ -12,7 +12,7 @@ def _convert_to_numeric(item):
     """
     if PY3:
         num_types = (int, float)
-    else:
+    else:                                 # pragma: no cover
         num_types = (int, long, float)    # noqa: F821
     # We don't wan't to perform any conversions if item is already a number
     if isinstance(item, num_types):

@@ -8,7 +8,7 @@ if PY3:
     basestring = (str, bytes)
     from itertools import zip_longest
     from collections.abc import Iterable
-else:
+else:                                                  # pragma: no cover
     basestring = basestring
     to_unicode = unicode                               # noqa: F821
     from itertools import izip_longest as zip_longest  # noqa: F401
