@@ -105,9 +105,18 @@ class RowData(BaseRow):
         width = table.column_widths
         align = table.column_alignments
         sign = table.sign_mode
+        lpw = table.left_padding_widths
+        rpw = table.right_padding_widths
         string = []
-        for item in self._row:
-            rows.append(to_unicode(item).split('\n'))
+        for i, item in enumerate(self._row):
+            if isinstance(item, type(table)):
+                # temporarily change the max width of the table
+                curr_max_width = item.max_table_width
+                item.max_table_width = width[i] - lpw[i] - rpw[i]
+                rows.append(to_unicode(item).split('\n'))
+                item.max_table_width = curr_max_width
+            else:
+                rows.append(to_unicode(item).split('\n'))
         for row in map(list, zip_longest(*rows, fillvalue='')):
             for i in range(len(row)):
                 row[i] = get_output_str(row[i], table.detect_numerics,

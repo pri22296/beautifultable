@@ -168,12 +168,13 @@ class BeautifulTable(object):
         self.serialno_header = "SN"
         self.detect_numerics = True
 
+        self._column_count = 0
         self._sign_mode = BeautifulTable.SM_MINUS
         self._width_exceed_policy = BeautifulTable.WEP_WRAP
-        self._default_alignment = default_alignment
-        self._default_padding = default_padding
         self._column_pad = " "
-        self._max_table_width = max_width
+        self.default_alignment = default_alignment
+        self.default_padding = default_padding
+        self.max_table_width = max_width
 
         self._initialize_table(0)
         self._table = []
@@ -377,6 +378,26 @@ class BeautifulTable(object):
         pad_width = self._validate_row(value)
         self._right_padding_widths = PositiveIntegerMetaData(self, pad_width)
 
+    @property
+    def max_table_width(self):
+        """get/set the maximum width of the table.
+
+        The width of the table is guaranteed to not exceed this value. If it
+        is not possible to print a given table with the width provided, this
+        value will automatically adjust.
+        """
+        offset = ((self._column_count - 1)
+                  * termwidth(self.column_separator_char))
+        offset += termwidth(self.left_border_char)
+        offset += termwidth(self.right_border_char)
+        self._max_table_width = max(self._max_table_width,
+                                    offset + self._column_count)
+        return self._max_table_width
+
+    @max_table_width.setter
+    def max_table_width(self, value):
+        self._max_table_width = value
+
 # *****************************Properties End Here*****************************
 
     def _initialize_table(self, column_count):
@@ -549,7 +570,7 @@ class BeautifulTable(object):
             * BeautifulTable.STYLE_DEFAULT
             * BeautifulTable.STYLE_DOTTED
             * BeautifulTable.STYLE_MYSQL
-            * BeautifulTable.STYLE_SEPERATED
+            * BeautifulTable.STYLE_SEPARATED
             * BeautifulTable.STYLE_COMPACT
             * BeautifulTable.STYLE_MARKDOWN
             * BeautifulTable.STYLE_RESTRUCTURED_TEXT
