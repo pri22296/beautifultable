@@ -25,11 +25,7 @@ Contents
    quickstart
    changelog
 
- 
-##########################################
-Indices and tables
-##########################################
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. include:: ../README.rst
+   :start-after: inclusion-marker-donation-start
+   :end-before: inclusion-marker-donation-end

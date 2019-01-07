@@ -239,3 +239,19 @@ This project is licensed under the MIT License - see the `LICENSE.txt <https://g
 
 
 .. inclusion-marker-license-end
+
+
+
+.. inclusion-marker-donation-start
+
+**************************************************************************
+Donation
+**************************************************************************
+
+If this project helps you in any way, consider buying me a cup of coffee :)
+
+.. image:: https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif
+    :target: https://paypal.me/beautifultable
+
+
+.. inclusion-marker-donation-end
