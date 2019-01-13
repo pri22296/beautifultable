@@ -640,6 +640,20 @@ works.
    | +----------+------+--------+ |                     |
    +------------------------------+---------------------+
 
+
+=========================================================================
+Support for East-asian(multibyte) characters
+=========================================================================
+
+**beautifultable** comes with in-built support for east-asian characters. To
+enable multibyte character support, You need to install the *wcwidth* library
+from PyPI.
+
+::
+
+    pip install wcwidth
+
+
 You can do much more with BeautifulTable but this much should give you a
 good start. Those of you who are interested to have more control can
 read the API Documentation.
