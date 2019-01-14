@@ -123,14 +123,17 @@ Changelog
 Unreleased
 ==========
 
+* Added finer control for intersection characters using 12 new attributes *intersect_{top|header|row|bottom}_{left|mid|right}*
+  Deprecated attribute *intersection_char*
+* Deprecated methods *get_top_border()*, *get_bottom_border()*, *get_header_separator()*, *get_row_separator()*
 * Updated the algorithm for calculating width of columns(better division of space among columns)
-* Added support for handling newline character
+* Added support for Paragraphs(using newline character)
 * Added the ability to also accept bytestrings instead of unicode
-* Fixed an issue with WEP_ELLIPSIS and WEP_STRIP when using multibyte characters
+* Fixed an issue with **WEP_ELLIPSIS** and **WEP_STRIP** when using multibyte characters
 * Fixed an issue where table would not be in proper form if column_width is too low
 
 ==========
-0.6.0
+v0.6.0
 ==========
 
 * Added support for handling Multi byte strings
@@ -139,75 +142,75 @@ Unreleased
 * Fixed an issue where sometimes width was calculated as higher than intended
 
 ==========
-0.5.3
+v0.5.3
 ==========
 
 * Added support for handing color codes using ANSI escape sequences(experimental)
 * Fixed collections ABCs deprecation warning
 
 ==========
-0.5.2
+v0.5.2
 ==========
 
-* Added new style `STYLE_NONE`
+* Added new style **STYLE_NONE**
 * Fixed issue regarding improper conversion of non-string floats
 
 ==========
-0.5.1
+v0.5.1
 ==========
 
-* Added `detect_numerics` boolean for toggling automatic numeric conversion
+* Added *detect_numerics* boolean for toggling automatic numeric conversion
 
 ==========
-0.5.0
+v0.5.0
 ==========
 
-* Added new property `serialno_header`
-* Deprecated methods with misspelled `seperator` in their name.
-  Legacy methods will be removed in 0.7.0
-* Fixed an issue where table was corrupted when column_count was too high
+* Added new property *serialno_header*
+* Deprecated methods with misspelled *seperator* in their name.
+  Legacy methods will be removed in v0.7.0
+* Fixed an issue where table was corrupted when *column_count* was too high
 
 
 ==========
-0.4.0
+v0.4.0
 ==========
 
 * Added predefined styles for easier customization
-* Added `reverse` argument to `sort` method
-* Fixed `enum34` dependency for python versions prior to 3.4
+* Added *reverse* argument to `sort` method
+* Fixed *enum34* dependency for python versions prior to 3.4
 
 ==========
-0.3.0
+v0.3.0
 ==========
 
-* Added property `serialno` for auto printing serial number
+* Added property *serialno* for auto printing serial number
 * Fixed an issue with `sign_mode` related to str conversion
 * Fixed bugs related to python version prior to 3.3
-* Fixed exception on WEP_ELLIPSIS and token length less than 3
+* Fixed exception on **WEP_ELLIPSIS** and token length less than 3
 * Fixed printing issues with empty table
 
 ==========
-0.2.0
+v0.2.0
 ==========
 
 * Added python 2 support
 
 ==========
-0.1.3
+v0.1.3
 ==========
 
 * Fixed minor issues
 
 ==========
-0.1.2
+v0.1.2
 ==========
 
-* Added new property `default_padding`
-* Added new method `update_row`
-* Fixed an issue in `auto_calculate_width`
+* Added new property *default_padding*
+* Added new method *update_row*
+* Fixed an issue in *auto_calculate_width*
 
 ==========
-0.1.1
+v0.1.1
 ==========
 
 * Initial release on PyPI

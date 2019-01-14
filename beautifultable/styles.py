@@ -1,15 +1,5 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
-
-class DefaultStyle(object):
-    left_border_char = '|'
-    right_border_char = '|'
-    top_border_char = '-'
-    bottom_border_char = '-'
-    header_separator_char = '-'
-    column_separator_char = '|'
-    row_separator_char = '-'
-    intersection_char = '+'
 
 
 class NoStyle(object):
@@ -20,7 +10,40 @@ class NoStyle(object):
     header_separator_char = ''
     column_separator_char = ''
     row_separator_char = ''
-    intersection_char = ''
+    intersect_top_left = ''
+    intersect_top_mid = ''
+    intersect_top_right = ''
+    intersect_header_left = ''
+    intersect_header_mid = ''
+    intersect_header_right = ''
+    intersect_row_left = ''
+    intersect_row_mid = ''
+    intersect_row_right = ''
+    intersect_bottom_left = ''
+    intersect_bottom_mid = ''
+    intersect_bottom_right = ''
+
+
+class DefaultStyle(NoStyle):
+    left_border_char = '|'
+    right_border_char = '|'
+    top_border_char = '-'
+    bottom_border_char = '-'
+    header_separator_char = '-'
+    column_separator_char = '|'
+    row_separator_char = '-'
+    intersect_top_left = '+'
+    intersect_top_mid = '+'
+    intersect_top_right = '+'
+    intersect_header_left = '+'
+    intersect_header_mid = '+'
+    intersect_header_right = '+'
+    intersect_row_left = '+'
+    intersect_row_mid = '+'
+    intersect_row_right = '+'
+    intersect_bottom_left = '+'
+    intersect_bottom_mid = '+'
+    intersect_bottom_right = '+'
 
 
 class MySQLStyle(DefaultStyle):
@@ -32,33 +55,40 @@ class SeparatedStyle(DefaultStyle):
     header_separator_char = '='
 
 
-class CompactStyle(DefaultStyle):
-    left_border_char = ''
-    right_border_char = ''
-    top_border_char = ''
-    bottom_border_char = ''
+class CompactStyle(NoStyle):
     header_separator_char = '-'
     column_separator_char = ' '
-    row_separator_char = ''
-    intersection_char = ' '
+    intersect_top_left = ' '
+    intersect_top_mid = ' '
+    intersect_top_right = ' '
+    intersect_header_left = ' '
+    intersect_header_mid = ' '
+    intersect_header_right = ' '
+    intersect_row_left = ' '
+    intersect_row_mid = ' '
+    intersect_row_right = ' '
+    intersect_bottom_left = ' '
+    intersect_bottom_mid = ' '
+    intersect_bottom_right = ' '
 
 
-class DottedStyle(object):
+class DottedStyle(NoStyle):
     left_border_char = ':'
     right_border_char = ':'
     top_border_char = '.'
     bottom_border_char = '.'
     header_separator_char = '.'
     column_separator_char = ':'
-    row_separator_char = ''
-    intersection_char = ''
 
 
-class MarkdownStyle(DefaultStyle):
-    top_border_char = ''
-    bottom_border_char = ''
-    row_separator_char = ''
-    intersection_char = '|'
+class MarkdownStyle(NoStyle):
+    left_border_char = '|'
+    right_border_char = '|'
+    header_separator_char = '-'
+    column_separator_char = '|'
+    intersect_header_left = '|'
+    intersect_header_mid = '|'
+    intersect_header_right = '|'
 
 
 class RestructuredTextStyle(CompactStyle):

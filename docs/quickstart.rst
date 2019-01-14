@@ -519,24 +519,28 @@ this feature. You can read the API Reference for more details.
 
 .. code:: python
 
+   >>> table.set_style(BeautifulTable.STYLE_NONE)  # clear all formatting
    >>> table.left_border_char = 'o'
    >>> table.right_border_char = 'o'
    >>> table.top_border_char = '<~>'
    >>> table.bottom_border_char = '='
    >>> table.header_separator_char = '^'
-   >>> table.row_separator_char = ''
-   >>> table.intersection_char = ''
    >>> table.column_separator_char = ':'
+   >>> table.row_separator_char = '~'
    >>> print(table)
-   <~><~><~><~><~><~><~><~><~><~><~><~
-   o name     : rank : gender : year o
-   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   o Jacob    :  1   :    boy : 2010 o
-   o Isabella :  1   :   girl : 2012 o
-   o Ethan    :  2   :    boy : 2008 o
-   o Sophia   :  2   :   girl : 2010 o
-   o Michael  :  3   :    boy : 2011 o
-   ===================================
+   <~><~><~><~><~><~><~><~><~><
+   o   name   : rank : gender o
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   o  Jacob   :  1   :  boy   o
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   o Isabella :  1   :  girl  o
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   o  Ethan   :  2   :  boy   o
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   o  Sophia  :  2   :  girl  o
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   o Michael  :  3   :  boy   o
+   ============================
 
 As you can see, you can change quite a lot about your *BeautifulTable* instance.
 For further sections, We switch the look of the table to *default* again.

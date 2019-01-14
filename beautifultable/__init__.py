@@ -1,4 +1,23 @@
 from .beautifultable import BeautifulTable
 
+
 __version__ = '0.6.0'
-__all__ = ['BeautifulTable']
+
+
+WEP_WRAP = BeautifulTable.WEP_WRAP
+WEP_STRIP = BeautifulTable.WEP_STRIP
+WEP_ELLIPSIS = BeautifulTable.WEP_ELLIPSIS
+SM_PLUS = BeautifulTable.SM_PLUS
+SM_MINUS = BeautifulTable.SM_MINUS
+SM_SPACE = BeautifulTable.SM_SPACE
+ALIGN_LEFT = BeautifulTable.ALIGN_LEFT
+ALIGN_CENTER = BeautifulTable.ALIGN_CENTER
+ALIGN_RIGHT = BeautifulTable.ALIGN_RIGHT
+STYLE_DEFAULT = BeautifulTable.STYLE_DEFAULT
+STYLE_NONE = BeautifulTable.STYLE_NONE
+STYLE_DOTTED = BeautifulTable.STYLE_DOTTED
+STYLE_SEPARATED = BeautifulTable.STYLE_SEPARATED
+STYLE_COMPACT = BeautifulTable.STYLE_COMPACT
+STYLE_MYSQL = BeautifulTable.STYLE_MYSQL
+STYLE_MARKDOWN = BeautifulTable.STYLE_MARKDOWN
+STYLE_RESTRUCTURED_TEXT = BeautifulTable.STYLE_RESTRUCTURED_TEXT
