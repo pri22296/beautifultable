@@ -27,9 +27,9 @@ Example
 """
 from __future__ import division, unicode_literals
 
-import itertools
 import copy
 import operator
+import warnings
 
 from .utils import get_output_str, raise_suppressed, termwidth
 from .rows import RowData, HeaderData
@@ -39,29 +39,6 @@ from .compat import basestring, Iterable, to_unicode
 
 
 __all__ = ['BeautifulTable']
-
-
-class Column:
-    def __init__(self, table, column):
-        self._column = column
-        self._table = table
-
-    def __getitem__(self, key):
-        if isinstance(key, int):
-            return next(itertools.islice(self._column, key, None))
-        elif isinstance(key, slice):
-            return itertools.islice(self._column, key.start, key.stop,
-                                    key.step)
-        else:
-            raise TypeError(("column indices must be integers or slices, "
-                             "not {}").format(type(key).__name__))
-
-    def __setitem__(self, key, value):
-        if isinstance(key, int):
-            self._column[key] = value
-        else:
-            raise TypeError(("column indices must be integers or slices, "
-                             "not {}").format(type(key).__name__))
 
 
 class BeautifulTable(object):
@@ -78,27 +55,16 @@ class BeautifulTable(object):
         maximum width of the table in number of characters. this is ignored
         when manually setting the width of the columns. if this value is too
         low with respect to the number of columns and width of padding, the
-        resulting table may override it.
+        resulting table may override it(default 80).
 
     default_alignment : int, optional
-        Default alignment for new columns.
+        Default alignment for new columns(default beautifultable.ALIGN_CENTER).
 
     default_padding : int, optional
-        Default width of the left and right padding for new columns.
+        Default width of the left and right padding for new columns(default 1).
 
     Attributes
     ----------
-    column_count
-    sign_mode
-    width_exceed_policy
-    default_alignment
-    default_padding
-    column_widths
-    column_headers
-    column_alignments
-    left_padding_widths
-    right_padding_widths
-
     left_border_char : str
         Character used to draw the left border.
 
@@ -123,6 +89,43 @@ class BeautifulTable(object):
     intersection_char : str
         Character used to draw intersection of a vertical and horizontal
         line. Disabling it just draws the horizontal line char in it's place.
+        (DEPRECATED).
+
+    intersect_top_left : str
+        Left most character of the top border.
+
+    intersect_top_mid : str
+        Intersection character for top border.
+
+    intersect_top_right : str
+        Right most character of the top border.
+
+    intersect_header_left : str
+        Left most character of the header separator.
+
+    intersect_header_mid : str
+        Intersection character for header separator.
+
+    intersect_header_right : str
+        Right most character of the header separator.
+
+    intersect_row_left : str
+        Left most character of the row separator.
+
+    intersect_row_mid : str
+        Intersection character for row separator.
+
+    intersect_row_right : str
+        Right most character of the row separator.
+
+    intersect_bottom_left : str
+        Left most character of the bottom border.
+
+    intersect_bottom_mid : str
+        Intersection character for bottom border.
+
+    intersect_bottom_right : str
+        Right most character of the bottom border.
 
     numeric_precision : int
         All float values will have maximum number of digits after the decimal,
@@ -183,7 +186,12 @@ class BeautifulTable(object):
         attrs = ('left_border_char', 'right_border_char', 'top_border_char',
                  'bottom_border_char', 'header_separator_char',
                  'column_separator_char', 'row_separator_char',
-                 'intersection_char')
+                 'intersect_top_left', 'intersect_top_mid',
+                 'intersect_top_right', 'intersect_header_left',
+                 'intersect_header_mid', 'intersect_header_right',
+                 'intersect_row_left', 'intersect_row_mid',
+                 'intersect_row_right', 'intersect_bottom_left',
+                 'intersect_bottom_mid', 'intersect_bottom_right')
         if to_unicode(name) in attrs and not isinstance(value, basestring):
             value_type = type(value).__name__
             raise TypeError(("Expected {attr} to be of type 'str', "
@@ -197,6 +205,34 @@ class BeautifulTable(object):
     def column_count(self):
         """Get the number of columns in the table(read only)"""
         return self._column_count
+
+    @property
+    def intersection_char(self):
+        """Character used to draw intersection of perpendicular lines.
+
+        Disabling it just draws the horizontal line char in it's place.
+        This attribute is deprecated. Use specific intersect_*_* attribute.
+        """
+        warnings.warn("'intersection_char' is deprecated, Use specific "
+                      "`intersect_*_*` attribute instead", DeprecationWarning)
+        return self.intersect_top_left
+
+    @intersection_char.setter
+    def intersection_char(self, value):
+        warnings.warn("'intersection_char' is deprecated, Use specific "
+                      "`intersect_*_*` attributes instead", DeprecationWarning)
+        self.intersect_top_left = value
+        self.intersect_top_mid = value
+        self.intersect_top_right = value
+        self.intersect_header_left = value
+        self.intersect_header_mid = value
+        self.intersect_header_right = value
+        self.intersect_row_left = value
+        self.intersect_row_mid = value
+        self.intersect_row_right = value
+        self.intersect_bottom_left = value
+        self.intersect_bottom_mid = value
+        self.intersect_bottom_right = value
 
     @property
     def sign_mode(self):
@@ -589,7 +625,18 @@ class BeautifulTable(object):
         self.header_separator_char = style_template.header_separator_char
         self.column_separator_char = style_template.column_separator_char
         self.row_separator_char = style_template.row_separator_char
-        self.intersection_char = style_template.intersection_char
+        self.intersect_top_left = style_template.intersect_top_left
+        self.intersect_top_mid = style_template.intersect_top_mid
+        self.intersect_top_right = style_template.intersect_top_right
+        self.intersect_header_left = style_template.intersect_header_left
+        self.intersect_header_mid = style_template.intersect_header_mid
+        self.intersect_header_right = style_template.intersect_header_right
+        self.intersect_row_left = style_template.intersect_row_left
+        self.intersect_row_mid = style_template.intersect_row_mid
+        self.intersect_row_right = style_template.intersect_row_right
+        self.intersect_bottom_left = style_template.intersect_bottom_left
+        self.intersect_bottom_mid = style_template.intersect_bottom_mid
+        self.intersect_bottom_right = style_template.intersect_bottom_right
 
     def auto_calculate_width(self):
         """Calculate width of column automatically based on data."""
@@ -1007,13 +1054,14 @@ class BeautifulTable(object):
         if clear_metadata:
             self._initialize_table(0)
 
-    def _get_horizontal_line(self, char):
+    def _get_horizontal_line(self, char, intersect_left,
+                             intersect_mid, intersect_right):
         """Get a horizontal line for the table.
 
         Internal method used to actually get all horizontal lines in the table.
         Column width should be set prior to calling this method. This method
-        detects intersection and handles it according to the value of
-        `intersection_char`.
+        detects intersection and handles it according to the values of
+        `intersect_*_*` attributes.
 
         Parameters
         ----------
@@ -1026,7 +1074,6 @@ class BeautifulTable(object):
             String which will be printed as the Top border of the table.
         """
         width = self.get_table_width()
-        intersection = self.intersection_char
 
         try:
             line = list(char * (int(width/termwidth(char)) + 1))[:width]
@@ -1036,24 +1083,26 @@ class BeautifulTable(object):
         if len(line) == 0:
             return ''
 
-        visible_junc = not self.intersection_char.isspace()
         # Only if Special Intersection is enabled and horizontal line is
         # visible
-        if termwidth(self.intersection_char) > 0 and not char.isspace():
+        if not char.isspace():
             # If left border is enabled and it is visible
+            visible_junc = not intersect_left.isspace()
             if termwidth(self.left_border_char) > 0:
                 if not (self.left_border_char.isspace() and visible_junc):
                     length = min(termwidth(self.left_border_char),
-                                 termwidth(self.intersection_char))
+                                 termwidth(intersect_left))
                     for i in range(length):
-                        line[i] = intersection[i]
+                        line[i] = intersect_left[i]
+            visible_junc = not intersect_right.isspace()
             # If right border is enabled and it is visible
             if termwidth(self.right_border_char) > 0:
                 if not (self.right_border_char.isspace() and visible_junc):
                     length = min(termwidth(self.right_border_char),
-                                 termwidth(self.intersection_char))
+                                 termwidth(intersect_right))
                     for i in range(length):
-                        line[-i-1] = intersection[-i-1]
+                        line[-i-1] = intersect_right[-i-1]
+            visible_junc = not intersect_mid.isspace()
             # If column separator is enabled and it is visible
             if termwidth(self.column_separator_char):
                 if not (self.column_separator_char.isspace() and visible_junc):
@@ -1061,12 +1110,18 @@ class BeautifulTable(object):
                     for i in range(self._column_count-1):
                         index += (self._column_widths[i])
                         length = min(termwidth(self.column_separator_char),
-                                     termwidth(self.intersection_char))
+                                     termwidth(intersect_mid))
                         for i in range(length):
-                            line[index+i] = intersection[i]
+                            line[index+i] = intersect_mid[i]
                         index += termwidth(self.column_separator_char)
 
         return ''.join(line)
+
+    def _get_top_border(self):
+        return self._get_horizontal_line(self.top_border_char,
+                                         self.intersect_top_left,
+                                         self.intersect_top_mid,
+                                         self.intersect_top_right)
 
     def get_top_border(self):
         """Get the Top border of table.
@@ -1078,7 +1133,14 @@ class BeautifulTable(object):
         str
             String which will be printed as the Top border of the table.
         """
-        return self._get_horizontal_line(self.top_border_char)
+        warnings.warn("'get_top_border()' is deprecated", DeprecationWarning)
+        return self._get_top_border()
+
+    def _get_header_separator(self):
+        return self._get_horizontal_line(self.header_separator_char,
+                                         self.intersect_header_left,
+                                         self.intersect_header_mid,
+                                         self.intersect_header_right)
 
     def get_header_separator(self):
         """Get the Header separator of table.
@@ -1090,7 +1152,15 @@ class BeautifulTable(object):
         str
             String which will be printed as Header separator of the table.
         """
-        return self._get_horizontal_line(self.header_separator_char)
+        warnings.warn("'get_header_separator()' is deprecated",
+                      DeprecationWarning)
+        return self._get_header_separator()
+
+    def _get_row_separator(self):
+        return self._get_horizontal_line(self.row_separator_char,
+                                         self.intersect_row_left,
+                                         self.intersect_row_mid,
+                                         self.intersect_row_right)
 
     def get_row_separator(self):
         """Get the Row separator of table.
@@ -1102,7 +1172,15 @@ class BeautifulTable(object):
         str
             String which will be printed as Row separator of the table.
         """
-        return self._get_horizontal_line(self.row_separator_char)
+        warnings.warn("'get_row_separator()' is deprecated",
+                      DeprecationWarning)
+        return self._get_row_separator()
+
+    def _get_bottom_border(self):
+        return self._get_horizontal_line(self.bottom_border_char,
+                                         self.intersect_bottom_left,
+                                         self.intersect_bottom_mid,
+                                         self.intersect_bottom_right)
 
     def get_bottom_border(self):
         """Get the Bottom border of table.
@@ -1112,9 +1190,11 @@ class BeautifulTable(object):
         Returns
         -------
         str
-            String which will be printed as the Bottom border of the table.
+            String which will be printed as Bottom border of the table.
         """
-        return self._get_horizontal_line(self.bottom_border_char)
+        warnings.warn("'get_bottom_border()' is deprecated",
+                      DeprecationWarning)
+        return self._get_bottom_border()
 
     def get_table_width(self):
         """Get the width of the table as number of characters.
@@ -1168,7 +1248,7 @@ class BeautifulTable(object):
         # Drawing the top border
         if self.top_border_char:
             string_.append(
-                self.get_top_border())
+                self._get_top_border())
 
         # Print headers if not empty or only spaces
         if ''.join(self._column_headers).strip():
@@ -1177,14 +1257,14 @@ class BeautifulTable(object):
 
             if self.header_separator_char:
                 string_.append(
-                    self.get_header_separator())
+                    self._get_header_separator())
 
         # Printing rows
         first_row_encountered = False
         for row in self._table:
             if first_row_encountered and self.row_separator_char:
                 string_.append(
-                    self.get_row_separator())
+                    self._get_row_separator())
             first_row_encountered = True
             content = to_unicode(row)
             string_.append(content)
@@ -1192,7 +1272,7 @@ class BeautifulTable(object):
         # Drawing the bottom border
         if self.bottom_border_char:
             string_.append(
-                self.get_bottom_border())
+                self._get_bottom_border())
 
         if self.serialno and self.column_count > 0:
             self.pop_column(0)
