@@ -4,7 +4,11 @@ from __future__ import unicode_literals
 
 
 import re
-from wcwidth import wcwidth
+
+try:
+    from wcwidth import wcwidth
+except ImportError:               # pragma: no cover
+    wcwidth = len                 # pragma: no cover
 
 from .compat import to_unicode
 
