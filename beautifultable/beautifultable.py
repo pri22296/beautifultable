@@ -29,12 +29,12 @@ from __future__ import division, unicode_literals
 
 import copy
 import operator
-import warnings
 
-from .utils import get_output_str, raise_suppressed, termwidth
+from . import enums
+
+from .utils import get_output_str, raise_suppressed, termwidth, deprecation
 from .rows import RowData, HeaderData
 from .meta import AlignmentMetaData, PositiveIntegerMetaData
-from .enums import WidthExceedPolicy, Alignment, SignMode, Style
 from .compat import basestring, Iterable, to_unicode
 
 
@@ -143,28 +143,11 @@ class BeautifulTable(object):
         Whether numeric strings should be automatically detected(Default True).
     """
 
-    WEP_WRAP = WidthExceedPolicy.WEP_WRAP
-    WEP_STRIP = WidthExceedPolicy.WEP_STRIP
-    WEP_ELLIPSIS = WidthExceedPolicy.WEP_ELLIPSIS
-    SM_PLUS = SignMode.SM_PLUS
-    SM_MINUS = SignMode.SM_MINUS
-    SM_SPACE = SignMode.SM_SPACE
-    ALIGN_LEFT = Alignment.ALIGN_LEFT
-    ALIGN_CENTER = Alignment.ALIGN_CENTER
-    ALIGN_RIGHT = Alignment.ALIGN_RIGHT
-    STYLE_DEFAULT = Style.STYLE_DEFAULT
-    STYLE_NONE = Style.STYLE_NONE
-    STYLE_DOTTED = Style.STYLE_DOTTED
-    STYLE_SEPARATED = Style.STYLE_SEPARATED
-    STYLE_COMPACT = Style.STYLE_COMPACT
-    STYLE_MYSQL = Style.STYLE_MYSQL
-    STYLE_MARKDOWN = Style.STYLE_MARKDOWN
-    STYLE_RESTRUCTURED_TEXT = Style.STYLE_RESTRUCTURED_TEXT
-
-    def __init__(self, max_width=80, default_alignment=ALIGN_CENTER,
+    def __init__(self, max_width=80,
+                 default_alignment=enums.ALIGN_CENTER,
                  default_padding=1):
 
-        self.set_style(BeautifulTable.STYLE_DEFAULT)
+        self.set_style(enums.STYLE_DEFAULT)
 
         self.numeric_precision = 3
         self.serialno = False
@@ -172,8 +155,8 @@ class BeautifulTable(object):
         self.detect_numerics = True
 
         self._column_count = 0
-        self._sign_mode = BeautifulTable.SM_MINUS
-        self._width_exceed_policy = BeautifulTable.WEP_WRAP
+        self._sign_mode = enums.SM_MINUS
+        self._width_exceed_policy = enums.WEP_WRAP
         self._column_pad = " "
         self.default_alignment = default_alignment
         self.default_padding = default_padding
@@ -207,20 +190,20 @@ class BeautifulTable(object):
         return self._column_count
 
     @property
-    def intersection_char(self):
+    def intersection_char(self):   # pragma : no cover
         """Character used to draw intersection of perpendicular lines.
 
         Disabling it just draws the horizontal line char in it's place.
         This attribute is deprecated. Use specific intersect_*_* attribute.
         """
-        warnings.warn("'intersection_char' is deprecated, Use specific "
-                      "`intersect_*_*` attribute instead", DeprecationWarning)
+        deprecation("'intersection_char' is deprecated, Use specific "
+                    "`intersect_*_*` attribute instead")
         return self.intersect_top_left
 
     @intersection_char.setter
-    def intersection_char(self, value):
-        warnings.warn("'intersection_char' is deprecated, Use specific "
-                      "`intersect_*_*` attributes instead", DeprecationWarning)
+    def intersection_char(self, value):  # pragma : no cover
+        deprecation("'intersection_char' is deprecated, Use specific "
+                    "`intersect_*_*` attributes instead")
         self.intersect_top_left = value
         self.intersect_top_mid = value
         self.intersect_top_right = value
@@ -243,12 +226,12 @@ class BeautifulTable(object):
         ========================  =============================================
          Option                    Meaning
         ========================  =============================================
-         BeautifulTable.SM_PLUS    A sign should be used for both +ve and -ve
+         beautifultable.SM_PLUS    A sign should be used for both +ve and -ve
                                    numbers.
 
-         BeautifulTable.SM_MINUS   A sign should only be used for -ve numbers.
+         beautifultable.SM_MINUS   A sign should only be used for -ve numbers.
 
-         BeautifulTable.SM_SPACE   A leading space should be used for +ve
+         beautifultable.SM_SPACE   A leading space should be used for +ve
                                    numbers and a minus sign for -ve numbers.
         ========================  =============================================
         """
@@ -256,9 +239,9 @@ class BeautifulTable(object):
 
     @sign_mode.setter
     def sign_mode(self, value):
-        if not isinstance(value, SignMode):
+        if not isinstance(value, enums.SignMode):
             allowed = ("{}.{}".format(type(self).__name__, i.name)
-                       for i in SignMode)
+                       for i in enums.SignMode)
             error_msg = ("allowed values for sign_mode are: "
                          + ', '.join(allowed))
             raise ValueError(error_msg)
@@ -273,13 +256,13 @@ class BeautifulTable(object):
         ============================  =========================================
          Option                        Meaning
         ============================  =========================================
-         BeautifulTable.WEP_WRAP       An item is wrapped so every line fits
+         beautifulbable.WEP_WRAP       An item is wrapped so every line fits
                                        within it's column width.
 
-         BeautifulTable.WEP_STRIP      An item is stripped to fit in it's
+         beautifultable.WEP_STRIP      An item is stripped to fit in it's
                                        column.
 
-         BeautifulTable.WEP_ELLIPSIS   An item is stripped to fit in it's
+         beautifultable.WEP_ELLIPSIS   An item is stripped to fit in it's
                                        column and appended with ...(Ellipsis).
         ============================  =========================================
         """
@@ -287,9 +270,9 @@ class BeautifulTable(object):
 
     @width_exceed_policy.setter
     def width_exceed_policy(self, value):
-        if not isinstance(value, WidthExceedPolicy):
+        if not isinstance(value, enums.WidthExceedPolicy):
             allowed = ("{}.{}".format(type(self).__name__, i.name)
-                       for i in WidthExceedPolicy)
+                       for i in enums.WidthExceedPolicy)
             error_msg = ("allowed values for width_exceed_policy are: "
                          + ', '.join(allowed))
             raise ValueError(error_msg)
@@ -304,20 +287,20 @@ class BeautifulTable(object):
         ============================  =========================================
          Option                        Meaning
         ============================  =========================================
-         BeautifulTable.ALIGN_LEFT     New columns are left aligned.
+         beautifultable.ALIGN_LEFT     New columns are left aligned.
 
-         BeautifulTable.ALIGN_CENTER   New columns are center aligned.
+         beautifultable.ALIGN_CENTER   New columns are center aligned.
 
-         BeautifulTable.ALIGN_RIGHT    New columns are right aligned.
+         beautifultable.ALIGN_RIGHT    New columns are right aligned.
         ============================  =========================================
         """
         return self._default_alignment
 
     @default_alignment.setter
     def default_alignment(self, value):
-        if not isinstance(value, Alignment):
+        if not isinstance(value, enums.Alignment):
             allowed = ("{}.{}".format(type(self).__name__, i.name)
-                       for i in Alignment)
+                       for i in enums.Alignment)
             error_msg = ("allowed values for default_alignment are: "
                          + ', '.join(allowed))
             raise ValueError(error_msg)
@@ -375,9 +358,9 @@ class BeautifulTable(object):
 
         It can be any iterable containing only the following:
 
-        * BeautifulTable.ALIGN_LEFT
-        * BeautifulTable.ALIGN_CENTER
-        * BeautifulTable.ALIGN_RIGHT
+        * beautifultable.ALIGN_LEFT
+        * beautifultable.ALIGN_CENTER
+        * beautifultable.ALIGN_RIGHT
         """
         return self._column_alignments
 
@@ -603,17 +586,22 @@ class BeautifulTable(object):
 
             It can be one of the following:
 
-            * BeautifulTable.STYLE_DEFAULT
-            * BeautifulTable.STYLE_DOTTED
-            * BeautifulTable.STYLE_MYSQL
-            * BeautifulTable.STYLE_SEPARATED
-            * BeautifulTable.STYLE_COMPACT
-            * BeautifulTable.STYLE_MARKDOWN
-            * BeautifulTable.STYLE_RESTRUCTURED_TEXT
+            * beautifulTable.STYLE_DEFAULT
+            * beautifultable.STYLE_NONE
+            * beautifulTable.STYLE_DOTTED
+            * beautifulTable.STYLE_MYSQL
+            * beautifulTable.STYLE_SEPARATED
+            * beautifulTable.STYLE_COMPACT
+            * beautifulTable.STYLE_MARKDOWN
+            * beautifulTable.STYLE_RESTRUCTURED_TEXT
+            * beautifultable.STYLE_BOX
+            * beautifultable.STYLE_BOX_DOUBLED
+            * beautifultable.STYLE_BOX_ROUNDED
+            * beautifultable.STYLE_GRID
         """
-        if not isinstance(style, Style):
+        if not isinstance(style, enums.Style):
             allowed = ("{}.{}".format(type(self).__name__, i.name)
-                       for i in Style)
+                       for i in enums.Style)
             error_msg = ("allowed values for style are: "
                          + ', '.join(allowed))
             raise ValueError(error_msg)
@@ -638,7 +626,7 @@ class BeautifulTable(object):
         self.intersect_bottom_mid = style_template.intersect_bottom_mid
         self.intersect_bottom_right = style_template.intersect_bottom_right
 
-    def auto_calculate_width(self):
+    def _calculate_column_widths(self):
         """Calculate width of column automatically based on data."""
         table_width = self.get_table_width()
         lpw, rpw = self._left_padding_widths, self._right_padding_widths
@@ -711,6 +699,10 @@ class BeautifulTable(object):
 
         for i in range(self.column_count):
             self.column_widths[i] += pad_widths[i]
+
+    def auto_calculate_width(self):    # pragma : no cover
+        deprecation("'auto_calculate_width()' is deprecated")
+        self._calculate_column_widths()
 
     def set_padding_widths(self, pad_width):
         """Set width for left and rigth padding of the columns of the table.
@@ -1123,7 +1115,7 @@ class BeautifulTable(object):
                                          self.intersect_top_mid,
                                          self.intersect_top_right)
 
-    def get_top_border(self):
+    def get_top_border(self):    # pragma : no cover
         """Get the Top border of table.
 
         Column width should be set prior to calling this method.
@@ -1133,7 +1125,7 @@ class BeautifulTable(object):
         str
             String which will be printed as the Top border of the table.
         """
-        warnings.warn("'get_top_border()' is deprecated", DeprecationWarning)
+        deprecation("'get_top_border()' is deprecated")
         return self._get_top_border()
 
     def _get_header_separator(self):
@@ -1142,7 +1134,7 @@ class BeautifulTable(object):
                                          self.intersect_header_mid,
                                          self.intersect_header_right)
 
-    def get_header_separator(self):
+    def get_header_separator(self):   # pragma : no cover
         """Get the Header separator of table.
 
         Column width should be set prior to calling this method.
@@ -1152,8 +1144,7 @@ class BeautifulTable(object):
         str
             String which will be printed as Header separator of the table.
         """
-        warnings.warn("'get_header_separator()' is deprecated",
-                      DeprecationWarning)
+        deprecation("'get_header_separator()' is deprecated")
         return self._get_header_separator()
 
     def _get_row_separator(self):
@@ -1162,7 +1153,7 @@ class BeautifulTable(object):
                                          self.intersect_row_mid,
                                          self.intersect_row_right)
 
-    def get_row_separator(self):
+    def get_row_separator(self):   # pragma : no cover
         """Get the Row separator of table.
 
         Column width should be set prior to calling this method.
@@ -1172,8 +1163,7 @@ class BeautifulTable(object):
         str
             String which will be printed as Row separator of the table.
         """
-        warnings.warn("'get_row_separator()' is deprecated",
-                      DeprecationWarning)
+        deprecation("'get_row_separator()' is deprecated")
         return self._get_row_separator()
 
     def _get_bottom_border(self):
@@ -1182,7 +1172,7 @@ class BeautifulTable(object):
                                          self.intersect_bottom_mid,
                                          self.intersect_bottom_right)
 
-    def get_bottom_border(self):
+    def get_bottom_border(self):   # pragma : no cover
         """Get the Bottom border of table.
 
         Column width should be set prior to calling this method.
@@ -1192,8 +1182,7 @@ class BeautifulTable(object):
         str
             String which will be printed as Bottom border of the table.
         """
-        warnings.warn("'get_bottom_border()' is deprecated",
-                      DeprecationWarning)
+        deprecation("'get_bottom_border()' is deprecated")
         return self._get_bottom_border()
 
     def get_table_width(self):
@@ -1241,7 +1230,7 @@ class BeautifulTable(object):
 
         # Should widths of column be recalculated
         if recalculate_width or sum(self._column_widths) == 0:
-            self.auto_calculate_width()
+            self._calculate_column_widths()
 
         string_ = []
 

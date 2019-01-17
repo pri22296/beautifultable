@@ -1,7 +1,11 @@
 """Module containing some utility methods"""
 
+import warnings
+
+
 from .ansi import ANSIMultiByteString
 from .compat import to_unicode, PY3
+from .exceptions import BeautifulTableDeprecationWarning
 
 
 def _convert_to_numeric(item):
@@ -63,3 +67,7 @@ def textwrap(item, width):
 def raise_suppressed(exp):
     exp.__cause__ = None
     raise exp
+
+
+def deprecation(message):
+    warnings.warn(message, BeautifulTableDeprecationWarning)

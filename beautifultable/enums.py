@@ -3,7 +3,8 @@ import enum
 
 from .styles import (DefaultStyle, NoStyle, DottedStyle, MySQLStyle,
                      SeparatedStyle, CompactStyle, MarkdownStyle,
-                     RestructuredTextStyle)
+                     RestructuredTextStyle, BoxStyle, DoubledBoxStyle,
+                     RoundedStyle, GridStyle)
 
 
 class WidthExceedPolicy(enum.Enum):
@@ -41,7 +42,34 @@ class Style(enum.Enum):
     STYLE_SEPARATED = SeparatedStyle
     STYLE_COMPACT = CompactStyle
     STYLE_MARKDOWN = MarkdownStyle
-    STYLE_RESTRUCTURED_TEXT = RestructuredTextStyle
+    STYLE_RST = RestructuredTextStyle
+    STYLE_BOX = BoxStyle
+    STYLE_BOX_DOUBLED = DoubledBoxStyle
+    STYLE_BOX_ROUNDED = RoundedStyle
+    STYLE_GRID = GridStyle
 
     def __repr__(self):
         return self.name
+
+
+WEP_WRAP = WidthExceedPolicy.WEP_WRAP
+WEP_STRIP = WidthExceedPolicy.WEP_STRIP
+WEP_ELLIPSIS = WidthExceedPolicy.WEP_ELLIPSIS
+SM_PLUS = SignMode.SM_PLUS
+SM_MINUS = SignMode.SM_MINUS
+SM_SPACE = SignMode.SM_SPACE
+ALIGN_LEFT = Alignment.ALIGN_LEFT
+ALIGN_CENTER = Alignment.ALIGN_CENTER
+ALIGN_RIGHT = Alignment.ALIGN_RIGHT
+STYLE_DEFAULT = Style.STYLE_DEFAULT
+STYLE_NONE = Style.STYLE_NONE
+STYLE_DOTTED = Style.STYLE_DOTTED
+STYLE_SEPARATED = Style.STYLE_SEPARATED
+STYLE_COMPACT = Style.STYLE_COMPACT
+STYLE_MYSQL = Style.STYLE_MYSQL
+STYLE_MARKDOWN = Style.STYLE_MARKDOWN
+STYLE_RST = Style.STYLE_RST
+STYLE_BOX = Style.STYLE_BOX
+STYLE_BOX_DOUBLED = Style.STYLE_BOX_DOUBLED
+STYLE_BOX_ROUNDED = Style.STYLE_BOX_ROUNDED
+STYLE_GRID = Style.STYLE_GRID

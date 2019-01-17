@@ -1,23 +1,28 @@
+from .__version__ import __title__, __description__, __url__, __version__
+from .__version__ import __copyright__, __author__, __author_email__
+from .__version__ import __license__
+
 from .beautifultable import BeautifulTable
+from . import enums
+from .enums import *         # noqa
+from .exceptions import BeautifulTableDeprecationWarning
+
+import warnings
 
 
-__version__ = '0.6.0'
+__all__ = ['BeautifulTable',
+           '__title__', '__description__', '__url__', '__version__',
+           '__copyright__', '__author__', '__author_email__', '__license__',
+           ]
 
 
-WEP_WRAP = BeautifulTable.WEP_WRAP
-WEP_STRIP = BeautifulTable.WEP_STRIP
-WEP_ELLIPSIS = BeautifulTable.WEP_ELLIPSIS
-SM_PLUS = BeautifulTable.SM_PLUS
-SM_MINUS = BeautifulTable.SM_MINUS
-SM_SPACE = BeautifulTable.SM_SPACE
-ALIGN_LEFT = BeautifulTable.ALIGN_LEFT
-ALIGN_CENTER = BeautifulTable.ALIGN_CENTER
-ALIGN_RIGHT = BeautifulTable.ALIGN_RIGHT
-STYLE_DEFAULT = BeautifulTable.STYLE_DEFAULT
-STYLE_NONE = BeautifulTable.STYLE_NONE
-STYLE_DOTTED = BeautifulTable.STYLE_DOTTED
-STYLE_SEPARATED = BeautifulTable.STYLE_SEPARATED
-STYLE_COMPACT = BeautifulTable.STYLE_COMPACT
-STYLE_MYSQL = BeautifulTable.STYLE_MYSQL
-STYLE_MARKDOWN = BeautifulTable.STYLE_MARKDOWN
-STYLE_RESTRUCTURED_TEXT = BeautifulTable.STYLE_RESTRUCTURED_TEXT
+# To avoid duplicating enums name, dynamically add them to BeautifulTable
+# class and __all__
+for token in dir(enums):
+    if (token.startswith('WEP_') or token.startswith('ALIGN_') or
+            token.startswith('SM_') or token.startswith('STYLE_')):
+        setattr(BeautifulTable, token, getattr(enums, token))
+        __all__.append(token)
+
+
+warnings.simplefilter('always', BeautifulTableDeprecationWarning)

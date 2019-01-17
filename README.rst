@@ -1,5 +1,5 @@
 ##########################################################################
-BeautifulTable
+beautifultable
 ##########################################################################
 
 .. inclusion-marker-badges-start
@@ -23,6 +23,9 @@ BeautifulTable
     :alt: Documentation Status
     :target: http://beautifultable.readthedocs.io/en/latest/?badge=latest
 
+.. image:: https://img.shields.io/badge/Donate-PayPal-brightgreen.svg
+    :target: https://paypal.me/beautifultable
+
 .. inclusion-marker-badges-end
 
 
@@ -35,11 +38,16 @@ Introduction
 This Package provides BeautifulTable class for easily printing
 tabular data in a visually appealing ASCII format to a terminal. 
 
-Features include:
+Features included but not limited to:
 
-* Full customization of the look and feel of the Table
-* Build the Table as you wish, By adding Rows, or by columns or even
-  mixing both these approaches.  
+* Full customization of the look and feel of the table
+* Build the Table as you wish, By adding rows, or by columns or even
+  mixing both these approaches.
+* Full support for *colors* using ANSI sequences or any library of your
+  choice. It just works.
+* Plenty of predefined *styles* for multiple use cases and option to
+  create custom ones.
+* Support for *Unicode* characters.
   
 .. inclusion-marker-introduction-end
 
@@ -123,14 +131,19 @@ Changelog
 Unreleased
 ==========
 
-* Added finer control for intersection characters using 12 new attributes *intersect_{top|header|row|bottom}_{left|mid|right}*
-  Deprecated attribute *intersection_char*
-* Deprecated methods *get_top_border()*, *get_bottom_border()*, *get_header_separator()*, *get_row_separator()*
+* Added 4 new styles, **STYLE_BOX**, **STYLE_BOX_DOUBLED**, **STYLE_BOX_ROUNDED**,
+  **STYLE_GRID**. Renamed **STYLE_RESTRUCTURED_TEXT** to **STYLE_RST**
+* **wcwidth** is now an optional dependency
 * Updated the algorithm for calculating width of columns(better division of space among columns)
-* Added support for Paragraphs(using newline character)
+* Added support for Paragraphs(using ``\n`` character)
+* Added finer control for intersection characters using 12 new
+  attributes ``intersect_{top|header|row|bottom}_{left|mid|right}``
+* Deprecated attribute *intersection_char*
+* Deprecated methods ``get_top_border()``, ``get_bottom_border()``, ``get_header_separator()``,
+  ``get_row_separator()``, ``auto_calculate_width()``
 * Added the ability to also accept bytestrings instead of unicode
 * Fixed an issue with **WEP_ELLIPSIS** and **WEP_STRIP** when using multibyte characters
-* Fixed an issue where table would not be in proper form if column_width is too low
+* Fixed an issue where table would not be in proper form if ``column_width`` is too low
 
 ==========
 v0.6.0
@@ -159,16 +172,15 @@ v0.5.2
 v0.5.1
 ==========
 
-* Added *detect_numerics* boolean for toggling automatic numeric conversion
+* Added ``detect_numerics`` boolean for toggling automatic numeric conversion
 
 ==========
 v0.5.0
 ==========
 
-* Added new property *serialno_header*
-* Deprecated methods with misspelled *seperator* in their name.
-  Legacy methods will be removed in v0.7.0
-* Fixed an issue where table was corrupted when *column_count* was too high
+* Added new property ``serialno_header``
+* Deprecated methods with misspelled *"seperator"* in their name.
+* Fixed an issue where table was corrupted when ``column_count`` was too high
 
 
 ==========
@@ -176,15 +188,15 @@ v0.4.0
 ==========
 
 * Added predefined styles for easier customization
-* Added *reverse* argument to `sort` method
+* Added *reverse* argument to ``sort()`` method
 * Fixed *enum34* dependency for python versions prior to 3.4
 
 ==========
 v0.3.0
 ==========
 
-* Added property *serialno* for auto printing serial number
-* Fixed an issue with `sign_mode` related to str conversion
+* Added property ``serialno`` for auto printing serial number
+* Fixed an issue with ``sign_mode`` related to str conversion
 * Fixed bugs related to python version prior to 3.3
 * Fixed exception on **WEP_ELLIPSIS** and token length less than 3
 * Fixed printing issues with empty table
@@ -205,9 +217,9 @@ v0.1.3
 v0.1.2
 ==========
 
-* Added new property *default_padding*
-* Added new method *update_row*
-* Fixed an issue in *auto_calculate_width*
+* Added new property ``default_padding``
+* Added new method ``update_row``
+* Fixed an issue in ``auto_calculate_width()``
 
 ==========
 v0.1.1
@@ -251,7 +263,7 @@ This project is licensed under the MIT License - see the `LICENSE.txt <https://g
 Donation
 **************************************************************************
 
-If this project helps you in any way, consider buying me a cup of coffee :)
+Love *beautifultable*? Consider supporting the development :)
 
 .. image:: https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif
     :target: https://paypal.me/beautifultable
