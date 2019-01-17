@@ -1,24 +1,37 @@
-from setuptools import setup
+import os
 
-version = '0.6.0'
+from setuptools import setup
+from codecs import open
+
+
 extras_require = {':python_version<"3.4"': ['enum34']}
-description = ('Utility package to print visually appealing ASCII tables '
-               'to terminal')
-download_url_fmt = 'https://github.com/pri22296/beautifultable/tarball/{}'
+
+this_dir = os.path.abspath(os.path.dirname(__file__))
+version_path = os.path.join(this_dir, 'beautifultable', '__version__.py')
+
+about = {}
+with open(version_path, 'r', 'utf-8') as f:
+    exec(f.read(), about)
+
+with open('README.rst', 'r', 'utf-8') as f:
+    readme = f.read()
+
+download_url = '{}/tarball/{}'.format(about['__url__'],
+                                      about['__version__'])
 
 setup(
-    name='beautifultable',
-    version=version,
-    description=description,
-    extras_require=extras_require,
-    long_description=open('README.rst', 'rt').read(),
-    author='Priyam Singh',
-    author_email='priyamsingh.22296@gmail.com',
+    name=about['__title__'],
+    version=about['__version__'],
+    description=about['__description__'],
+    long_description=readme,
+    author=about['__author__'],
+    author_email=about['__author_email__'],
     packages=['beautifultable'],
-    url='https://github.com/pri22296/beautifultable',
-    download_url=download_url_fmt.format(version),
+    url=about['__url__'],
+    download_url=download_url,
+    license=about['__license__'],
     keywords='table terminal ascii',
-    license='MIT',
+    extras_require=extras_require,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console',

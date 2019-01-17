@@ -19,13 +19,11 @@ Contents
 ******************************************
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    
    install
    quickstart
    changelog
 
 
-.. include:: ../README.rst
-   :start-after: inclusion-marker-donation-start
-   :end-before: inclusion-marker-donation-end
+.. include:: donation.rst

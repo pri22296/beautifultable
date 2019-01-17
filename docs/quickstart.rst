@@ -287,7 +287,7 @@ Cheking if a row is in table
 
 
 =========================================================================
-Sorting
+Sorting based on a Column
 =========================================================================
 
 You can also :meth:`~.BeautifulTable.sort` the table based on a column by
@@ -497,11 +497,11 @@ of the table. The following styles are available:
      |  Sophia  |  2   |  girl  |
      | Michael  |  3   |  boy   |
 
-* **STYLE_RESTRUCTURED_TEXT**
+* **STYLE_RST**
 
   .. code:: python
 
-     >>> table.set_style(BeautifulTable.STYLE_RESTRUCTURED_TEXT)
+     >>> table.set_style(BeautifulTable.STYLE_RST)
      >>> print(table)
      ========== ====== ========
         name     rank   gender
@@ -512,6 +512,86 @@ of the table. The following styles are available:
        Sophia     2      girl
       Michael     3      boy
      ========== ====== ========
+
+* **STYLE_BOX**
+
+  .. code:: python
+
+     >>> table.set_style(BeautifulTable.STYLE_BOX)
+     >>> print(table)
+     ┌──────────┬──────┬────────┐
+     │   name   │ rank │ gender │
+     ├──────────┼──────┼────────┤
+     │  Jacob   │  1   │  boy   │
+     ├──────────┼──────┼────────┤
+     │ Isabella │  1   │  girl  │
+     ├──────────┼──────┼────────┤
+     │  Ethan   │  2   │  boy   │
+     ├──────────┼──────┼────────┤
+     │  Sophia  │  2   │  girl  │
+     ├──────────┼──────┼────────┤
+     │ Michael  │  3   │  boy   │
+     └──────────┴──────┴────────┘
+
+* **STYLE_BOX_DOUBLED**
+
+  .. code:: python
+
+     >>> table.set_style(BeautifulTable.STYLE_BOX_DOUBLED)
+     >>> print(table)
+     ╔══════════╦══════╦════════╗
+     ║   name   ║ rank ║ gender ║
+     ╠══════════╬══════╬════════╣
+     ║  Jacob   ║  1   ║  boy   ║
+     ╠══════════╬══════╬════════╣
+     ║ Isabella ║  1   ║  girl  ║
+     ╠══════════╬══════╬════════╣
+     ║  Ethan   ║  2   ║  boy   ║
+     ╠══════════╬══════╬════════╣
+     ║  Sophia  ║  2   ║  girl  ║
+     ╠══════════╬══════╬════════╣
+     ║ Michael  ║  3   ║  boy   ║
+     ╚══════════╩══════╩════════╝
+
+* **STYLE_BOX_ROUNDED**
+
+  .. code:: python
+
+     >>> table.set_style(BeautifulTable.STYLE_BOX_ROUNDED)
+     >>> print(table)
+     ╭──────────┬──────┬────────╮
+     │   name   │ rank │ gender │
+     ├──────────┼──────┼────────┤
+     │  Jacob   │  1   │  boy   │
+     ├──────────┼──────┼────────┤
+     │ Isabella │  1   │  girl  │
+     ├──────────┼──────┼────────┤
+     │  Ethan   │  2   │  boy   │
+     ├──────────┼──────┼────────┤
+     │  Sophia  │  2   │  girl  │
+     ├──────────┼──────┼────────┤
+     │ Michael  │  3   │  boy   │
+     ╰──────────┴──────┴────────╯
+
+* **STYLE_GRID**
+
+  .. code:: python
+
+     >>> table.set_style(BeautifulTable.STYLE_GRID)
+     >>> print(table)
+     ╔══════════╤══════╤════════╗
+     ║   name   │ rank │ gender ║
+     ╟──────────┼──────┼────────╢
+     ║  Jacob   │  1   │  boy   ║
+     ╟──────────┼──────┼────────╢
+     ║ Isabella │  1   │  girl  ║
+     ╟──────────┼──────┼────────╢
+     ║  Ethan   │  2   │  boy   ║
+     ╟──────────┼──────┼────────╢
+     ║  Sophia  │  2   │  girl  ║
+     ╟──────────┼──────┼────────╢
+     ║ Michael  │  3   │  boy   ║
+     ╚══════════╧══════╧════════╝
 
 For more finer customization, you can change what characters are used to draw
 various parts of the table. Here we show you an example of how you can use
@@ -646,12 +726,12 @@ works.
 
 
 =========================================================================
-Support for East-asian(multibyte) characters
+Support for Multibyte Unicode characters
 =========================================================================
 
-**beautifultable** comes with in-built support for east-asian characters. To
-enable multibyte character support, You need to install the *wcwidth* library
-from PyPI.
+**beautifultable** comes with in-built support for multibyte unicode such as
+east-asian characters. To enable support, You need to install the *wcwidth*
+library from PyPI.
 
 ::
 
