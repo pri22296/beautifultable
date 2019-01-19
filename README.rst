@@ -23,7 +23,7 @@ beautifultable
     :alt: Documentation Status
     :target: http://beautifultable.readthedocs.io/en/latest/?badge=latest
 
-.. image:: https://img.shields.io/badge/Donate-PayPal-brightgreen.svg
+.. image:: https://img.shields.io/badge/Donate-PayPal-yellow.svg
     :target: https://paypal.me/beautifultable
 
 .. inclusion-marker-badges-end
@@ -128,20 +128,21 @@ Changelog
 **************************************************************************
 
 ==========
-Unreleased
+v0.7.0
 ==========
 
 * Added 4 new styles, **STYLE_BOX**, **STYLE_BOX_DOUBLED**, **STYLE_BOX_ROUNDED**,
-  **STYLE_GRID**. Renamed **STYLE_RESTRUCTURED_TEXT** to **STYLE_RST**
+  **STYLE_GRID**.
+* Renamed **STYLE_RESTRUCTURED_TEXT** to **STYLE_RST**
 * **wcwidth** is now an optional dependency
 * Updated the algorithm for calculating width of columns(better division of space among columns)
 * Added support for Paragraphs(using ``\n`` character)
 * Added finer control for intersection characters using 12 new
   attributes ``intersect_{top|header|row|bottom}_{left|mid|right}``
-* Deprecated attribute *intersection_char*
+* Added the ability to also accept bytestrings instead of unicode
+* Deprecated attribute ``intersection_char``
 * Deprecated methods ``get_top_border()``, ``get_bottom_border()``, ``get_header_separator()``,
   ``get_row_separator()``, ``auto_calculate_width()``
-* Added the ability to also accept bytestrings instead of unicode
 * Fixed an issue with **WEP_ELLIPSIS** and **WEP_STRIP** when using multibyte characters
 * Fixed an issue where table would not be in proper form if ``column_width`` is too low
 
