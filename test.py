@@ -248,6 +248,23 @@ class TableOperationsTestCase(unittest.TestCase):
 +----------+------+--------+"""
         self.assertEqual(string, self.table.get_string())
 
+    def test_align_all(self):
+        self.table.column_alignments = self.table.ALIGN_LEFT
+        string = """+----------+------+--------+
+| name     | rank | gender |
++----------+------+--------+
+| Jacob    | 1    | boy    |
++----------+------+--------+
+| Isabella | 1    | girl   |
++----------+------+--------+
+| Ethan    | 2    | boy    |
++----------+------+--------+
+| Sophia   | 2    | girl   |
++----------+------+--------+
+| Michael  | 3    | boy    |
++----------+------+--------+"""
+        self.assertEqual(string, self.table.get_string())
+
     def test_signmode_plus(self):
         self.table.sign_mode = self.table.SM_PLUS
         string = """+----------+------+--------+

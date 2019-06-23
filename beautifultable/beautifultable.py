@@ -332,6 +332,8 @@ class BeautifulTable(object):
 
     @column_widths.setter
     def column_widths(self, value):
+        if isinstance(value, int):
+            value = [value] * self._column_count
         width = self._validate_row(value)
         self._column_widths = PositiveIntegerMetaData(self, width)
 
@@ -366,6 +368,8 @@ class BeautifulTable(object):
 
     @column_alignments.setter
     def column_alignments(self, value):
+        if isinstance(value, enums.Alignment):
+            value = [value] * self._column_count
         alignment = self._validate_row(value)
         self._column_alignments = AlignmentMetaData(self, alignment)
 
@@ -380,6 +384,8 @@ class BeautifulTable(object):
 
     @left_padding_widths.setter
     def left_padding_widths(self, value):
+        if isinstance(value, int):
+            value = [value] * self._column_count
         pad_width = self._validate_row(value)
         self._left_padding_widths = PositiveIntegerMetaData(self, pad_width)
 
@@ -394,6 +400,8 @@ class BeautifulTable(object):
 
     @right_padding_widths.setter
     def right_padding_widths(self, value):
+        if isinstance(value, int):
+            value = [value] * self._column_count
         pad_width = self._validate_row(value)
         self._right_padding_widths = PositiveIntegerMetaData(self, pad_width)
 
