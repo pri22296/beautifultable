@@ -586,14 +586,14 @@ class BeautifulTable(object):
 
             It can be one of the following:
 
-            * beautifulTable.STYLE_DEFAULT
+            * beautifultable.STYLE_DEFAULT
             * beautifultable.STYLE_NONE
-            * beautifulTable.STYLE_DOTTED
-            * beautifulTable.STYLE_MYSQL
-            * beautifulTable.STYLE_SEPARATED
-            * beautifulTable.STYLE_COMPACT
-            * beautifulTable.STYLE_MARKDOWN
-            * beautifulTable.STYLE_RESTRUCTURED_TEXT
+            * beautifultable.STYLE_DOTTED
+            * beautifultable.STYLE_MYSQL
+            * beautifultable.STYLE_SEPARATED
+            * beautifultable.STYLE_COMPACT
+            * beautifultable.STYLE_MARKDOWN
+            * beautifultable.STYLE_RESTRUCTURED_TEXT
             * beautifultable.STYLE_BOX
             * beautifultable.STYLE_BOX_DOUBLED
             * beautifultable.STYLE_BOX_ROUNDED
@@ -636,20 +636,24 @@ class BeautifulTable(object):
         self._max_table_width = max(self._max_table_width,
                                     offset + self._column_count)
 
-        for index, column in enumerate(zip(*self._table)):
+        for index, header in enumerate(self.column_headers):
             max_length = 0
-            for i in column:
-                for j in to_unicode(i).split('\n'):
-                    output_str = get_output_str(j, self.detect_numerics,
-                                                self.numeric_precision,
-                                                self.sign_mode.value)
-                    max_length = max(max_length, termwidth(output_str))
             for i in to_unicode(self._column_headers[index]).split('\n'):
                 output_str = get_output_str(i, self.detect_numerics,
                                             self.numeric_precision,
                                             self.sign_mode.value)
                 max_length = max(max_length, termwidth(output_str))
             max_widths[index] += max_length
+
+        for index, column in enumerate(zip(*self._table)):
+            max_length = max_widths[index]
+            for i in column:
+                for j in to_unicode(i).split('\n'):
+                    output_str = get_output_str(j, self.detect_numerics,
+                                                self.numeric_precision,
+                                                self.sign_mode.value)
+                    max_length = max(max_length, termwidth(output_str))
+            max_widths[index] = max_length
 
         sum_ = sum(max_widths)
         desired_sum = self._max_table_width - offset
@@ -997,10 +1001,10 @@ class BeautifulTable(object):
             if not isinstance(header, basestring):
                 raise TypeError("header must be of type str")
             column_length = 0
-            for i, (row, new_item) in enumerate(zip(self._table, column)):
+            for row, new_item in zip(self._table, column):
                 row._insert(index, new_item)
-                column_length = i
-            if column_length == len(self._table) - 1:
+                column_length += 1
+            if column_length == len(self._table):
                 self._column_count += 1
                 self._column_headers._insert(index, header)
                 self._column_alignments._insert(index, self.default_alignment)
@@ -1013,7 +1017,7 @@ class BeautifulTable(object):
                     self._table[j]._pop(index)
                 raise ValueError(("length of 'column' should be atleast {}, "
                                   "got {}").format(len(self._table),
-                                                   column_length + 1))
+                                                   column_length))
 
     def append_column(self, header, column):
         """Append a column to end of the table.
@@ -1204,6 +1208,85 @@ class BeautifulTable(object):
         width += termwidth(self.right_border_char)
         return width
 
+    def _get_string(self, rows, append=False, recalculate_width=False):
+        # Drawing the top border
+        if self.serialno:
+            if self.column_count > 0:
+                self.insert_column(0, self.serialno_header,
+                                   range(1, len(self) + 1))
+
+        if recalculate_width or sum(self._column_widths) == 0:
+            self._calculate_column_widths()
+
+        if self.serialno and self.column_count > 0 and self.column_widths[0] == 0:
+            self.column_widths[0] = (max(4, len(self.serialno_header))
+                                     + 2 * self.default_padding)
+
+        if self.top_border_char:
+            yield self._get_top_border()
+
+        # Print headers if not empty or only spaces
+        if ''.join(self._column_headers).strip():
+            headers = to_unicode(self._column_headers)
+            yield headers
+
+            if self.header_separator_char:
+                yield self._get_header_separator()
+
+        # Printing rows
+        first_row_encountered = False
+        for row in self._table:
+            if first_row_encountered and self.row_separator_char:
+                yield self._get_row_separator()
+            first_row_encountered = True
+            content = to_unicode(row)
+            yield content
+
+        prev_length = len(self)
+        for i, row in enumerate(rows, start=1):
+            if first_row_encountered and self.row_separator_char:
+                yield self._get_row_separator()
+            first_row_encountered = True
+            if self.serialno:
+                row.insert(0, prev_length + i)
+            self.append_row(row)
+            content = to_unicode(self._table[-1])
+            if not append:
+                self.pop_row()
+            yield content
+
+        # Drawing the bottom border
+        if self.bottom_border_char:
+            yield self._get_bottom_border()
+
+        if self.serialno and self.column_count > 0:
+            self.pop_column(0)
+
+    def stream(self, rows, append=False):
+        """Get a generator for the table.
+
+        This should be used in cases where data takes time to retrieve and
+        it is required be displayed as soon as possible. Any existing rows
+        in the table shall also be returned. It is required that atleast one
+        of title, width or existing rows set prior to calling this method.
+
+        Parameters
+        ----------
+        rows : iterable
+            A generator which yields one row at a time.
+
+        append : bool, optional
+            If rows should also be appended to the table.(Default False)
+
+        Returns
+        -------
+        iterable:
+            string representation of the table as a generators
+        """
+        for line in self._get_string(rows, append=append,
+                                     recalculate_width=False):
+            yield line
+
     def get_string(self, recalculate_width=True):
         """Get the table as a String.
 
@@ -1220,50 +1303,13 @@ class BeautifulTable(object):
         str:
             Table as a string.
         """
-        # Empty table. returning empty string.
+
         if len(self._table) == 0:
             return ''
 
-        if self.serialno and self.column_count > 0:
-            self.insert_column(0, self.serialno_header,
-                               range(1, len(self) + 1))
-
-        # Should widths of column be recalculated
-        if recalculate_width or sum(self._column_widths) == 0:
-            self._calculate_column_widths()
-
         string_ = []
-
-        # Drawing the top border
-        if self.top_border_char:
-            string_.append(
-                self._get_top_border())
-
-        # Print headers if not empty or only spaces
-        if ''.join(self._column_headers).strip():
-            headers = to_unicode(self._column_headers)
-            string_.append(headers)
-
-            if self.header_separator_char:
-                string_.append(
-                    self._get_header_separator())
-
-        # Printing rows
-        first_row_encountered = False
-        for row in self._table:
-            if first_row_encountered and self.row_separator_char:
-                string_.append(
-                    self._get_row_separator())
-            first_row_encountered = True
-            content = to_unicode(row)
-            string_.append(content)
-
-        # Drawing the bottom border
-        if self.bottom_border_char:
-            string_.append(
-                self._get_bottom_border())
-
-        if self.serialno and self.column_count > 0:
-            self.pop_column(0)
+        for line in self._get_string([], append=False,
+                                     recalculate_width=recalculate_width):
+            string_.append(line)
 
         return '\n'.join(string_)
