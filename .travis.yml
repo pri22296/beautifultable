@@ -26,6 +26,8 @@ matrix:
       env:
         - TOXENV=coverage
         - COVERAGE_REPORT=codecov
+    - python: 3.6
+      env: TOXENV=black
 
 install:
     - pip install tox

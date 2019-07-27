@@ -1,10 +1,20 @@
 from __future__ import unicode_literals
 import enum
 
-from .styles import (DefaultStyle, NoStyle, DottedStyle, MySQLStyle,
-                     SeparatedStyle, CompactStyle, MarkdownStyle,
-                     RestructuredTextStyle, BoxStyle, DoubledBoxStyle,
-                     RoundedStyle, GridStyle)
+from .styles import (
+    DefaultStyle,
+    NoStyle,
+    DottedStyle,
+    MySQLStyle,
+    SeparatedStyle,
+    CompactStyle,
+    MarkdownStyle,
+    RestructuredTextStyle,
+    BoxStyle,
+    DoubledBoxStyle,
+    RoundedStyle,
+    GridStyle,
+)
 
 
 class WidthExceedPolicy(enum.Enum):
@@ -17,18 +27,18 @@ class WidthExceedPolicy(enum.Enum):
 
 
 class SignMode(enum.Enum):
-    SM_PLUS = '+'
-    SM_MINUS = '-'
-    SM_SPACE = ' '
+    SM_PLUS = "+"
+    SM_MINUS = "-"
+    SM_SPACE = " "
 
     def __repr__(self):
         return self.name
 
 
 class Alignment(enum.Enum):
-    ALIGN_LEFT = '<'
-    ALIGN_CENTER = '^'
-    ALIGN_RIGHT = '>'
+    ALIGN_LEFT = "<"
+    ALIGN_CENTER = "^"
+    ALIGN_RIGHT = ">"
 
     def __repr__(self):
         return self.name

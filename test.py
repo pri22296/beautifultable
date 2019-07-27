@@ -29,32 +29,32 @@ class TableOperationsTestCase(unittest.TestCase):
         self.assertEqual(self.table.column_count, 3)
 
     def test_access_column_by_header(self):
-        column = ['Jacob', 'Isabella', 'Ethan', 'Sophia', 'Michael']
-        self.compare_iterable(column, self.table['name'])
+        column = ["Jacob", "Isabella", "Ethan", "Sophia", "Michael"]
+        self.compare_iterable(column, self.table["name"])
         with self.assertRaises(KeyError):
-            self.table['name1']
+            self.table["name1"]
 
     def test_get_column_index(self):
-        self.assertEqual(self.table.get_column_index('gender'), 2)
+        self.assertEqual(self.table.get_column_index("gender"), 2)
         with self.assertRaises(KeyError):
-            self.table.get_column_index('rank1')
+            self.table.get_column_index("rank1")
 
     def test_get_column_header(self):
-        self.assertEqual(self.table.get_column_header(2), 'gender')
+        self.assertEqual(self.table.get_column_header(2), "gender")
         with self.assertRaises(IndexError):
             self.table.get_column_header(self.table.column_count)
 
     def test_append_column(self):
-        title = 'year'
-        column = ['2010', '2012', '2008', '2010', '2011']
+        title = "year"
+        column = ["2010", "2012", "2008", "2010", "2011"]
         self.table.append_column(title, column)
         self.assertEqual(self.table.column_count, 4)
         last_column = self.table.get_column(self.table.column_count - 1)
         self.compare_iterable(column, last_column)
 
     def test_insert_column(self):
-        column = ['2010', '2012', '2008', '2010', '2011']
-        title = 'year'
+        column = ["2010", "2012", "2008", "2010", "2011"]
+        title = "year"
         position = 2
         self.table.insert_column(position, title, column)
         self.assertEqual(self.table.column_count, 4)
@@ -69,14 +69,14 @@ class TableOperationsTestCase(unittest.TestCase):
             self.table.get_column(header)
 
     def test_pop_column_by_header(self):
-        header = 'gender'
+        header = "gender"
         self.table.pop_column(header)
         self.assertEqual(self.table.column_count, 2)
         with self.assertRaises(KeyError):
             self.table.get_column(header)
 
     def test_update_column(self):
-        header = 'rank'
+        header = "rank"
         column = [3, 2, 1, 2, 4]
         self.table.update_column(header, column)
         self.assertEqual(self.table.column_count, 3)
@@ -94,19 +94,19 @@ class TableOperationsTestCase(unittest.TestCase):
             self.table[len(self.table)]
 
     def test_access_row_element_by_index(self):
-        self.assertEqual(self.table[2][0], 'Ethan')
+        self.assertEqual(self.table[2][0], "Ethan")
 
     def test_access_row_element_by_header(self):
-        self.assertEqual(self.table[2]['name'], 'Ethan')
+        self.assertEqual(self.table[2]["name"], "Ethan")
 
     def test_append_row(self):
-        row = ['Gary', 2, 'boy']
+        row = ["Gary", 2, "boy"]
         self.table.append_row(row)
         self.assertEqual(len(self.table), 6)
         self.compare_iterable(self.table[5], row)
 
     def test_insert_row(self):
-        row = ['Gary', 2, 'boy']
+        row = ["Gary", 2, "boy"]
         position = 2
         self.table.insert_row(position, row)
         self.assertEqual(len(self.table), 6)
@@ -118,13 +118,13 @@ class TableOperationsTestCase(unittest.TestCase):
         self.assertEqual(len(self.table), 4)
 
     def test_update_row(self):
-        row = ['Sophie', 5, 'girl']
+        row = ["Sophie", 5, "girl"]
         position = 3
         self.table.update_row(position, row)
         self.compare_iterable(self.table[position], row)
 
     def test_update_row_slice(self):
-        rows = [['Sophie', 5, 'girl'], ['Mike', 4, 'boy']]
+        rows = [["Sophie", 5, "girl"], ["Mike", 4, "boy"]]
         self.table.update_row(slice(3, 5, 1), rows)
         self.assertEqual(len(self.table), 5)
         self.compare_iterable(self.table[3], rows[0])
@@ -146,36 +146,36 @@ class TableOperationsTestCase(unittest.TestCase):
         self.assertEqual(len(self.table), 2)
 
     def test_delitem_str(self):
-        del self.table['rank']
+        del self.table["rank"]
         self.assertEqual(self.table.column_count, 2)
         with self.assertRaises(KeyError):
-            self.table.get_column('rank')
+            self.table.get_column("rank")
 
     def test_setitem_int(self):
         position = 3
-        row = ['Sophie', 5, 'girl']
+        row = ["Sophie", 5, "girl"]
         self.table[position] = row
         self.compare_iterable(self.table[position], row)
 
     def test_setitem_slice(self):
-        rows = [['Sophie', 5, 'girl'], ['Mike', 4, 'boy']]
+        rows = [["Sophie", 5, "girl"], ["Mike", 4, "boy"]]
         self.table[3:] = rows
         self.assertEqual(len(self.table), 5)
         self.compare_iterable(self.table[3], rows[0])
         self.compare_iterable(self.table[4], rows[1])
 
     def test_setitem_str(self):
-        header = 'rank'
+        header = "rank"
         column = [3, 2, 1, 2, 4]
         self.table[header] = column
         self.assertEqual(self.table.column_count, 3)
         self.compare_iterable(column, self.table.get_column(header))
 
     def test_contains(self):
-        self.assertTrue('rank' in self.table)
-        self.assertFalse('rankk' in self.table)
+        self.assertTrue("rank" in self.table)
+        self.assertFalse("rankk" in self.table)
         self.assertTrue(["Isabella", 1, "girl"] in self.table)
-        self.assertFalse(['Ethan', 3, 'boy'] in self.table)
+        self.assertFalse(["Ethan", 3, "boy"] in self.table)
 
     # Test for printing operations
 
@@ -230,9 +230,11 @@ class TableOperationsTestCase(unittest.TestCase):
         self.assertEqual(string, self.table.get_string())
 
     def test_mixed_align(self):
-        self.table.column_alignments = [self.table.ALIGN_LEFT,
-                                        self.table.ALIGN_CENTER,
-                                        self.table.ALIGN_RIGHT]
+        self.table.column_alignments = [
+            self.table.ALIGN_LEFT,
+            self.table.ALIGN_CENTER,
+            self.table.ALIGN_RIGHT,
+        ]
         string = """+----------+------+--------+
 | name     | rank | gender |
 +----------+------+--------+
@@ -341,7 +343,7 @@ class TableOperationsTestCase(unittest.TestCase):
         self.assertEqual(string, self.table.get_string())
 
     def test_empty_header(self):
-        self.table.column_headers = ['', ' ', '  ']
+        self.table.column_headers = ["", " ", "  "]
         string = """+----------+---+------+
 |  Jacob   | 1 | boy  |
 +----------+---+------+
@@ -388,7 +390,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +------------+------+--------+
 | こんにちは |  2   |  boy   |
 +------------+------+--------+"""
-        self.table.append_row([u'こんにちは', 2, 'boy'])
+        self.table.append_row([u"こんにちは", 2, "boy"])
         self.assertEqual(string, self.table.get_string())
 
     def test_newline(self):
@@ -417,7 +419,7 @@ class TableOperationsTestCase(unittest.TestCase):
         string = """+------+---+-----+
 | \x1b[31mAdam\x1b[0m | 2 | boy |
 +------+---+-----+"""
-        table.append_row(['\x1b[31mAdam\x1b[0m', 2, 'boy'])
+        table.append_row(["\x1b[31mAdam\x1b[0m", 2, "boy"])
         self.assertEqual(string, table.get_string())
 
     def test_ansi_wrap(self):
@@ -426,8 +428,8 @@ class TableOperationsTestCase(unittest.TestCase):
 | \x1b[31mThis is a very \x1b[0m | 2 | girl |
 |    \x1b[32mlong name\x1b[0m    |   |      |
 +-----------------+---+------+"""
-        long_string = '\x1b[31mThis is a very \x1b[0m\x1b[32mlong name\x1b[0m'
-        table.append_row([long_string, 2, 'girl'])
+        long_string = "\x1b[31mThis is a very \x1b[0m\x1b[32mlong name\x1b[0m"
+        table.append_row([long_string, 2, "girl"])
         self.assertEqual(string, table.get_string())
 
     def test_ansi_wrap_mb(self):
@@ -436,8 +438,8 @@ class TableOperationsTestCase(unittest.TestCase):
 | \x1b[31mこれは非常に長\x1b[0m  | 2 | girl |
 |   \x1b[31mい\x1b[0m\x1b[32m名前です\x1b[0m    |   |      |
 +-----------------+---+------+"""
-        long_string = u'\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m'
-        table.append_row([long_string, 2, 'girl'])
+        long_string = u"\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
+        table.append_row([long_string, 2, "girl"])
         self.assertEqual(string, table.get_string())
 
     def test_ansi_ellipsis(self):
@@ -446,8 +448,8 @@ class TableOperationsTestCase(unittest.TestCase):
         string = """+-----------------+---+------+
 | \x1b[31mThis is a ve\x1b[0m... | 2 | girl |
 +-----------------+---+------+"""
-        long_string = '\x1b[31mThis is a very \x1b[0m\x1b[32mlong name\x1b[0m'
-        table.append_row([long_string, 2, 'girl'])
+        long_string = "\x1b[31mThis is a very \x1b[0m\x1b[32mlong name\x1b[0m"
+        table.append_row([long_string, 2, "girl"])
         self.assertEqual(string, table.get_string())
 
     def test_ansi_ellipsis_mb(self):
@@ -456,8 +458,8 @@ class TableOperationsTestCase(unittest.TestCase):
         string = u"""+-----------------+---+------+
 | \x1b[31mこれは非常に\x1b[0m... | 2 | girl |
 +-----------------+---+------+"""
-        long_string = u'\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m'
-        table.append_row([long_string, 2, 'girl'])
+        long_string = u"\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
+        table.append_row([long_string, 2, "girl"])
         self.assertEqual(string, table.get_string())
 
     def test_ansi_strip(self):
@@ -466,8 +468,8 @@ class TableOperationsTestCase(unittest.TestCase):
         string = """+-----------------+---+------+
 | \x1b[31mThis is a very \x1b[0m | 2 | girl |
 +-----------------+---+------+"""
-        long_string = '\x1b[31mThis is a very \x1b[0m\x1b[32mlong name\x1b[0m'
-        table.append_row([long_string, 2, 'girl'])
+        long_string = "\x1b[31mThis is a very \x1b[0m\x1b[32mlong name\x1b[0m"
+        table.append_row([long_string, 2, "girl"])
         self.assertEqual(string, table.get_string())
 
     def test_ansi_strip_mb(self):
@@ -476,8 +478,8 @@ class TableOperationsTestCase(unittest.TestCase):
         string = u"""+-----------------+---+------+
 | \x1b[31mこれは非常に長\x1b[0m  | 2 | girl |
 +-----------------+---+------+"""
-        long_string = u'\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m'
-        table.append_row([long_string, 2, 'girl'])
+        long_string = u"\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
+        table.append_row([long_string, 2, "girl"])
         self.assertEqual(string, table.get_string())
 
     # Test on empty table
@@ -486,13 +488,13 @@ class TableOperationsTestCase(unittest.TestCase):
         self.create_table(20)
         for i in range(3):
             self.table.pop_column()
-        self.assertEqual(self.table.get_string(), '')
+        self.assertEqual(self.table.get_string(), "")
 
     def test_empty_table_by_row(self):
         self.create_table(20)
         for i in range(5):
             self.table.pop_row()
-        self.assertEqual(self.table.get_string(), '')
+        self.assertEqual(self.table.get_string(), "")
 
     def test_table_width_zero(self):
         self.create_table(20)
@@ -501,7 +503,7 @@ class TableOperationsTestCase(unittest.TestCase):
         self.assertEqual(width, 0)
 
     def test_table_auto_width(self):
-        row_list = ['abcdefghijklmopqrstuvwxyz', 1234, 'none']
+        row_list = ["abcdefghijklmopqrstuvwxyz", 1234, "none"]
 
         self.create_table(200)
         self.table.append_row(row_list)
@@ -514,5 +516,5 @@ class TableOperationsTestCase(unittest.TestCase):
         self.assertEqual(len_for_max_width_80, len_for_max_width_200)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

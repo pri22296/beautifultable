@@ -38,7 +38,7 @@ from .meta import AlignmentMetaData, PositiveIntegerMetaData
 from .compat import basestring, Iterable, to_unicode
 
 
-__all__ = ['BeautifulTable']
+__all__ = ["BeautifulTable"]
 
 
 class BeautifulTable(object):
@@ -143,9 +143,12 @@ class BeautifulTable(object):
         Whether numeric strings should be automatically detected(Default True).
     """
 
-    def __init__(self, max_width=80,
-                 default_alignment=enums.ALIGN_CENTER,
-                 default_padding=1):
+    def __init__(
+        self,
+        max_width=80,
+        default_alignment=enums.ALIGN_CENTER,
+        default_padding=1,
+    ):
 
         self.set_style(enums.STYLE_DEFAULT)
 
@@ -166,23 +169,37 @@ class BeautifulTable(object):
         self._table = []
 
     def __setattr__(self, name, value):
-        attrs = ('left_border_char', 'right_border_char', 'top_border_char',
-                 'bottom_border_char', 'header_separator_char',
-                 'column_separator_char', 'row_separator_char',
-                 'intersect_top_left', 'intersect_top_mid',
-                 'intersect_top_right', 'intersect_header_left',
-                 'intersect_header_mid', 'intersect_header_right',
-                 'intersect_row_left', 'intersect_row_mid',
-                 'intersect_row_right', 'intersect_bottom_left',
-                 'intersect_bottom_mid', 'intersect_bottom_right')
+        attrs = (
+            "left_border_char",
+            "right_border_char",
+            "top_border_char",
+            "bottom_border_char",
+            "header_separator_char",
+            "column_separator_char",
+            "row_separator_char",
+            "intersect_top_left",
+            "intersect_top_mid",
+            "intersect_top_right",
+            "intersect_header_left",
+            "intersect_header_mid",
+            "intersect_header_right",
+            "intersect_row_left",
+            "intersect_row_mid",
+            "intersect_row_right",
+            "intersect_bottom_left",
+            "intersect_bottom_mid",
+            "intersect_bottom_right",
+        )
         if to_unicode(name) in attrs and not isinstance(value, basestring):
             value_type = type(value).__name__
-            raise TypeError(("Expected {attr} to be of type 'str', "
-                             "got '{attr_type}'").format(attr=name,
-                                                         attr_type=value_type))
+            raise TypeError(
+                (
+                    "Expected {attr} to be of type 'str', " "got '{attr_type}'"
+                ).format(attr=name, attr_type=value_type)
+            )
         super(BeautifulTable, self).__setattr__(name, value)
 
-# ****************************Properties Begin Here****************************
+    # ************************Properties Begin Here************************
 
     @property
     def column_count(self):
@@ -190,20 +207,24 @@ class BeautifulTable(object):
         return self._column_count
 
     @property
-    def intersection_char(self):   # pragma : no cover
+    def intersection_char(self):  # pragma : no cover
         """Character used to draw intersection of perpendicular lines.
 
         Disabling it just draws the horizontal line char in it's place.
         This attribute is deprecated. Use specific intersect_*_* attribute.
         """
-        deprecation("'intersection_char' is deprecated, Use specific "
-                    "`intersect_*_*` attribute instead")
+        deprecation(
+            "'intersection_char' is deprecated, Use specific "
+            "`intersect_*_*` attribute instead"
+        )
         return self.intersect_top_left
 
     @intersection_char.setter
     def intersection_char(self, value):  # pragma : no cover
-        deprecation("'intersection_char' is deprecated, Use specific "
-                    "`intersect_*_*` attributes instead")
+        deprecation(
+            "'intersection_char' is deprecated, Use specific "
+            "`intersect_*_*` attributes instead"
+        )
         self.intersect_top_left = value
         self.intersect_top_mid = value
         self.intersect_top_right = value
@@ -240,10 +261,13 @@ class BeautifulTable(object):
     @sign_mode.setter
     def sign_mode(self, value):
         if not isinstance(value, enums.SignMode):
-            allowed = ("{}.{}".format(type(self).__name__, i.name)
-                       for i in enums.SignMode)
-            error_msg = ("allowed values for sign_mode are: "
-                         + ', '.join(allowed))
+            allowed = (
+                "{}.{}".format(type(self).__name__, i.name)
+                for i in enums.SignMode
+            )
+            error_msg = "allowed values for sign_mode are: " + ", ".join(
+                allowed
+            )
             raise ValueError(error_msg)
         self._sign_mode = value
 
@@ -271,10 +295,14 @@ class BeautifulTable(object):
     @width_exceed_policy.setter
     def width_exceed_policy(self, value):
         if not isinstance(value, enums.WidthExceedPolicy):
-            allowed = ("{}.{}".format(type(self).__name__, i.name)
-                       for i in enums.WidthExceedPolicy)
-            error_msg = ("allowed values for width_exceed_policy are: "
-                         + ', '.join(allowed))
+            allowed = (
+                "{}.{}".format(type(self).__name__, i.name)
+                for i in enums.WidthExceedPolicy
+            )
+            error_msg = (
+                "allowed values for width_exceed_policy are: "
+                + ", ".join(allowed)
+            )
             raise ValueError(error_msg)
         self._width_exceed_policy = value
 
@@ -299,10 +327,14 @@ class BeautifulTable(object):
     @default_alignment.setter
     def default_alignment(self, value):
         if not isinstance(value, enums.Alignment):
-            allowed = ("{}.{}".format(type(self).__name__, i.name)
-                       for i in enums.Alignment)
-            error_msg = ("allowed values for default_alignment are: "
-                         + ', '.join(allowed))
+            allowed = (
+                "{}.{}".format(type(self).__name__, i.name)
+                for i in enums.Alignment
+            )
+            error_msg = (
+                "allowed values for default_alignment are: "
+                + ", ".join(allowed)
+            )
             raise ValueError(error_msg)
         self._default_alignment = value
 
@@ -350,8 +382,11 @@ class BeautifulTable(object):
         header = self._validate_row(value)
         for i in header:
             if not isinstance(i, basestring):
-                raise TypeError(("Headers should be of type 'str', "
-                                 "not {}").format(type(i)))
+                raise TypeError(
+                    ("Headers should be of type 'str', " "not {}").format(
+                        type(i)
+                    )
+                )
         self._column_headers = HeaderData(self, header)
 
     @property
@@ -413,19 +448,21 @@ class BeautifulTable(object):
         is not possible to print a given table with the width provided, this
         value will automatically adjust.
         """
-        offset = ((self._column_count - 1)
-                  * termwidth(self.column_separator_char))
+        offset = (self._column_count - 1) * termwidth(
+            self.column_separator_char
+        )
         offset += termwidth(self.left_border_char)
         offset += termwidth(self.right_border_char)
-        self._max_table_width = max(self._max_table_width,
-                                    offset + self._column_count)
+        self._max_table_width = max(
+            self._max_table_width, offset + self._column_count
+        )
         return self._max_table_width
 
     @max_table_width.setter
     def max_table_width(self, value):
         self._max_table_width = value
 
-# *****************************Properties End Here*****************************
+    # *************************Properties End Here*************************
 
     def _initialize_table(self, column_count):
         """Sets the column count of the table.
@@ -437,7 +474,7 @@ class BeautifulTable(object):
         column_count : int
             number of columns in the table
         """
-        header = [''] * column_count
+        header = [""] * column_count
         alignment = [self.default_alignment] * column_count
         width = [0] * column_count
         padding = [self.default_padding] * column_count
@@ -461,8 +498,11 @@ class BeautifulTable(object):
             self._initialize_table(len(row))
 
         if len(row) != self._column_count:
-            raise ValueError(("'Expected iterable of length {}, "
-                              "got {}").format(self._column_count, len(row)))
+            raise ValueError(
+                ("'Expected iterable of length {}, " "got {}").format(
+                    self._column_count, len(row)
+                )
+            )
         return row
 
     def __getitem__(self, key):
@@ -499,13 +539,15 @@ class BeautifulTable(object):
             for row in self._table[key]:
                 new_table.append_row(row)
             return new_table
-        elif isinstance(key, int):
+        if isinstance(key, int):
             return self._table[key]
-        elif isinstance(key, basestring):
+        if isinstance(key, basestring):
             return self.get_column(key)
-        else:
-            raise TypeError(("table indices must be integers, strings or "
-                             "slices, not {}").format(type(key).__name__))
+        raise TypeError(
+            (
+                "table indices must be integers, strings or " "slices, not {}"
+            ).format(type(key).__name__)
+        )
 
     def __delitem__(self, key):
         """Delete a row, or a column, or multiple rows by slicing.
@@ -531,8 +573,12 @@ class BeautifulTable(object):
         elif isinstance(key, basestring):
             return self.pop_column(key)
         else:
-            raise TypeError(("table indices must be integers, strings or "
-                             "slices, not {}").format(type(key).__name__))
+            raise TypeError(
+                (
+                    "table indices must be integers, strings or "
+                    "slices, not {}"
+                ).format(type(key).__name__)
+            )
 
     def __setitem__(self, key, value):
         """Update a row, or a column, or multiple rows by slicing.
@@ -558,8 +604,12 @@ class BeautifulTable(object):
         elif isinstance(key, basestring):
             self.update_column(key, value)
         else:
-            raise TypeError(("table indices must be integers, strings or "
-                             "slices, not {}").format(type(key).__name__))
+            raise TypeError(
+                (
+                    "table indices must be integers, strings or "
+                    "slices, not {}"
+                ).format(type(key).__name__)
+            )
 
     def __len__(self):
         return len(self._table)
@@ -570,8 +620,11 @@ class BeautifulTable(object):
         elif isinstance(key, Iterable):
             return key in self._table
         else:
-            raise TypeError(("'key' must be str or Iterable, "
-                             "not {}").format(type(key).__name__))
+            raise TypeError(
+                ("'key' must be str or Iterable, " "not {}").format(
+                    type(key).__name__
+                )
+            )
 
     def __iter__(self):
         return iter(self._table)
@@ -608,10 +661,11 @@ class BeautifulTable(object):
             * beautifultable.STYLE_GRID
         """
         if not isinstance(style, enums.Style):
-            allowed = ("{}.{}".format(type(self).__name__, i.name)
-                       for i in enums.Style)
-            error_msg = ("allowed values for style are: "
-                         + ', '.join(allowed))
+            allowed = (
+                "{}.{}".format(type(self).__name__, i.name)
+                for i in enums.Style
+            )
+            error_msg = "allowed values for style are: " + ", ".join(allowed)
             raise ValueError(error_msg)
         style_template = style.value
         self.left_border_char = style_template.left_border_char
@@ -641,25 +695,32 @@ class BeautifulTable(object):
         pad_widths = [(lpw[i] + rpw[i]) for i in range(self._column_count)]
         max_widths = [0 for index in range(self._column_count)]
         offset = table_width - sum(self._column_widths) + sum(pad_widths)
-        self._max_table_width = max(self._max_table_width,
-                                    offset + self._column_count)
+        self._max_table_width = max(
+            self._max_table_width, offset + self._column_count
+        )
 
         for index, header in enumerate(self.column_headers):
             max_length = 0
-            for i in to_unicode(self._column_headers[index]).split('\n'):
-                output_str = get_output_str(i, self.detect_numerics,
-                                            self.numeric_precision,
-                                            self.sign_mode.value)
+            for i in to_unicode(self._column_headers[index]).split("\n"):
+                output_str = get_output_str(
+                    i,
+                    self.detect_numerics,
+                    self.numeric_precision,
+                    self.sign_mode.value,
+                )
                 max_length = max(max_length, termwidth(output_str))
             max_widths[index] += max_length
 
         for index, column in enumerate(zip(*self._table)):
             max_length = max_widths[index]
             for i in column:
-                for j in to_unicode(i).split('\n'):
-                    output_str = get_output_str(j, self.detect_numerics,
-                                                self.numeric_precision,
-                                                self.sign_mode.value)
+                for j in to_unicode(i).split("\n"):
+                    output_str = get_output_str(
+                        j,
+                        self.detect_numerics,
+                        self.numeric_precision,
+                        self.sign_mode.value,
+                    )
                     max_length = max(max_length, termwidth(output_str))
             max_widths[index] = max_length
 
@@ -686,16 +747,14 @@ class BeautifulTable(object):
         for i, width in enumerate(max_widths):
             self.column_widths[i] = width
             if not flag[i]:
-                new_width = 1 + int((width-1) * avail_space / actual_space)
+                new_width = 1 + int((width - 1) * avail_space / actual_space)
                 if new_width < width:
                     self.column_widths[i] = new_width
                     shrinked_columns[new_width] = i
 
         # Divide any remaining space among shrinked columns
         if shrinked_columns:
-            extra = (self._max_table_width
-                     - offset
-                     - sum(self.column_widths))
+            extra = self._max_table_width - offset - sum(self.column_widths)
             actual_space = sum(shrinked_columns)
 
             if extra > 0:
@@ -704,15 +763,17 @@ class BeautifulTable(object):
                     extra_width = int(width * extra / actual_space)
                     self.column_widths[i] += extra_width
                     if i == (len(shrinked_columns) - 1):
-                        extra = (self._max_table_width
-                                 - offset
-                                 - sum(self.column_widths))
+                        extra = (
+                            self._max_table_width
+                            - offset
+                            - sum(self.column_widths)
+                        )
                         self.column_widths[index] += extra
 
         for i in range(self.column_count):
             self.column_widths[i] += pad_widths[i]
 
-    def auto_calculate_width(self):    # pragma : no cover
+    def auto_calculate_width(self):  # pragma : no cover
         deprecation("'auto_calculate_width()' is deprecated")
         self._calculate_column_widths()
 
@@ -782,8 +843,11 @@ class BeautifulTable(object):
             index = self._column_headers.index(header)
             return index
         except ValueError:
-            raise_suppressed(KeyError(("'{}' is not a header for any "
-                                       "column").format(header)))
+            raise_suppressed(
+                KeyError(
+                    ("'{}' is not a header for any " "column").format(header)
+                )
+            )
 
     def get_column(self, key):
         """Return an iterator to a column.
@@ -809,8 +873,11 @@ class BeautifulTable(object):
         elif isinstance(key, basestring):
             index = self.get_column_index(key)
         else:
-            raise TypeError(("key must be an int or str, "
-                             "not {}").format(type(key).__name__))
+            raise TypeError(
+                ("key must be an int or str, " "not {}").format(
+                    type(key).__name__
+                )
+            )
         return iter(map(operator.itemgetter(index), self._table))
 
     def reverse(self):
@@ -850,8 +917,11 @@ class BeautifulTable(object):
         elif isinstance(index, basestring):
             index = self.get_column_index(index)
         else:
-            raise TypeError(("column index must be an integer or a string, "
-                             "not {}").format(type(index).__name__))
+            raise TypeError(
+                (
+                    "column index must be an integer or a string, " "not {}"
+                ).format(type(index).__name__)
+            )
         if self._column_count == 0:
             raise IndexError("pop from empty table")
         if self._column_count == 1:
@@ -1023,9 +1093,11 @@ class BeautifulTable(object):
                 # Roll back changes so that table remains in consistent state
                 for j in range(column_length, -1, -1):
                     self._table[j]._pop(index)
-                raise ValueError(("length of 'column' should be atleast {}, "
-                                  "got {}").format(len(self._table),
-                                                   column_length))
+                raise ValueError(
+                    (
+                        "length of 'column' should be atleast {}, " "got {}"
+                    ).format(len(self._table), column_length)
+                )
 
     def append_column(self, header, column):
         """Append a column to end of the table.
@@ -1058,8 +1130,9 @@ class BeautifulTable(object):
         if clear_metadata:
             self._initialize_table(0)
 
-    def _get_horizontal_line(self, char, intersect_left,
-                             intersect_mid, intersect_right):
+    def _get_horizontal_line(
+        self, char, intersect_left, intersect_mid, intersect_right
+    ):
         """Get a horizontal line for the table.
 
         Internal method used to actually get all horizontal lines in the table.
@@ -1080,12 +1153,12 @@ class BeautifulTable(object):
         width = self.get_table_width()
 
         try:
-            line = list(char * (int(width/termwidth(char)) + 1))[:width]
+            line = list(char * (int(width / termwidth(char)) + 1))[:width]
         except ZeroDivisionError:
-            line = [' '] * width
+            line = [" "] * width
 
         if len(line) == 0:
-            return ''
+            return ""
 
         # Only if Special Intersection is enabled and horizontal line is
         # visible
@@ -1094,40 +1167,48 @@ class BeautifulTable(object):
             visible_junc = not intersect_left.isspace()
             if termwidth(self.left_border_char) > 0:
                 if not (self.left_border_char.isspace() and visible_junc):
-                    length = min(termwidth(self.left_border_char),
-                                 termwidth(intersect_left))
+                    length = min(
+                        termwidth(self.left_border_char),
+                        termwidth(intersect_left),
+                    )
                     for i in range(length):
                         line[i] = intersect_left[i]
             visible_junc = not intersect_right.isspace()
             # If right border is enabled and it is visible
             if termwidth(self.right_border_char) > 0:
                 if not (self.right_border_char.isspace() and visible_junc):
-                    length = min(termwidth(self.right_border_char),
-                                 termwidth(intersect_right))
+                    length = min(
+                        termwidth(self.right_border_char),
+                        termwidth(intersect_right),
+                    )
                     for i in range(length):
-                        line[-i-1] = intersect_right[-i-1]
+                        line[-i - 1] = intersect_right[-i - 1]
             visible_junc = not intersect_mid.isspace()
             # If column separator is enabled and it is visible
             if termwidth(self.column_separator_char):
                 if not (self.column_separator_char.isspace() and visible_junc):
                     index = termwidth(self.left_border_char)
-                    for i in range(self._column_count-1):
-                        index += (self._column_widths[i])
-                        length = min(termwidth(self.column_separator_char),
-                                     termwidth(intersect_mid))
-                        for i in range(length):
-                            line[index+i] = intersect_mid[i]
+                    for i in range(self._column_count - 1):
+                        index += self._column_widths[i]
+                        length = min(
+                            termwidth(self.column_separator_char),
+                            termwidth(intersect_mid),
+                        )
+                        for j in range(length):
+                            line[index + j] = intersect_mid[j]
                         index += termwidth(self.column_separator_char)
 
-        return ''.join(line)
+        return "".join(line)
 
     def _get_top_border(self):
-        return self._get_horizontal_line(self.top_border_char,
-                                         self.intersect_top_left,
-                                         self.intersect_top_mid,
-                                         self.intersect_top_right)
+        return self._get_horizontal_line(
+            self.top_border_char,
+            self.intersect_top_left,
+            self.intersect_top_mid,
+            self.intersect_top_right,
+        )
 
-    def get_top_border(self):    # pragma : no cover
+    def get_top_border(self):  # pragma : no cover
         """Get the Top border of table.
 
         Column width should be set prior to calling this method.
@@ -1141,12 +1222,14 @@ class BeautifulTable(object):
         return self._get_top_border()
 
     def _get_header_separator(self):
-        return self._get_horizontal_line(self.header_separator_char,
-                                         self.intersect_header_left,
-                                         self.intersect_header_mid,
-                                         self.intersect_header_right)
+        return self._get_horizontal_line(
+            self.header_separator_char,
+            self.intersect_header_left,
+            self.intersect_header_mid,
+            self.intersect_header_right,
+        )
 
-    def get_header_separator(self):   # pragma : no cover
+    def get_header_separator(self):  # pragma : no cover
         """Get the Header separator of table.
 
         Column width should be set prior to calling this method.
@@ -1160,12 +1243,14 @@ class BeautifulTable(object):
         return self._get_header_separator()
 
     def _get_row_separator(self):
-        return self._get_horizontal_line(self.row_separator_char,
-                                         self.intersect_row_left,
-                                         self.intersect_row_mid,
-                                         self.intersect_row_right)
+        return self._get_horizontal_line(
+            self.row_separator_char,
+            self.intersect_row_left,
+            self.intersect_row_mid,
+            self.intersect_row_right,
+        )
 
-    def get_row_separator(self):   # pragma : no cover
+    def get_row_separator(self):  # pragma : no cover
         """Get the Row separator of table.
 
         Column width should be set prior to calling this method.
@@ -1179,12 +1264,14 @@ class BeautifulTable(object):
         return self._get_row_separator()
 
     def _get_bottom_border(self):
-        return self._get_horizontal_line(self.bottom_border_char,
-                                         self.intersect_bottom_left,
-                                         self.intersect_bottom_mid,
-                                         self.intersect_bottom_right)
+        return self._get_horizontal_line(
+            self.bottom_border_char,
+            self.intersect_bottom_left,
+            self.intersect_bottom_mid,
+            self.intersect_bottom_right,
+        )
 
-    def get_bottom_border(self):   # pragma : no cover
+    def get_bottom_border(self):  # pragma : no cover
         """Get the Bottom border of table.
 
         Column width should be set prior to calling this method.
@@ -1210,8 +1297,9 @@ class BeautifulTable(object):
         if self.column_count == 0:
             return 0
         width = sum(self._column_widths)
-        width += ((self._column_count - 1)
-                  * termwidth(self.column_separator_char))
+        width += (self._column_count - 1) * termwidth(
+            self.column_separator_char
+        )
         width += termwidth(self.left_border_char)
         width += termwidth(self.right_border_char)
         return width
@@ -1220,21 +1308,25 @@ class BeautifulTable(object):
         # Drawing the top border
         if self.serialno:
             if self.column_count > 0:
-                self.insert_column(0, self.serialno_header,
-                                   range(1, len(self) + 1))
+                self.insert_column(
+                    0, self.serialno_header, range(1, len(self) + 1)
+                )
 
         if recalculate_width or sum(self._column_widths) == 0:
             self._calculate_column_widths()
 
-        if self.serialno and self.column_count > 0 and self.column_widths[0] == 0:
-            self.column_widths[0] = (max(4, len(self.serialno_header))
-                                     + 2 * self.default_padding)
+        if self.serialno:
+            if self.column_count > 0 and self.column_widths[0] == 0:
+                self.column_widths[0] = (
+                    max(4, len(self.serialno_header))
+                    + 2 * self.default_padding
+                )
 
         if self.top_border_char:
             yield self._get_top_border()
 
         # Print headers if not empty or only spaces
-        if ''.join(self._column_headers).strip():
+        if "".join(self._column_headers).strip():
             headers = to_unicode(self._column_headers)
             yield headers
 
@@ -1291,8 +1383,9 @@ class BeautifulTable(object):
         iterable:
             string representation of the table as a generators
         """
-        for line in self._get_string(rows, append=append,
-                                     recalculate_width=False):
+        for line in self._get_string(
+            rows, append=append, recalculate_width=False
+        ):
             yield line
 
     def get_string(self, recalculate_width=True):
@@ -1313,11 +1406,12 @@ class BeautifulTable(object):
         """
 
         if len(self._table) == 0:
-            return ''
+            return ""
 
         string_ = []
-        for line in self._get_string([], append=False,
-                                     recalculate_width=recalculate_width):
+        for line in self._get_string(
+            [], append=False, recalculate_width=recalculate_width
+        ):
             string_.append(line)
 
-        return '\n'.join(string_)
+        return "\n".join(string_)

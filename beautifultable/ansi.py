@@ -7,16 +7,16 @@ import re
 
 try:
     from wcwidth import wcwidth
-except ImportError:               # pragma: no cover
-    wcwidth = len                 # pragma: no cover
+except ImportError:  # pragma: no cover
+    wcwidth = len  # pragma: no cover
 
 from .compat import to_unicode
 
 
 class ANSIMultiByteString(object):
 
-    ANSI_REGEX = re.compile(r'(\x1B\[[0-?]*[ -/]*[@-~])')
-    ANSI_RESET = '\x1b[0m'
+    ANSI_REGEX = re.compile(r"(\x1B\[[0-?]*[ -/]*[@-~])")
+    ANSI_RESET = "\x1b[0m"
 
     def __init__(self, string):
         self._string = []
@@ -38,9 +38,11 @@ class ANSIMultiByteString(object):
                     for char in token:
                         w = wcwidth(char)
                         if w == -1:
-                            raise ValueError(("Unsupported Literal {} in "
-                                              "string {}").format(repr(char),
-                                                                  repr(token)))
+                            raise ValueError(
+                                (
+                                    "Unsupported Literal {} in " "string {}"
+                                ).format(repr(char), repr(token))
+                            )
                         self._termwidth += w
                         self._string.append(char)
                         self._width.append(w)
@@ -52,16 +54,19 @@ class ANSIMultiByteString(object):
     def __getitem__(self, key):
         if isinstance(key, int):
             if self._state[key]:
-                return ("".join(self._state[key])
-                        + self._string[key]
-                        + self.ANSI_RESET)
-            else:
-                return self._string[key]
-        elif isinstance(key, slice):
+                return (
+                    "".join(self._state[key])
+                    + self._string[key]
+                    + self.ANSI_RESET
+                )
+            return self._string[key]
+        if isinstance(key, slice):
             return self._slice(key)
-        else:
-            raise TypeError(("table indices must be integers or slices, "
-                             "not {}").format(type(key).__name__))
+        raise TypeError(
+            ("table indices must be integers or slices, " "not {}").format(
+                type(key).__name__
+            )
+        )
 
     def _slice(self, key):
         res = []

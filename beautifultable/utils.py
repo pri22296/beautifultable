@@ -16,8 +16,8 @@ def _convert_to_numeric(item):
     """
     if PY3:
         num_types = (int, float)
-    else:                                 # pragma: no cover
-        num_types = (int, long, float)    # noqa: F821
+    else:  # pragma: no cover
+        num_types = (int, long, float)  # noqa: F821
     # We don't wan't to perform any conversions if item is already a number
     if isinstance(item, num_types):
         return item
@@ -47,7 +47,7 @@ def get_output_str(item, detect_numerics, precision, sign_value):
     if isinstance(item, float):
         item = round(item, precision)
     try:
-        item = '{:{sign}}'.format(item, sign=sign_value)
+        item = "{:{sign}}".format(item, sign=sign_value)
     except (ValueError, TypeError):
         pass
     return to_unicode(item)
