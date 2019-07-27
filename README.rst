@@ -132,6 +132,7 @@ Unreleased
 ==========
 
 * Dropped support for Python 3.3
+* Added support for streaming tables using a generator for cases  where data retrieval is slow
 
 ==========
 v0.7.0
