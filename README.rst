@@ -131,6 +131,10 @@ Changelog
 Unreleased
 ==========
 
+==========
+v0.8.0
+==========
+
 * Dropped support for Python 3.3
 * Added support for streaming tables using a generator for cases  where data retrieval is slow
 * Alignment, padding, width can now be set for all columns using a simplified syntax like
