@@ -37,6 +37,7 @@ script:
 
 deploy:
   provider: pypi
+  skip_existing: true
   distributions: sdist bdist_wheel
   user: pri22296
   password:
@@ -44,5 +45,3 @@ deploy:
   on:
     tags: true
     repo: pri22296/beautifultable
-    branch: master
-    python: '3.6'
