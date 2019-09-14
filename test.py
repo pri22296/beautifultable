@@ -25,6 +25,8 @@ class TableOperationsTestCase(unittest.TestCase):
         for item1, item2 in zip(iterable1, iterable2):
             self.assertEqual(item1, item2)
 
+    # Test for table operations
+
     def test_filter(self):
         new_table = self.table.filter(lambda x: x["rank"] > 1)
         self.assertEqual(len(self.table), 5)
@@ -35,6 +37,58 @@ class TableOperationsTestCase(unittest.TestCase):
         ]
         for row_t, row in zip(new_table, rows):
             self.compare_iterable(row_t, row)
+
+    def test_sort_by_index(self):
+        self.table.sort(0)
+        rows = [
+            ["Ethan", 2, "boy"],
+            ["Isabella", 1, "girl"],
+            ["Jacob", 1, "boy"],
+            ["Michael", 3, "boy"],
+            ["Sophia", 2, "girl"],
+        ]
+        for row_t, row in zip(self.table, rows):
+            self.compare_iterable(row_t, row)
+
+    def test_sort_by_index_reversed(self):
+        self.table.sort(0, reverse=True)
+        rows = [
+            ["Ethan", 2, "boy"],
+            ["Isabella", 1, "girl"],
+            ["Jacob", 1, "boy"],
+            ["Michael", 3, "boy"],
+            ["Sophia", 2, "girl"],
+        ]
+        for row_t, row in zip(self.table, reversed(rows)):
+            self.compare_iterable(row_t, row)
+
+    def test_sort_by_header(self):
+        self.table.sort("name")
+        rows = [
+            ["Ethan", 2, "boy"],
+            ["Isabella", 1, "girl"],
+            ["Jacob", 1, "boy"],
+            ["Michael", 3, "boy"],
+            ["Sophia", 2, "girl"],
+        ]
+        for row_t, row in zip(self.table, rows):
+            self.compare_iterable(row_t, row)
+
+    def test_sort_by_callable(self):
+        self.table.sort(lambda x: (x[1], x[0]))
+        rows = [
+            ["Isabella", 1, "girl"],
+            ["Jacob", 1, "boy"],
+            ["Ethan", 2, "boy"],
+            ["Sophia", 2, "girl"],
+            ["Michael", 3, "boy"],
+        ]
+        for row_t, row in zip(self.table, rows):
+            self.compare_iterable(row_t, row)
+
+    def test_sort_raises_exception(self):
+        with self.assertRaises(TypeError):
+            self.table.sort(None)
 
     # Tests for column operations
 
@@ -530,26 +584,26 @@ class TableOperationsTestCase(unittest.TestCase):
 
     def test_csv_export(self):
         # Create csv files in path.
-        self.table.to_csv('beautiful_table.csv')
-        self.table.to_csv('./docs/beautiful_table.csv')
+        self.table.to_csv("beautiful_table.csv")
+        self.table.to_csv("./docs/beautiful_table.csv")
 
         with self.assertRaises(ValueError):
             self.table.to_csv(1)
 
         # Check if csv files exist.
-        self.assertTrue(os.path.exists('beautiful_table.csv'))
-        self.assertTrue(os.path.exists('./docs/beautiful_table.csv'))
+        self.assertTrue(os.path.exists("beautiful_table.csv"))
+        self.assertTrue(os.path.exists("./docs/beautiful_table.csv"))
 
         # Teardown step.
-        os.remove('beautiful_table.csv')
-        os.remove('./docs/beautiful_table.csv')
+        os.remove("beautiful_table.csv")
+        os.remove("./docs/beautiful_table.csv")
 
     def test_csv_import(self):
         # Export table as CSV file and import it back.
-        self.table.to_csv('beautiful_table.csv')
+        self.table.to_csv("beautiful_table.csv")
 
         test_table = BeautifulTable()
-        test_table.from_csv('beautiful_table.csv')
+        test_table.from_csv("beautiful_table.csv")
 
         with self.assertRaises(ValueError):
             self.table.from_csv(1)
@@ -561,11 +615,11 @@ class TableOperationsTestCase(unittest.TestCase):
         #     self.assertEqual(self.table[index], test_table[index])
 
         test_table = BeautifulTable()
-        test_table.from_csv('beautiful_table.csv', header_exists=False)
+        test_table.from_csv("beautiful_table.csv", header_exists=False)
         self.assertEqual(len(self.table), len(test_table) - 1)
 
         # Teardown step.
-        os.remove('beautiful_table.csv')
+        os.remove("beautiful_table.csv")
 
 
 if __name__ == "__main__":

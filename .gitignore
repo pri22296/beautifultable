@@ -6,3 +6,4 @@ build/
 .tox/
 *.pyc
 .coverage
+.vscode/
