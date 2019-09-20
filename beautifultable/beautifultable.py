@@ -28,6 +28,7 @@ Example
 from __future__ import division, unicode_literals
 
 import copy
+import csv
 import operator
 
 from . import enums
@@ -1415,3 +1416,73 @@ class BeautifulTable(object):
             string_.append(line)
 
         return "\n".join(string_)
+
+    def to_csv(self, file_name, delimiter=','):
+        """Export table to CSV format.
+
+        Parameters
+        ----------
+        file_name : str
+            Path to CSV file which BeautifulTable will write to.
+
+        delimiter : str, optional
+            Delimiter used as value separator. Defaults to comma (',').
+        """
+
+        if not isinstance(file_name, str):
+            raise ValueError(
+                (
+                    "Expected 'file_name' to be string, got {}"
+                ).format(type(file_name).__name__)
+            )
+
+        try:
+            with open(file_name, mode='wt', newline='') as csv_file:
+                csv_writer = csv.writer(csv_file,
+                                        delimiter=delimiter,
+                                        quoting=csv.QUOTE_MINIMAL)
+                csv_writer.writerow(self.column_headers)  # write header
+                csv_writer.writerows(self._table)  # write table
+        except OSError:
+            raise
+
+    def from_csv(self, file_name, delimiter=',', header_exists=True):
+        """Create table from CSV file.
+
+        Parameters
+        ----------
+        file_name : str
+            Path to CSV file which `BeautifulTable` will read from.
+        delimiter : str, optional
+            Delimiter used as value separator. Defaults to comma (`,`).
+        header_exists : bool, optional
+            First row in CSV file should be set as table header.
+
+        Raises
+        ------
+        ValueError
+            If `file_name` is not str type.
+        FileNotFoundError
+            If `file_name` is not valid path to file.
+        """
+
+        if not isinstance(file_name, str):
+            raise ValueError(
+                (
+                    "Expected 'file_name' to be string, got {}"
+                ).format(type(file_name).__name__)
+            )
+
+        try:
+            with open(file_name, mode='rt', newline='') as csv_file:
+                csv_file = csv.reader(csv_file, delimiter=delimiter)
+
+                if header_exists:
+                    self.column_headers = next(csv_file)
+
+                for row in csv_file:
+                    self.append_row(row)
+
+                return self
+        except FileNotFoundError:
+            raise

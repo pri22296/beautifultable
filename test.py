@@ -2,6 +2,8 @@
 
 
 import unittest
+import os
+
 from beautifultable import BeautifulTable
 
 
@@ -514,6 +516,45 @@ class TableOperationsTestCase(unittest.TestCase):
         len_for_max_width_80 = len(str(self.table))
 
         self.assertEqual(len_for_max_width_80, len_for_max_width_200)
+
+    def test_csv_export(self):
+        # Create csv files in path.
+        self.table.to_csv('beautiful_table.csv')
+        self.table.to_csv('./docs/beautiful_table.csv')
+
+        with self.assertRaises(ValueError):
+            self.table.to_csv(1)
+
+        # Check if csv files exist.
+        self.assertTrue(os.path.exists('beautiful_table.csv'))
+        self.assertTrue(os.path.exists('./docs/beautiful_table.csv'))
+
+        # Teardown step.
+        os.remove('beautiful_table.csv')
+        os.remove('./docs/beautiful_table.csv')
+
+    def test_csv_import(self):
+        # Export table as CSV file and import it back.
+        self.table.to_csv('beautiful_table.csv')
+
+        test_table = BeautifulTable()
+        test_table.from_csv('beautiful_table.csv')
+
+        with self.assertRaises(ValueError):
+            self.table.from_csv(1)
+
+        self.assertEqual(len(self.table), len(test_table))
+        self.assertEqual(self.table.column_headers, test_table.column_headers)
+
+        # for index in range(len(self.table)):
+        #     self.assertEqual(self.table[index], test_table[index])
+
+        test_table = BeautifulTable()
+        test_table.from_csv('beautiful_table.csv', header_exists=False)
+        self.assertEqual(len(self.table), len(test_table) - 1)
+
+        # Teardown step.
+        os.remove('beautiful_table.csv')
 
 
 if __name__ == "__main__":
