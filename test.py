@@ -23,6 +23,17 @@ class TableOperationsTestCase(unittest.TestCase):
         for item1, item2 in zip(iterable1, iterable2):
             self.assertEqual(item1, item2)
 
+    def test_filter(self):
+        new_table = self.table.filter(lambda x: x["rank"] > 1)
+        self.assertEqual(len(self.table), 5)
+        rows = [
+            ["Ethan", 2, "boy"],
+            ["Sophia", 2, "girl"],
+            ["Michael", 3, "boy"],
+        ]
+        for row_t, row in zip(new_table, rows):
+            self.compare_iterable(row_t, row)
+
     # Tests for column operations
 
     def test_column_count(self):
