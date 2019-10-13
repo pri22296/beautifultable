@@ -817,6 +817,21 @@ class BeautifulTable(object):
         """
         return self[:]
 
+    def filter(self, key):
+        """Return a copy of the table with only those rows which satisfy a
+        certain condition.
+
+        Returns
+        -------
+        BeautifulTable:
+            Filtered copy of the BeautifulTable instance.
+        """
+        new_table = self.copy()
+        new_table.clear()
+        for row in filter(key, self):
+            new_table.append_row(row)
+        return new_table
+
     def get_column_header(self, index):
         """Get header of a column from it's index.
 
