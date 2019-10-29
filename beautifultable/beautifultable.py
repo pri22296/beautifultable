@@ -30,6 +30,7 @@ from __future__ import division, unicode_literals
 import copy
 import csv
 import operator
+import json
 
 from . import enums
 
@@ -1500,4 +1501,92 @@ class BeautifulTable(object):
 
                 return self
         except FileNotFoundError:
+            raise
+
+    def to_json(self, file_name, indent=4, sort=False):
+        """Export table to JSON format.
+
+        Parameters
+        ----------
+        file_name : str
+            Path to JSON file which BeautifulTable will write to.
+        indent : int, optional
+            Equivalent of json.dump argument.
+        sort : bool, optional
+            Sort by keys in JSON output.
+
+        Raises
+        ------
+        ValueError
+            If `file_name` is not str type or header contains empty values.
+        FileNotFoundError
+            If `file_name` is not valid path to file.
+        """
+
+        if not isinstance(file_name, str):
+            raise ValueError(
+                (
+                    "Expected 'file_name' to be string, got {}"
+                ).format(type(file_name).__name__)
+            )
+
+        if '' in list(self.column_headers):
+            raise ValueError('Header should contain name of columns')
+
+        try:
+            with open(file_name, mode='w') as json_file:
+
+                header = list(self.column_headers)
+                rows = [list(row) for row in self._table]
+
+                _table = []
+
+                # Match column name with row entry for particular column.
+                for row in rows:
+                    _table.append({header[index]: row[index]
+                                   for index in range(self.column_count)})
+
+                json.dump(_table, json_file, indent=indent, sort_keys=sort)
+        except OSError:
+            raise
+
+    def from_json(self, file_name):
+        """Create table from JSON file.
+
+        Parameters
+        ----------
+        file_name : str
+            Path to JSON file from which BeautifulTable will read from.
+
+        Raises
+        ------
+        ValueError
+            If `file_name` is not str type.
+        FileNotFoundError
+            If `file_name` is not valid path to file.
+        JSONDecodeError
+            If file can't be decoded as json.
+        """
+
+        if not isinstance(file_name, str):
+            raise ValueError(
+                (
+                    "Expected 'file_name' to be string, got {}"
+                ).format(type(file_name).__name__)
+            )
+
+        try:
+            with open(file_name) as json_file:
+                _table = json.load(json_file)
+
+                # Get keys of first record.
+                self.column_headers = list(_table[0].keys())
+
+                for row in _table:
+                    self.append_row([r for r in row.values()])
+
+                return self
+        except FileNotFoundError:
+            raise
+        except json.JSONDecodeError:
             raise

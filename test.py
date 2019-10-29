@@ -567,6 +567,61 @@ class TableOperationsTestCase(unittest.TestCase):
         # Teardown step.
         os.remove('beautiful_table.csv')
 
+    def test_json_export(self):
+        self.table.to_json('beautiful_table_1.json', None, False)
+        self.table.to_json('beautiful_table_2.json', 2)
+        self.table.to_json('beautiful_table_3.json', 4)
+        self.table.to_json('beautiful_table_4.json', 0)
+        self.table.to_json('beautiful_table_5.json', 4, True)
+
+        with self.assertRaises(ValueError):
+            self.table.to_json(1)
+
+        # Check if json files exist.
+        self.assertTrue(os.path.exists('beautiful_table_1.json'))
+        self.assertTrue(os.path.exists('beautiful_table_2.json'))
+        self.assertTrue(os.path.exists('beautiful_table_3.json'))
+        self.assertTrue(os.path.exists('beautiful_table_4.json'))
+        self.assertTrue(os.path.exists('beautiful_table_5.json'))
+
+        # Teardown step.
+        os.remove('beautiful_table_1.json')
+        os.remove('beautiful_table_2.json')
+        os.remove('beautiful_table_3.json')
+        os.remove('beautiful_table_4.json')
+        os.remove('beautiful_table_5.json')
+
+    def test_json_import(self):
+        self.table.to_json('beautiful_table_1.json', None, False)
+        self.table.to_json('beautiful_table_2.json', 4, False)
+
+        with self.assertRaises(ValueError):
+            self.table.from_json(1)
+
+        table_with_empty_header = BeautifulTable()
+        table_with_empty_header.append_row(["Jacob", 1, "boy"])
+        table_with_empty_header.append_row(["Isabella", 1, "girl"])
+
+        with self.assertRaises(ValueError):
+            table_with_empty_header.to_json('beautiful_table_empty.json')
+
+        table_1 = self.table.from_json('beautiful_table_1.json')
+        table_2 = self.table.from_json('beautiful_table_2.json')
+
+        self.assertEqual(len(self.table), len(table_1))
+        self.assertEqual(len(self.table), len(table_2))
+
+        self.assertEqual(self.table.column_headers, table_1.column_headers)
+        self.assertEqual(self.table.column_headers, table_2.column_headers)
+
+        for index in range(len(self.table)):
+            self.assertEqual(self.table[index], table_1[index])
+            self.assertEqual(self.table[index], table_2[index])
+
+        # Teardown step.
+        os.remove('beautiful_table_1.json')
+        os.remove('beautiful_table_2.json')
+
 
 if __name__ == "__main__":
     unittest.main()
