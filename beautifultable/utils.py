@@ -4,7 +4,7 @@ import warnings
 
 
 from .ansi import ANSIMultiByteString
-from .compat import to_unicode, PY3
+from .compat import to_unicode
 from .exceptions import BeautifulTableDeprecationWarning
 
 
@@ -14,10 +14,7 @@ def _convert_to_numeric(item):
 
     If the conversion is not possible, it simply returns the string.
     """
-    if PY3:
-        num_types = (int, float)
-    else:  # pragma: no cover
-        num_types = (int, long, float)  # noqa: F821
+    num_types = (int, float)
     # We don't wan't to perform any conversions if item is already a number
     if isinstance(item, num_types):
         return item
