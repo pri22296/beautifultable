@@ -800,12 +800,16 @@ class BeautifulTable(object):
             If `True` then table is sorted as if each comparison was reversed.
         """
         if isinstance(key, int):
-            index = key
+            key = operator.itemgetter(key)
         elif isinstance(key, basestring):
-            index = self.get_column_index(key)
+            key = operator.itemgetter(self.get_column_index(key))
+        elif callable(key):
+            pass
         else:
-            raise TypeError("'key' must either be 'int' or 'str'")
-        self._table.sort(key=operator.itemgetter(index), reverse=reverse)
+            raise TypeError(
+                "'key' must either be 'int' or 'str' or a 'callable'"
+            )
+        self._table.sort(key=key, reverse=reverse)
 
     def copy(self):
         """Return a shallow copy of the table.
@@ -1432,7 +1436,7 @@ class BeautifulTable(object):
 
         return "\n".join(string_)
 
-    def to_csv(self, file_name, delimiter=','):
+    def to_csv(self, file_name, delimiter=","):
         """Export table to CSV format.
 
         Parameters
@@ -1446,22 +1450,22 @@ class BeautifulTable(object):
 
         if not isinstance(file_name, str):
             raise ValueError(
-                (
-                    "Expected 'file_name' to be string, got {}"
-                ).format(type(file_name).__name__)
+                ("Expected 'file_name' to be string, got {}").format(
+                    type(file_name).__name__
+                )
             )
 
         try:
-            with open(file_name, mode='wt', newline='') as csv_file:
-                csv_writer = csv.writer(csv_file,
-                                        delimiter=delimiter,
-                                        quoting=csv.QUOTE_MINIMAL)
+            with open(file_name, mode="wt", newline="") as csv_file:
+                csv_writer = csv.writer(
+                    csv_file, delimiter=delimiter, quoting=csv.QUOTE_MINIMAL
+                )
                 csv_writer.writerow(self.column_headers)  # write header
                 csv_writer.writerows(self._table)  # write table
         except OSError:
             raise
 
-    def from_csv(self, file_name, delimiter=',', header_exists=True):
+    def from_csv(self, file_name, delimiter=",", header_exists=True):
         """Create table from CSV file.
 
         Parameters
@@ -1483,13 +1487,13 @@ class BeautifulTable(object):
 
         if not isinstance(file_name, str):
             raise ValueError(
-                (
-                    "Expected 'file_name' to be string, got {}"
-                ).format(type(file_name).__name__)
+                ("Expected 'file_name' to be string, got {}").format(
+                    type(file_name).__name__
+                )
             )
 
         try:
-            with open(file_name, mode='rt', newline='') as csv_file:
+            with open(file_name, mode="rt", newline="") as csv_file:
                 csv_file = csv.reader(csv_file, delimiter=delimiter)
 
                 if header_exists:
