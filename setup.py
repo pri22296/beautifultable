@@ -4,7 +4,7 @@ from setuptools import setup
 from codecs import open
 
 
-extras_require = {':python_version<"3.4"': ["enum34"]}
+extras_require = {}
 
 this_dir = os.path.abspath(os.path.dirname(__file__))
 version_path = os.path.join(this_dir, "beautifultable", "__version__.py")
@@ -37,7 +37,6 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
