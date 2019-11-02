@@ -31,6 +31,8 @@ import copy
 import csv
 import operator
 
+from lxml import etree
+
 from . import enums
 
 from .utils import get_output_str, raise_suppressed, termwidth, deprecation
@@ -1505,3 +1507,38 @@ class BeautifulTable(object):
                 return self
         except FileNotFoundError:
             raise
+
+    def to_html(self):
+        base_template = "<{tag}>{content}</{tag}>"
+
+        html_content = []
+
+        if "".join(self.column_headers).strip():
+            content = "".join(
+                base_template.format(tag="th", content=th)
+                for th in self.column_headers
+            )
+            html_content.append(base_template.format(tag="tr", content=content))
+
+        for row in self:
+            content = "".join(
+                base_template.format(
+                    tag="td",
+                    content=to_html(td) if isinstance(td, BeautifulTable) else td,
+                )
+                for td in row
+            )
+            html_content.append(base_template.format(tag="tr", content=content))
+
+        return base_template.format(tag="table", content="".join(html_content))
+    
+    def from_html(self, data):
+        parsed_html = etree.HTML(data).find("body/table")
+        rows = iter(parsed_html)
+        first = [(col.text, col.tag) for col in next(rows)]
+        if 'th' in (x[1] for x in first):
+            self.column_headers = [x[0] for x in first]
+        else:
+            self.append_row([x[0] for x in first])
+        for row in rows:
+            self.append_row([x.text for x in row])
