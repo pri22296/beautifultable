@@ -2,16 +2,19 @@ from .__version__ import __title__, __description__, __url__, __version__
 from .__version__ import __copyright__, __author__, __author_email__
 from .__version__ import __license__
 
-from .beautifultable import BeautifulTable
+from .beautifultable import (  # noqa F401
+    BeautifulTable,
+    BTRowCollection,
+    BTColumnCollection,
+    BTRowHeader,
+    BTColumnHeader,
+    __all__,
+)
 from . import enums
 from .enums import *  # noqa
-from .exceptions import BeautifulTableDeprecationWarning
-
-import warnings
 
 
-__all__ = [
-    "BeautifulTable",
+__all__ = __all__ + [
     "__title__",
     "__description__",
     "__url__",
@@ -34,6 +37,3 @@ for token in dir(enums):
     ):
         setattr(BeautifulTable, token, getattr(enums, token))
         __all__.append(token)
-
-
-warnings.simplefilter("always", BeautifulTableDeprecationWarning)

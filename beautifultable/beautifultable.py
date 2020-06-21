@@ -29,22 +29,45 @@ from __future__ import division, unicode_literals
 
 import copy
 import csv
-import operator
 
 from . import enums
 
-from .utils import get_output_str, raise_suppressed, termwidth, deprecation
-from .rows import RowData, HeaderData
-from .meta import AlignmentMetaData, PositiveIntegerMetaData
+from .utils import pre_process, termwidth, deprecated, deprecated_param
 from .compat import basestring, Iterable, to_unicode
+from .base import BTBaseList
+from .helpers import (
+    BTRowCollection,
+    BTColumnCollection,
+    BTRowHeader,
+    BTColumnHeader,
+)
 
 
-__all__ = ["BeautifulTable"]
+__all__ = [
+    "BeautifulTable",
+    "BTRowCollection",
+    "BTColumnCollection",
+    "BTRowHeader",
+    "BTColumnHeader",
+]
+
+
+class BTTableData(BTBaseList):
+    def __init__(self, table, value=None):
+        if value is None:
+            value = []
+        self._table = table
+        self._value = value
+
+    def _get_canonical_key(self, key):
+        return self._table.rows._canonical_key(key)
+
+    def _get_ideal_length(self):
+        pass
 
 
 class BeautifulTable(object):
     """Utility Class to print data in tabular format to terminal.
-
     The instance attributes can be used to customize the look of the
     table. To disable a behaviour, just set its corresponding attribute
     to an empty string. For example, if Top border should not be drawn,
@@ -52,7 +75,7 @@ class BeautifulTable(object):
 
     Parameters
     ----------
-    max_width: int, optional
+    maxwidth: int, optional
         maximum width of the table in number of characters. this is ignored
         when manually setting the width of the columns. if this value is too
         low with respect to the number of columns and width of padding, the
@@ -64,8 +87,16 @@ class BeautifulTable(object):
     default_padding : int, optional
         Default width of the left and right padding for new columns(default 1).
 
+    precision : int, optional
+        All float values will have maximum number of digits after the decimal,
+        capped by this value(Default 3).
+
+    detect_numerics : bool, optional
+        Whether numeric strings should be automatically detected(Default True).
+
     Attributes
     ----------
+
     left_border_char : str
         Character used to draw the left border.
 
@@ -86,11 +117,6 @@ class BeautifulTable(object):
 
     column_separator_char : str
         Character used to draw the line seperating two columns.
-
-    intersection_char : str
-        Character used to draw intersection of a vertical and horizontal
-        line. Disabling it just draws the horizontal line char in it's place.
-        (DEPRECATED).
 
     intersect_top_left : str
         Left most character of the top border.
@@ -128,7 +154,7 @@ class BeautifulTable(object):
     intersect_bottom_right : str
         Right most character of the bottom border.
 
-    numeric_precision : int
+    precision : int
         All float values will have maximum number of digits after the decimal,
         capped by this value(Default 3).
 
@@ -144,30 +170,97 @@ class BeautifulTable(object):
         Whether numeric strings should be automatically detected(Default True).
     """
 
+    @deprecated_param("1.0.0", "1.2.0", "sign_mode", "sign")
+    @deprecated_param("1.0.0", "1.2.0", "numeric_precision", "precision")
+    @deprecated_param("1.0.0", "1.2.0", "max_width", "maxwidth")
+    @deprecated_param("1.0.0", "1.2.0", "serialno")
+    @deprecated_param("1.0.0", "1.2.0", "serialno_header")
     def __init__(
         self,
-        max_width=80,
+        maxwidth=80,
         default_alignment=enums.ALIGN_CENTER,
         default_padding=1,
+        precision=3,
+        serialno=False,
+        serialno_header="SN",
+        detect_numerics=True,
+        sign=enums.SM_MINUS,
+        **kwargs
     ):
+
+        kwargs.setdefault("max_width", None)
+        if kwargs["max_width"] is not None:
+            maxwidth = kwargs["max_width"]
+
+        kwargs.setdefault("numeric_precision", None)
+        if kwargs["numeric_precision"] is not None:
+            precision = kwargs["numeric_precision"]
+
+        kwargs.setdefault("sign_mode", None)
+        if kwargs["sign_mode"] is not None:
+            sign = kwargs["sign_mode"]
 
         self.set_style(enums.STYLE_DEFAULT)
 
-        self.numeric_precision = 3
-        self.serialno = False
-        self.serialno_header = "SN"
-        self.detect_numerics = True
+        self.precision = precision
+        self._serialno = serialno
+        self._serialno_header = serialno_header
+        self.detect_numerics = detect_numerics
 
-        self._column_count = 0
-        self._sign_mode = enums.SM_MINUS
-        self._width_exceed_policy = enums.WEP_WRAP
-        self._column_pad = " "
-        self.default_alignment = default_alignment
-        self.default_padding = default_padding
-        self.max_table_width = max_width
+        self._sign = sign
+        self.maxwidth = maxwidth
 
-        self._initialize_table(0)
-        self._table = []
+        self._ncol = 0
+        self._data = BTTableData(self)
+
+        self.rows = BTRowCollection(self)
+        self.columns = BTColumnCollection(
+            self, default_alignment, default_padding
+        )
+
+    def __copy__(self):
+        obj = type(self)()
+        obj.__dict__.update(
+            {k: copy.copy(v) for k, v in self.__dict__.items()}
+        )
+
+        obj.rows._table = obj
+        obj.rows.header._table = obj
+
+        obj.columns._table = obj
+        obj.columns.header._table = obj
+        obj.columns.alignment._table = obj
+        obj.columns.width._table = obj
+        obj.columns.padding_left._table = obj
+        obj.columns.padding_right._table = obj
+
+        obj._data._table = obj
+        for row in obj._data:
+            row._table = obj
+
+        return obj
+
+    def __deepcopy__(self, memo):
+        obj = type(self)()
+        obj.__dict__.update(
+            {k: copy.deepcopy(v, memo) for k, v in self.__dict__.items()}
+        )
+
+        obj.rows._table = obj
+        obj.rows.header._table = obj
+
+        obj.columns._table = obj
+        obj.columns.header._table = obj
+        obj.columns.alignment._table = obj
+        obj.columns.width._table = obj
+        obj.columns.padding_left._table = obj
+        obj.columns.padding_right._table = obj
+
+        obj._data._table = obj
+        for row in obj._data:
+            row._table = obj
+
+        return obj
 
     def __setattr__(self, name, value):
         attrs = (
@@ -200,47 +293,54 @@ class BeautifulTable(object):
             )
         super(BeautifulTable, self).__setattr__(name, value)
 
+    @deprecated(
+        "1.0.0",
+        "1.2.0",
+        BTRowCollection.__len__,
+        details="Use len(BeautifulTable.rows)' instead.",
+    )
+    def __len__(self):  # pragma: no cover
+        return len(self.rows)
+
+    @deprecated(
+        "1.0.0" "1.2.0",
+        BTRowCollection.__iter__,
+        details="Use iter(BeautifulTable.rows)' instead.",
+    )
+    def __iter__(self):  # pragma: no cover
+        return iter(self.rows)
+
+    @deprecated(
+        "1.0.0",
+        "1.2.0",
+        BTColumnCollection.__contains__,
+        details="Use ''value' in BeautifulTable.{columns|rows}' instead.",
+    )
+    def __contains__(self, key):  # pragma: no cover
+        if isinstance(key, basestring):
+            return key in self.columns
+        elif isinstance(key, Iterable):
+            return key in self.rows
+        else:
+            raise TypeError(
+                ("'key' must be str or Iterable, " "not {}").format(
+                    type(key).__name__
+                )
+            )
+
+    def __repr__(self):
+        return repr(self._data)
+
+    def __str__(self):
+        return self.get_string()
+
     # ************************Properties Begin Here************************
+    @property
+    def shape(self):
+        return (len(self.rows), len(self.columns))
 
     @property
-    def column_count(self):
-        """Get the number of columns in the table(read only)"""
-        return self._column_count
-
-    @property
-    def intersection_char(self):  # pragma : no cover
-        """Character used to draw intersection of perpendicular lines.
-
-        Disabling it just draws the horizontal line char in it's place.
-        This attribute is deprecated. Use specific intersect_*_* attribute.
-        """
-        deprecation(
-            "'intersection_char' is deprecated, Use specific "
-            "`intersect_*_*` attribute instead"
-        )
-        return self.intersect_top_left
-
-    @intersection_char.setter
-    def intersection_char(self, value):  # pragma : no cover
-        deprecation(
-            "'intersection_char' is deprecated, Use specific "
-            "`intersect_*_*` attributes instead"
-        )
-        self.intersect_top_left = value
-        self.intersect_top_mid = value
-        self.intersect_top_right = value
-        self.intersect_header_left = value
-        self.intersect_header_mid = value
-        self.intersect_header_right = value
-        self.intersect_row_left = value
-        self.intersect_row_mid = value
-        self.intersect_row_right = value
-        self.intersect_bottom_left = value
-        self.intersect_bottom_mid = value
-        self.intersect_bottom_right = value
-
-    @property
-    def sign_mode(self):
+    def sign(self):
         """Attribute to control how signs are displayed for numerical data.
 
         It can be one of the following:
@@ -257,387 +357,276 @@ class BeautifulTable(object):
                                    numbers and a minus sign for -ve numbers.
         ========================  =============================================
         """
-        return self._sign_mode
+        return self._sign
 
-    @sign_mode.setter
-    def sign_mode(self, value):
+    @sign.setter
+    def sign(self, value):
         if not isinstance(value, enums.SignMode):
             allowed = (
                 "{}.{}".format(type(self).__name__, i.name)
                 for i in enums.SignMode
             )
-            error_msg = "allowed values for sign_mode are: " + ", ".join(
-                allowed
-            )
+            error_msg = "allowed values for sign are: " + ", ".join(allowed)
             raise ValueError(error_msg)
-        self._sign_mode = value
+        self._sign = value
 
     @property
-    def width_exceed_policy(self):
-        """Attribute to control how exceeding column width should be handled.
+    @deprecated("1.0.0", "1.2.0", BTRowCollection.header.fget)
+    def serialno(self):  # pragma: no cover
+        return self._serialno
 
-        It can be one of the following:
-
-        ============================  =========================================
-         Option                        Meaning
-        ============================  =========================================
-         beautifulbable.WEP_WRAP       An item is wrapped so every line fits
-                                       within it's column width.
-
-         beautifultable.WEP_STRIP      An item is stripped to fit in it's
-                                       column.
-
-         beautifultable.WEP_ELLIPSIS   An item is stripped to fit in it's
-                                       column and appended with ...(Ellipsis).
-        ============================  =========================================
-        """
-        return self._width_exceed_policy
-
-    @width_exceed_policy.setter
-    def width_exceed_policy(self, value):
-        if not isinstance(value, enums.WidthExceedPolicy):
-            allowed = (
-                "{}.{}".format(type(self).__name__, i.name)
-                for i in enums.WidthExceedPolicy
-            )
-            error_msg = (
-                "allowed values for width_exceed_policy are: "
-                + ", ".join(allowed)
-            )
-            raise ValueError(error_msg)
-        self._width_exceed_policy = value
+    @serialno.setter
+    @deprecated("1.0.0", "1.2.0", BTRowCollection.header.fget)
+    def serialno(self, value):  # pragma: no cover
+        self._serialno = value
 
     @property
-    def default_alignment(self):
-        """Attribute to control the alignment of newly created columns.
+    @deprecated("1.0.0", "1.2.0")
+    def serialno_header(self):  # pragma: no cover
+        return self._serialno_header
 
-        It can be one of the following:
-
-        ============================  =========================================
-         Option                        Meaning
-        ============================  =========================================
-         beautifultable.ALIGN_LEFT     New columns are left aligned.
-
-         beautifultable.ALIGN_CENTER   New columns are center aligned.
-
-         beautifultable.ALIGN_RIGHT    New columns are right aligned.
-        ============================  =========================================
-        """
-        return self._default_alignment
-
-    @default_alignment.setter
-    def default_alignment(self, value):
-        if not isinstance(value, enums.Alignment):
-            allowed = (
-                "{}.{}".format(type(self).__name__, i.name)
-                for i in enums.Alignment
-            )
-            error_msg = (
-                "allowed values for default_alignment are: "
-                + ", ".join(allowed)
-            )
-            raise ValueError(error_msg)
-        self._default_alignment = value
+    @serialno_header.setter
+    @deprecated("1.0.0", "1.2.0")
+    def serialno_header(self, value):  # pragma: no cover
+        self._serialno_header = value
 
     @property
-    def default_padding(self):
-        """Initial value for Left and Right padding widths for new columns."""
-        return self._default_padding
+    @deprecated("1.0.0", "1.2.0", sign.fget)
+    def sign_mode(self):  # pragma: no cover
+        return self.sign
 
-    @default_padding.setter
-    def default_padding(self, value):
-        if not isinstance(value, int):
-            raise TypeError("padding must be an integer")
-        elif value < 0:
-            raise ValueError("padding must be equal to or greater than 0")
-        else:
-            self._default_padding = value
+    @sign_mode.setter
+    @deprecated("1.0.0", "1.2.0", sign.fget)
+    def sign_mode(self, value):  # pragma: no cover
+        self.sign = value
 
     @property
-    def column_widths(self):
-        """get/set width for the columns of the table.
-
-        Width of the column specifies the max number of characters
-        a column can contain. Larger characters are handled according to
-        the value of `width_exceed_policy`.
-        """
-        return self._column_widths
-
-    @column_widths.setter
-    def column_widths(self, value):
-        if isinstance(value, int):
-            value = [value] * self._column_count
-        width = self._validate_row(value)
-        self._column_widths = PositiveIntegerMetaData(self, width)
-
-    @property
-    def column_headers(self):
-        """get/set titles for the columns of the table.
-
-        It can be any iterable having all memebers an instance of `str`.
-        """
-        return self._column_headers
-
-    @column_headers.setter
-    def column_headers(self, value):
-        header = self._validate_row(value)
-        for i in header:
-            if not isinstance(i, basestring):
-                raise TypeError(
-                    ("Headers should be of type 'str', " "not {}").format(
-                        type(i)
-                    )
-                )
-        self._column_headers = HeaderData(self, header)
-
-    @property
-    def column_alignments(self):
-        """get/set alignment of the columns of the table.
-
-        It can be any iterable containing only the following:
-
-        * beautifultable.ALIGN_LEFT
-        * beautifultable.ALIGN_CENTER
-        * beautifultable.ALIGN_RIGHT
-        """
-        return self._column_alignments
-
-    @column_alignments.setter
-    def column_alignments(self, value):
-        if isinstance(value, enums.Alignment):
-            value = [value] * self._column_count
-        alignment = self._validate_row(value)
-        self._column_alignments = AlignmentMetaData(self, alignment)
-
-    @property
-    def left_padding_widths(self):
-        """get/set width for left padding of the columns of the table.
-
-        Left Width of the padding specifies the number of characters
-        on the left of a column reserved for padding. By Default It is 1.
-        """
-        return self._left_padding_widths
-
-    @left_padding_widths.setter
-    def left_padding_widths(self, value):
-        if isinstance(value, int):
-            value = [value] * self._column_count
-        pad_width = self._validate_row(value)
-        self._left_padding_widths = PositiveIntegerMetaData(self, pad_width)
-
-    @property
-    def right_padding_widths(self):
-        """get/set width for right padding of the columns of the table.
-
-        Right Width of the padding specifies the number of characters
-        on the rigth of a column reserved for padding. By default It is 1.
-        """
-        return self._right_padding_widths
-
-    @right_padding_widths.setter
-    def right_padding_widths(self, value):
-        if isinstance(value, int):
-            value = [value] * self._column_count
-        pad_width = self._validate_row(value)
-        self._right_padding_widths = PositiveIntegerMetaData(self, pad_width)
-
-    @property
-    def max_table_width(self):
+    def maxwidth(self):
         """get/set the maximum width of the table.
 
         The width of the table is guaranteed to not exceed this value. If it
         is not possible to print a given table with the width provided, this
         value will automatically adjust.
         """
-        offset = (self._column_count - 1) * termwidth(
+        offset = (len(self.columns) - 1) * termwidth(
             self.column_separator_char
         )
         offset += termwidth(self.left_border_char)
         offset += termwidth(self.right_border_char)
-        self._max_table_width = max(
-            self._max_table_width, offset + self._column_count
-        )
-        return self._max_table_width
+        self._maxwidth = max(self._maxwidth, offset + len(self.columns))
+        return self._maxwidth
+
+    @maxwidth.setter
+    def maxwidth(self, value):
+        self._maxwidth = value
+
+    @property
+    @deprecated("1.0.0", "1.2.0", maxwidth.fget)
+    def max_table_width(self):  # pragma: no cover
+        return self.maxwidth
 
     @max_table_width.setter
-    def max_table_width(self, value):
-        self._max_table_width = value
+    @deprecated("1.0.0", "1.2.0", maxwidth.fget)
+    def max_table_width(self, value):  # pragma: no cover
+        self.maxwidth = value
+
+    @property
+    @deprecated(
+        "1.0.0",
+        "1.2.0",
+        BTColumnCollection.__len__,
+        details="Use 'len(self.columns)' instead.",
+    )
+    def column_count(self):  # pragma: no cover
+        return len(self.columns)
+
+    @property
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.width_exceed_policy.fget)
+    def width_exceed_policy(self):  # pragma: no cover
+        return self.columns.width_exceed_policy
+
+    @width_exceed_policy.setter
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.width_exceed_policy.fget)
+    def width_exceed_policy(self, value):  # pragma: no cover
+        self.columns.width_exceed_policy = value
+
+    @property
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.default_alignment.fget)
+    def default_alignment(self):  # pragma: no cover
+        return self.columns.default_alignment
+
+    @default_alignment.setter
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.default_alignment.fget)
+    def default_alignment(self, value):  # pragma: no cover
+        self.columns.default_alignment = value
+
+    @property
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.default_padding.fget)
+    def default_padding(self):  # pragma: no cover
+        return self.columns.default_padding
+
+    @default_padding.setter
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.default_padding.fget)
+    def default_padding(self, value):  # pragma: no cover
+        self.columns.default_padding = value
+
+    @property
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.width.fget)
+    def column_widths(self):  # pragma: no cover
+        return self.columns.width
+
+    @column_widths.setter
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.width.fget)
+    def column_widths(self, value):  # pragma: no cover
+        self.columns.width = value
+
+    @property
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.header.fget)
+    def column_headers(self):  # pragma: no cover
+        return self.columns.header
+
+    @column_headers.setter
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.header.fget)
+    def column_headers(self, value):  # pragma: no cover
+        self.columns.header = value
+
+    @property
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.alignment.fget)
+    def column_alignments(self):  # pragma: no cover
+        return self.columns.alignment
+
+    @column_alignments.setter
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.alignment.fget)
+    def column_alignments(self, value):  # pragma: no cover
+        self.columns.alignment = value
+
+    @property
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.padding_left.fget)
+    def left_padding_widths(self):  # pragma: no cover
+        return self.columns.padding_left
+
+    @left_padding_widths.setter
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.padding_left.fget)
+    def left_padding_widths(self, value):  # pragma: no cover
+        self.columns.padding_left = value
+
+    @property
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.padding_right.fget)
+    def right_padding_widths(self):  # pragma: no cover
+        return self.columns.padding_right
+
+    @right_padding_widths.setter
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.padding_right.fget)
+    def right_padding_widths(self, value):  # pragma: no cover
+        self.columns.padding_right = value
+
+    @deprecated(
+        "1.0.0",
+        "1.2.0",
+        BTColumnCollection.__getitem__,
+        details="Use 'BeautifulTable.{columns|rows}[key]' instead.",
+    )
+    def __getitem__(self, key):  # pragma: no cover
+        if isinstance(key, basestring):
+            return self.columns[key]
+        return self.rows[key]
+
+    @deprecated(
+        "1.0.0",
+        "1.2.0",
+        BTColumnCollection.__setitem__,
+        details="Use 'BeautifulTable.{columns|rows}[key]' instead.",
+    )
+    def __setitem__(self, key, value):  # pragma: no cover
+        if isinstance(key, basestring):
+            self.columns[key] = value
+        else:
+            self.rows[key] = value
+
+    @deprecated(
+        "1.0.0",
+        "1.2.0",
+        BTColumnCollection.__delitem__,
+        details="Use 'BeautifulTable.{columns|rows}[key]' instead.",
+    )
+    def __delitem__(self, key):  # pragma: no cover
+        if isinstance(key, basestring):
+            del self.columns[key]
+        else:
+            del self.rows[key]
 
     # *************************Properties End Here*************************
 
-    def _initialize_table(self, column_count):
-        """Sets the column count of the table.
+    @deprecated(
+        "1.0.0",
+        "1.2.0",
+        BTColumnCollection.__getitem__,
+        details="Use 'BeautifulTable.columns[key]' instead.",
+    )
+    def get_column(self, key):  # pragma: no cover
+        return self.columns[key]
 
-        This method is called to set the number of columns for the first time.
+    @deprecated(
+        "1.0.0",
+        "1.2.0",
+        BTColumnHeader.__getitem__,
+        details="Use 'BeautifulTable.columns.header[key]' instead.",
+    )
+    def get_column_header(self, index):  # pragma: no cover
+        return self.columns.header[index]
 
-        Parameters
-        ----------
-        column_count : int
-            number of columns in the table
-        """
-        header = [""] * column_count
-        alignment = [self.default_alignment] * column_count
-        width = [0] * column_count
-        padding = [self.default_padding] * column_count
+    @deprecated(
+        "1.0.0",
+        "1.2.0",
+        BTColumnHeader.__getitem__,
+        details="Use 'BeautifulTable.columns.header.index(header)' instead.",
+    )
+    def get_column_index(self, header):  # pragma: no cover
+        return self.columns.header.index(header)
 
-        self._column_count = column_count
-        self._column_headers = HeaderData(self, header)
-        self._column_alignments = AlignmentMetaData(self, alignment)
-        self._column_widths = PositiveIntegerMetaData(self, width)
-        self._left_padding_widths = PositiveIntegerMetaData(self, padding)
-        self._right_padding_widths = PositiveIntegerMetaData(self, padding)
+    @deprecated("1.0.0", "1.2.0", BTRowCollection.filter)
+    def filter(self, key):  # pragma: no cover
+        return self.rows.filter(key)
 
-    def _validate_row(self, value, init_table_if_required=True):
-        # TODO: Rename this method
-        # str is also an iterable but it is not a valid row, so
-        # an extra check is required for str
-        if not isinstance(value, Iterable) or isinstance(value, basestring):
-            raise TypeError("parameter must be an iterable")
+    @deprecated("1.0.0", "1.2.0", BTRowCollection.sort)
+    def sort(self, key, reverse=False):  # pragma: no cover
+        self.rows.sort(key, reverse=reverse)
 
-        row = list(value)
-        if init_table_if_required and self._column_count == 0:
-            self._initialize_table(len(row))
+    @deprecated("1.0.0", "1.2.0", BTRowCollection.reverse)
+    def reverse(self, value):  # pragma: no cover
+        self.rows.reverse()
 
-        if len(row) != self._column_count:
-            raise ValueError(
-                ("'Expected iterable of length {}, " "got {}").format(
-                    self._column_count, len(row)
-                )
-            )
-        return row
+    @deprecated("1.0.0", "1.2.0", BTRowCollection.pop)
+    def pop_row(self, index=-1):  # pragma: no cover
+        return self.rows.pop(index)
 
-    def __getitem__(self, key):
-        """Get a row, or a column, or a new table by slicing.
+    @deprecated("1.0.0", "1.2.0", BTRowCollection.insert)
+    def insert_row(self, index, row):  # pragma: no cover
+        return self.rows.insert(index, row)
 
-        Parameters
-        ----------
-        key : int, slice, str
-            If key is an `int`, returns a row.
-            If key is an `str`, returns iterator to a column with header `key`.
-            If key is a slice object, returns a new table sliced according to
-            rows.
+    @deprecated("1.0.0", "1.2.0", BTRowCollection.append)
+    def append_row(self, value):  # pragma: no cover
+        self.rows.append(value)
 
-        Raises
-        ------
-        TypeError
-            If key is not of type int, slice or str.
-        IndexError
-            If `int` key is out of range.
-        KeyError
-            If `str` key is not found in headers.
-        """
-        if isinstance(key, slice):
-            new_table = copy.copy(self)
-            # Every child of BaseRow class needs to be reassigned so that
-            # They contain reference of the new table rather than the old
-            # This was a cause of a nasty bug once.
-            new_table.column_headers = self.column_headers
-            new_table.column_alignments = self.column_alignments
-            new_table.column_widths = self.column_widths
-            new_table.left_padding_widths = self.left_padding_widths
-            new_table.right_padding_widths = self.left_padding_widths
-            new_table._table = []
-            for row in self._table[key]:
-                new_table.append_row(row)
-            return new_table
-        if isinstance(key, int):
-            return self._table[key]
-        if isinstance(key, basestring):
-            return self.get_column(key)
-        raise TypeError(
-            (
-                "table indices must be integers, strings or " "slices, not {}"
-            ).format(type(key).__name__)
-        )
+    @deprecated("1.0.0", "1.2.0", BTRowCollection.update)
+    def update_row(self, key, value):  # pragma: no cover
+        self.rows.update(key, value)
 
-    def __delitem__(self, key):
-        """Delete a row, or a column, or multiple rows by slicing.
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.pop)
+    def pop_column(self, index=-1):  # pragma: no cover
+        return self.columns.pop(index)
 
-        Parameters
-        ----------
-        key : int, slice, str
-            If key is an `int`, deletes a row.
-            If key is a slice object, deletes multiple rows.
-            If key is an `str`, delete the first column with heading `key`
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.insert)
+    def insert_column(self, index, header, column):  # pragma: no cover
+        self.columns.insert(index, column, header)
 
-        Raises
-        ------
-        TypeError
-            If key is not of type int, slice or str.
-        IndexError
-            If `int` key is out of range.
-        KeyError
-            If `str` key is not found in headers.
-        """
-        if isinstance(key, int) or isinstance(key, slice):
-            del self._table[key]
-        elif isinstance(key, basestring):
-            return self.pop_column(key)
-        else:
-            raise TypeError(
-                (
-                    "table indices must be integers, strings or "
-                    "slices, not {}"
-                ).format(type(key).__name__)
-            )
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.append)
+    def append_column(self, header, column):  # pragma: no cover
+        self.columns.append(column, header)
 
-    def __setitem__(self, key, value):
-        """Update a row, or a column, or multiple rows by slicing.
-
-        Parameters
-        ----------
-        key : int, slice, str
-            If key is an `int`, updates a row.
-            If key is an `str`, appends `column` to the list with header as
-            `key`.
-            If key is a slice object, updates multiple rows according to slice
-            rules.
-
-        Raises
-        ------
-        TypeError
-            If key is not of type int, slice or str.
-        IndexError
-            If `int` key is out of range.
-        """
-        if isinstance(key, (int, slice)):
-            self.update_row(key, value)
-        elif isinstance(key, basestring):
-            self.update_column(key, value)
-        else:
-            raise TypeError(
-                (
-                    "table indices must be integers, strings or "
-                    "slices, not {}"
-                ).format(type(key).__name__)
-            )
-
-    def __len__(self):
-        return len(self._table)
-
-    def __contains__(self, key):
-        if isinstance(key, basestring):
-            return key in self._column_headers
-        elif isinstance(key, Iterable):
-            return key in self._table
-        else:
-            raise TypeError(
-                ("'key' must be str or Iterable, " "not {}").format(
-                    type(key).__name__
-                )
-            )
-
-    def __iter__(self):
-        return iter(self._table)
-
-    def __next__(self):
-        return next(self._table)
-
-    def __repr__(self):
-        return repr(self._table)
-
-    def __str__(self):
-        return self.get_string()
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.update)
+    def update_column(self, header, column):  # pragma: no cover
+        self.columns.update(header, column)
 
     def set_style(self, style):
         """Set the style of the table from a predefined set of styles.
@@ -689,50 +678,49 @@ class BeautifulTable(object):
         self.intersect_bottom_mid = style_template.intersect_bottom_mid
         self.intersect_bottom_right = style_template.intersect_bottom_right
 
-    def _calculate_column_widths(self):
+    def _compute_width(self):
         """Calculate width of column automatically based on data."""
-        table_width = self.get_table_width()
-        lpw, rpw = self._left_padding_widths, self._right_padding_widths
-        pad_widths = [(lpw[i] + rpw[i]) for i in range(self._column_count)]
-        max_widths = [0 for index in range(self._column_count)]
-        offset = table_width - sum(self._column_widths) + sum(pad_widths)
-        self._max_table_width = max(
-            self._max_table_width, offset + self._column_count
-        )
+        table_width = self.width
+        lpw, rpw = self.columns.padding_left, self.columns.padding_right
+        pad_widths = [(lpw[i] + rpw[i]) for i in range(len(self.columns))]
+        maxwidths = [0 for index in range(len(self.columns))]
+        offset = table_width - sum(self.columns.width) + sum(pad_widths)
+        self._maxwidth = max(self._maxwidth, offset + len(self.columns))
 
-        for index, header in enumerate(self.column_headers):
+        for index, header in enumerate(self.columns.header):
             max_length = 0
-            for i in to_unicode(self._column_headers[index]).split("\n"):
-                output_str = get_output_str(
-                    i,
-                    self.detect_numerics,
-                    self.numeric_precision,
-                    self.sign_mode.value,
+            for i in pre_process(
+                header, self.detect_numerics, self.precision, self.sign.value
+            ).split("\n"):
+                output_str = pre_process(
+                    i, self.detect_numerics, self.precision, self.sign.value,
                 )
                 max_length = max(max_length, termwidth(output_str))
-            max_widths[index] += max_length
+            maxwidths[index] += max_length
 
-        for index, column in enumerate(zip(*self._table)):
-            max_length = max_widths[index]
+        for index, column in enumerate(zip(*self._data)):
+            max_length = maxwidths[index]
             for i in column:
-                for j in to_unicode(i).split("\n"):
-                    output_str = get_output_str(
+                for j in pre_process(
+                    i, self.detect_numerics, self.precision, self.sign.value
+                ).split("\n"):
+                    output_str = pre_process(
                         j,
                         self.detect_numerics,
-                        self.numeric_precision,
-                        self.sign_mode.value,
+                        self.precision,
+                        self.sign.value,
                     )
                     max_length = max(max_length, termwidth(output_str))
-            max_widths[index] = max_length
+            maxwidths[index] = max_length
 
-        sum_ = sum(max_widths)
-        desired_sum = self._max_table_width - offset
+        sum_ = sum(maxwidths)
+        desired_sum = self._maxwidth - offset
 
         # Set flag for columns who are within their fair share
         temp_sum = 0
-        flag = [0] * len(max_widths)
-        for i, width in enumerate(max_widths):
-            if width <= int(desired_sum / self._column_count):
+        flag = [0] * len(maxwidths)
+        for i, width in enumerate(maxwidths):
+            if width <= int(desired_sum / len(self.columns)):
                 temp_sum += width
                 flag[i] = 1
             else:
@@ -745,71 +733,37 @@ class BeautifulTable(object):
 
         # Columns which exceed their fair share should be shrinked based on
         # how much space is left for the table
-        for i, width in enumerate(max_widths):
-            self.column_widths[i] = width
+        for i, width in enumerate(maxwidths):
+            self.columns.width[i] = width
             if not flag[i]:
                 new_width = 1 + int((width - 1) * avail_space / actual_space)
                 if new_width < width:
-                    self.column_widths[i] = new_width
+                    self.columns.width[i] = new_width
                     shrinked_columns[new_width] = i
 
         # Divide any remaining space among shrinked columns
         if shrinked_columns:
-            extra = self._max_table_width - offset - sum(self.column_widths)
+            extra = self._maxwidth - offset - sum(self.columns.width)
             actual_space = sum(shrinked_columns)
 
             if extra > 0:
                 for i, width in enumerate(sorted(shrinked_columns)):
                     index = shrinked_columns[width]
                     extra_width = int(width * extra / actual_space)
-                    self.column_widths[i] += extra_width
+                    self.columns.width[i] += extra_width
                     if i == (len(shrinked_columns) - 1):
                         extra = (
-                            self._max_table_width
-                            - offset
-                            - sum(self.column_widths)
+                            self._maxwidth - offset - sum(self.columns.width)
                         )
-                        self.column_widths[index] += extra
+                        self.columns.width[index] += extra
 
-        for i in range(self.column_count):
-            self.column_widths[i] += pad_widths[i]
+        for i in range(len(self.columns)):
+            self.columns.width[i] += pad_widths[i]
 
-    def auto_calculate_width(self):  # pragma : no cover
-        deprecation("'auto_calculate_width()' is deprecated")
-        self._calculate_column_widths()
-
-    def set_padding_widths(self, pad_width):
-        """Set width for left and rigth padding of the columns of the table.
-
-        Parameters
-        ----------
-        pad_width : array_like
-            pad widths for the columns.
-        """
-        self.left_padding_widths = pad_width
-        self.right_padding_widths = pad_width
-
-    def sort(self, key, reverse=False):
-        """Stable sort of the table *IN-PLACE* with respect to a column.
-
-        Parameters
-        ----------
-        key: int, str
-            index or header of the column. Normal list rules apply.
-        reverse : bool
-            If `True` then table is sorted as if each comparison was reversed.
-        """
-        if isinstance(key, int):
-            key = operator.itemgetter(key)
-        elif isinstance(key, basestring):
-            key = operator.itemgetter(self.get_column_index(key))
-        elif callable(key):
-            pass
-        else:
-            raise TypeError(
-                "'key' must either be 'int' or 'str' or a 'callable'"
-            )
-        self._table.sort(key=key, reverse=reverse)
+    @deprecated("1.0.0", "1.2.0", BTColumnCollection.padding.fget)
+    def set_padding_widths(self, pad_width):  # pragma: no cover
+        self.columns.padding_left = pad_width
+        self.columns.padding_right = pad_width
 
     def copy(self):
         """Return a shallow copy of the table.
@@ -819,320 +773,10 @@ class BeautifulTable(object):
         BeautifulTable:
             shallow copy of the BeautifulTable instance.
         """
-        return self[:]
+        return copy.copy(self)
 
-    def filter(self, key):
-        """Return a copy of the table with only those rows which satisfy a
-        certain condition.
-
-        Returns
-        -------
-        BeautifulTable:
-            Filtered copy of the BeautifulTable instance.
-        """
-        new_table = self.copy()
-        new_table.clear()
-        for row in filter(key, self):
-            new_table.append_row(row)
-        return new_table
-
-    def get_column_header(self, index):
-        """Get header of a column from it's index.
-
-        Parameters
-        ----------
-        index: int
-            Normal list rules apply.
-        """
-        return self._column_headers[index]
-
-    def get_column_index(self, header):
-        """Get index of a column from it's header.
-
-        Parameters
-        ----------
-        header: str
-            header of the column.
-
-        Raises
-        ------
-        ValueError:
-            If no column could be found corresponding to `header`.
-        """
-        try:
-            index = self._column_headers.index(header)
-            return index
-        except ValueError:
-            raise_suppressed(
-                KeyError(
-                    ("'{}' is not a header for any " "column").format(header)
-                )
-            )
-
-    def get_column(self, key):
-        """Return an iterator to a column.
-
-        Parameters
-        ----------
-        key : int, str
-            index of the column, or the header of the column.
-            If index is specified, then normal list rules apply.
-
-        Raises
-        ------
-        TypeError:
-            If key is not of type `int`, or `str`.
-
-        Returns
-        -------
-        iter:
-            Iterator to the specified column.
-        """
-        if isinstance(key, int):
-            index = key
-        elif isinstance(key, basestring):
-            index = self.get_column_index(key)
-        else:
-            raise TypeError(
-                ("key must be an int or str, " "not {}").format(
-                    type(key).__name__
-                )
-            )
-        return iter(map(operator.itemgetter(index), self._table))
-
-    def reverse(self):
-        """Reverse the table row-wise *IN PLACE*."""
-        self._table.reverse()
-
-    def pop_row(self, index=-1):
-        """Remove and return row at index (default last).
-
-        Parameters
-        ----------
-        index : int
-            index of the row. Normal list rules apply.
-        """
-        row = self._table.pop(index)
-        return row
-
-    def pop_column(self, index=-1):
-        """Remove and return row at index (default last).
-
-        Parameters
-        ----------
-        index : int, str
-            index of the column, or the header of the column.
-            If index is specified, then normal list rules apply.
-
-        Raises
-        ------
-        TypeError:
-            If index is not an instance of `int`, or `str`.
-
-        IndexError:
-            If Table is empty.
-        """
-        if isinstance(index, int):
-            pass
-        elif isinstance(index, basestring):
-            index = self.get_column_index(index)
-        else:
-            raise TypeError(
-                (
-                    "column index must be an integer or a string, " "not {}"
-                ).format(type(index).__name__)
-            )
-        if self._column_count == 0:
-            raise IndexError("pop from empty table")
-        if self._column_count == 1:
-            # This is the last column. So we should clear the table to avoid
-            # empty rows
-            self.clear(clear_metadata=True)
-        else:
-            # Not the last column. safe to pop from row
-            self._column_count -= 1
-            self._column_alignments._pop(index)
-            self._column_widths._pop(index)
-            self._left_padding_widths._pop(index)
-            self._right_padding_widths._pop(index)
-            self._column_headers._pop(index)
-            for row in self._table:
-                row._pop(index)
-
-    def insert_row(self, index, row):
-        """Insert a row before index in the table.
-
-        Parameters
-        ----------
-        index : int
-            List index rules apply
-
-        row : iterable
-            Any iterable of appropriate length.
-
-        Raises
-        ------
-        TypeError:
-            If `row` is not an iterable.
-
-        ValueError:
-            If size of `row` is inconsistent with the current number
-            of columns.
-        """
-        row = self._validate_row(row)
-        row_obj = RowData(self, row)
-        self._table.insert(index, row_obj)
-
-    def append_row(self, row):
-        """Append a row to end of the table.
-
-        Parameters
-        ----------
-        row : iterable
-            Any iterable of appropriate length.
-
-        """
-        self.insert_row(len(self._table), row)
-
-    def update_row(self, key, value):
-        """Update a column named `header` in the table.
-
-        If length of column is smaller than number of rows, lets say
-        `k`, only the first `k` values in the column is updated.
-
-        Parameters
-        ----------
-        key : int or slice
-            index of the row, or a slice object.
-
-        value : iterable
-            If an index is specified, `value` should be an iterable
-            of appropriate length. Instead if a slice object is
-            passed as key, value should be an iterable of rows.
-
-        Raises
-        ------
-        IndexError:
-            If index specified is out of range.
-
-        TypeError:
-            If `value` is of incorrect type.
-
-        ValueError:
-            If length of row does not matches number of columns.
-        """
-        if isinstance(key, int):
-            row = self._validate_row(value, init_table_if_required=False)
-            row_obj = RowData(self, row)
-            self._table[key] = row_obj
-        elif isinstance(key, slice):
-            row_obj_list = []
-            for row in value:
-                row_ = self._validate_row(row, init_table_if_required=True)
-                row_obj_list.append(RowData(self, row_))
-            self._table[key] = row_obj_list
-        else:
-            raise TypeError("key must be an integer or a slice object")
-
-    def update_column(self, header, column):
-        """Update a column named `header` in the table.
-
-        If length of column is smaller than number of rows, lets say
-        `k`, only the first `k` values in the column is updated.
-
-        Parameters
-        ----------
-        header : str
-            Header of the column
-
-        column : iterable
-            Any iterable of appropriate length.
-
-        Raises
-        ------
-        TypeError:
-            If length of `column` is shorter than number of rows.
-
-        ValueError:
-            If no column exists with title `header`.
-        """
-        index = self.get_column_index(header)
-        if not isinstance(header, basestring):
-            raise TypeError("header must be of type str")
-        for row, new_item in zip(self._table, column):
-            row[index] = new_item
-
-    def insert_column(self, index, header, column):
-        """Insert a column before `index` in the table.
-
-        If length of column is bigger than number of rows, lets say
-        `k`, only the first `k` values of `column` is considered.
-        If column is shorter than 'k', ValueError is raised.
-
-        Note that Table remains in consistent state even if column
-        is too short. Any changes made by this method is rolled back
-        before raising the exception.
-
-        Parameters
-        ----------
-        index : int
-            List index rules apply.
-
-        header : str
-            Title of the column.
-
-        column : iterable
-            Any iterable of appropriate length.
-
-        Raises
-        ------
-        TypeError:
-            If `header` is not of type `str`.
-
-        ValueError:
-            If length of `column` is shorter than number of rows.
-        """
-        if self._column_count == 0:
-            self.column_headers = HeaderData(self, [header])
-            self._table = [RowData(self, [i]) for i in column]
-        else:
-            if not isinstance(header, basestring):
-                raise TypeError("header must be of type str")
-            column_length = 0
-            for row, new_item in zip(self._table, column):
-                row._insert(index, new_item)
-                column_length += 1
-            if column_length == len(self._table):
-                self._column_count += 1
-                self._column_headers._insert(index, header)
-                self._column_alignments._insert(index, self.default_alignment)
-                self._column_widths._insert(index, 0)
-                self._left_padding_widths._insert(index, self.default_padding)
-                self._right_padding_widths._insert(index, self.default_padding)
-            else:
-                # Roll back changes so that table remains in consistent state
-                for j in range(column_length, -1, -1):
-                    self._table[j]._pop(index)
-                raise ValueError(
-                    (
-                        "length of 'column' should be atleast {}, " "got {}"
-                    ).format(len(self._table), column_length)
-                )
-
-    def append_column(self, header, column):
-        """Append a column to end of the table.
-
-        Parameters
-        ----------
-        header : str
-            Title of the column
-
-        column : iterable
-            Any iterable of appropriate length.
-        """
-        self.insert_column(self._column_count, header, column)
-
-    def clear(self, clear_metadata=False):
+    @deprecated_param("1.0.0", "1.2.0", "clear_metadata", "reset_columns")
+    def clear(self, reset_columns=False, **kwargs):  # pragma: no cover
         """Clear the contents of the table.
 
         Clear all rows of the table, and if specified clears all column
@@ -1140,22 +784,24 @@ class BeautifulTable(object):
 
         Parameters
         ----------
-        clear_metadata : bool, optional
+        reset_columns : bool, optional
             If it is true(default False), all metadata of columns such as their
             alignment, padding, width, etc. are also cleared and number of
             columns is set to 0.
         """
-        # Cannot use clear method to support Python 2.7
-        del self._table[:]
-        if clear_metadata:
-            self._initialize_table(0)
+        kwargs.setdefault("clear_metadata", None)
+        if kwargs["clear_metadata"]:
+            reset_columns = kwargs["clear_metadata"]
+        self.rows.clear()
+        if reset_columns:
+            self.columns.clear()
 
     def _get_horizontal_line(
-        self, char, intersect_left, intersect_mid, intersect_right
+        self, char, intersect_left, intersect_mid, intersect_right, mask=None
     ):
         """Get a horizontal line for the table.
 
-        Internal method used to actually get all horizontal lines in the table.
+        Internal method used to draw all horizontal lines in the table.
         Column width should be set prior to calling this method. This method
         detects intersection and handles it according to the values of
         `intersect_*_*` attributes.
@@ -1168,9 +814,12 @@ class BeautifulTable(object):
         Returns
         -------
         str
-            String which will be printed as the Top border of the table.
+            String which will be printed as a line in the table.
         """
-        width = self.get_table_width()
+        width = self.width
+
+        if mask is None:
+            mask = [True] * len(self.columns)
 
         try:
             line = list(char * (int(width / termwidth(char)) + 1))[:width]
@@ -1192,7 +841,7 @@ class BeautifulTable(object):
                         termwidth(intersect_left),
                     )
                     for i in range(length):
-                        line[i] = intersect_left[i]
+                        line[i] = intersect_left[i] if mask[0] else " "
             visible_junc = not intersect_right.isspace()
             # If right border is enabled and it is visible
             if termwidth(self.right_border_char) > 0:
@@ -1202,110 +851,77 @@ class BeautifulTable(object):
                         termwidth(intersect_right),
                     )
                     for i in range(length):
-                        line[-i - 1] = intersect_right[-i - 1]
+                        line[-i - 1] = (
+                            intersect_right[-i - 1] if mask[-1] else " "
+                        )
             visible_junc = not intersect_mid.isspace()
             # If column separator is enabled and it is visible
             if termwidth(self.column_separator_char):
                 if not (self.column_separator_char.isspace() and visible_junc):
                     index = termwidth(self.left_border_char)
-                    for i in range(self._column_count - 1):
-                        index += self._column_widths[i]
+                    for i in range(len(self.columns) - 1):
+                        if not mask[i]:
+                            for j in range(self.columns.width[i]):
+                                line[index + j] = " "
+                        index += self.columns.width[i]
                         length = min(
                             termwidth(self.column_separator_char),
                             termwidth(intersect_mid),
                         )
                         for j in range(length):
-                            line[index + j] = intersect_mid[j]
+                            # TODO: we should also hide junctions based on mask
+                            line[index + j] = (
+                                intersect_mid[j]
+                                if (mask[i] or mask[i + 1])
+                                else " "
+                            )
                         index += termwidth(self.column_separator_char)
 
         return "".join(line)
 
-    def _get_top_border(self):
+    def _get_top_border(self, *args, **kwargs):
         return self._get_horizontal_line(
             self.top_border_char,
             self.intersect_top_left,
             self.intersect_top_mid,
             self.intersect_top_right,
+            *args,
+            **kwargs
         )
 
-    def get_top_border(self):  # pragma : no cover
-        """Get the Top border of table.
-
-        Column width should be set prior to calling this method.
-
-        Returns
-        -------
-        str
-            String which will be printed as the Top border of the table.
-        """
-        deprecation("'get_top_border()' is deprecated")
-        return self._get_top_border()
-
-    def _get_header_separator(self):
+    def _get_header_separator(self, *args, **kwargs):
         return self._get_horizontal_line(
             self.header_separator_char,
             self.intersect_header_left,
             self.intersect_header_mid,
             self.intersect_header_right,
+            *args,
+            **kwargs
         )
 
-    def get_header_separator(self):  # pragma : no cover
-        """Get the Header separator of table.
-
-        Column width should be set prior to calling this method.
-
-        Returns
-        -------
-        str
-            String which will be printed as Header separator of the table.
-        """
-        deprecation("'get_header_separator()' is deprecated")
-        return self._get_header_separator()
-
-    def _get_row_separator(self):
+    def _get_row_separator(self, *args, **kwargs):
         return self._get_horizontal_line(
             self.row_separator_char,
             self.intersect_row_left,
             self.intersect_row_mid,
             self.intersect_row_right,
+            *args,
+            **kwargs
         )
 
-    def get_row_separator(self):  # pragma : no cover
-        """Get the Row separator of table.
-
-        Column width should be set prior to calling this method.
-
-        Returns
-        -------
-        str
-            String which will be printed as Row separator of the table.
-        """
-        deprecation("'get_row_separator()' is deprecated")
-        return self._get_row_separator()
-
-    def _get_bottom_border(self):
+    def _get_bottom_border(self, *args, **kwargs):
         return self._get_horizontal_line(
             self.bottom_border_char,
             self.intersect_bottom_left,
             self.intersect_bottom_mid,
             self.intersect_bottom_right,
+            *args,
+            **kwargs
         )
 
-    def get_bottom_border(self):  # pragma : no cover
-        """Get the Bottom border of table.
-
-        Column width should be set prior to calling this method.
-
-        Returns
-        -------
-        str
-            String which will be printed as Bottom border of the table.
-        """
-        deprecation("'get_bottom_border()' is deprecated")
-        return self._get_bottom_border()
-
-    def get_table_width(self):
-        """Get the width of the table as number of characters.
+    @property
+    def width(self):
+        """Get the actual width of the table as number of characters.
 
         Column width should be set prior to calling this method.
 
@@ -1314,80 +930,128 @@ class BeautifulTable(object):
         int
             Width of the table as number of characters.
         """
-        if self.column_count == 0:
+        if len(self.columns) == 0:
             return 0
-        width = sum(self._column_widths)
-        width += (self._column_count - 1) * termwidth(
+        width = sum(self.columns.width)
+        width += (len(self.columns) - 1) * termwidth(
             self.column_separator_char
         )
         width += termwidth(self.left_border_char)
         width += termwidth(self.right_border_char)
         return width
 
-    def _get_string(self, rows, append=False, recalculate_width=False):
-        # Drawing the top border
-        if self.serialno:
-            if self.column_count > 0:
-                self.insert_column(
-                    0, self.serialno_header, range(1, len(self) + 1)
+    @deprecated("1.0.0", "1.2.0", width.fget)
+    def get_table_width(self):  # pragma: no cover
+        return self.width
+
+    def _get_string(self, rows, append=False, recalculate_width=True):
+        row_header_visible = bool(
+            "".join(
+                x if x is not None else "" for x in self.rows.header
+            ).strip()
+        )
+        column_header_visible = bool(
+            "".join(
+                x if x is not None else "" for x in self.columns.header
+            ).strip()
+        )
+
+        # Preparing table for printing serialno, row headers and column headers
+        if len(self.columns) > 0:
+            if self._serialno:
+                self.columns.insert(
+                    0, range(1, len(self.rows) + 1), self._serialno_header
                 )
 
-        if recalculate_width or sum(self._column_widths) == 0:
-            self._calculate_column_widths()
+            if row_header_visible:
+                self.columns.insert(0, self.rows.header)
 
-        if self.serialno:
-            if self.column_count > 0 and self.column_widths[0] == 0:
-                self.column_widths[0] = (
-                    max(4, len(self.serialno_header))
-                    + 2 * self.default_padding
+        if len(self.rows) > 0:
+            if column_header_visible:
+                self.rows.insert(0, self.columns.header)
+
+        if (self.columns._auto_width and recalculate_width) or sum(
+            self.columns.width
+        ) == 0:
+            self._compute_width()
+
+        if len(self.columns) > 0:
+            if self._serialno:
+                index = 1 if row_header_visible else 0
+                if self.columns.width[index] == 0:
+                    self.columns.width[index] = (
+                        max(len(i) for i in self.rows.header)
+                        + 2 * self.columns.default_padding
+                    )
+
+            if row_header_visible:
+                if self.columns.width[0] == 0:
+                    self.columns.width[0] = (
+                        max(4, len(self._serialno_header))
+                        + 2 * self.columns.default_padding
+                    )
+
+        try:
+            # Rendering the top border
+            if self.top_border_char:
+                yield self._get_top_border()
+
+            # Print column headers if not empty or only spaces
+            row_iterator = iter(self.rows)
+            if column_header_visible:
+                yield next(row_iterator)._get_string(
+                    align=self.columns.header.alignment
                 )
+                if self.header_separator_char:
+                    yield self._get_header_separator()
 
-        if self.top_border_char:
-            yield self._get_top_border()
+            # Printing rows
+            first_row_encountered = False
+            for i, row in enumerate(row_iterator):
+                if first_row_encountered and self.row_separator_char:
+                    yield self._get_row_separator()
+                first_row_encountered = True
+                content = to_unicode(row)
+                yield content
 
-        # Print headers if not empty or only spaces
-        if "".join(self._column_headers).strip():
-            headers = to_unicode(self._column_headers)
-            yield headers
+            # Printing additional rows
+            prev_length = len(self.rows)
+            for i, row in enumerate(rows, start=1):
+                if first_row_encountered and self.row_separator_char:
+                    yield self._get_row_separator()
+                first_row_encountered = True
+                if self._serialno:
+                    row.insert(0, prev_length + i)
+                self.rows.append(row)
+                content = to_unicode(self.rows[-1])
+                if not append:
+                    self.rows.pop()
+                yield content
 
-            if self.header_separator_char:
-                yield self._get_header_separator()
+            # Rendering the bottom border
+            if self.bottom_border_char:
+                yield self._get_bottom_border()
+        except Exception:
+            raise
+        finally:
+            # Cleanup
+            if len(self.rows) > 0:
+                if column_header_visible:
+                    self.rows.pop(0)
 
-        # Printing rows
-        first_row_encountered = False
-        for row in self._table:
-            if first_row_encountered and self.row_separator_char:
-                yield self._get_row_separator()
-            first_row_encountered = True
-            content = to_unicode(row)
-            yield content
+            if len(self.columns) > 0:
+                if row_header_visible:
+                    self.columns.pop(0)
 
-        prev_length = len(self)
-        for i, row in enumerate(rows, start=1):
-            if first_row_encountered and self.row_separator_char:
-                yield self._get_row_separator()
-            first_row_encountered = True
-            if self.serialno:
-                row.insert(0, prev_length + i)
-            self.append_row(row)
-            content = to_unicode(self._table[-1])
-            if not append:
-                self.pop_row()
-            yield content
-
-        # Drawing the bottom border
-        if self.bottom_border_char:
-            yield self._get_bottom_border()
-
-        if self.serialno and self.column_count > 0:
-            self.pop_column(0)
+                if self._serialno:
+                    self.columns.pop(0)
 
     def stream(self, rows, append=False):
         """Get a generator for the table.
 
         This should be used in cases where data takes time to retrieve and
-        it is required be displayed as soon as possible. Any existing rows
-        in the table shall also be returned. It is required that atleast one
+        it is required to be displayed as soon as possible. Any existing rows
+        in the table shall also be returned. It is essential that atleast one
         of title, width or existing rows set prior to calling this method.
 
         Parameters
@@ -1408,16 +1072,8 @@ class BeautifulTable(object):
         ):
             yield line
 
-    def get_string(self, recalculate_width=True):
-        """Get the table as a String.
-
-        Parameters
-        ----------
-        recalculate_width : bool, optional
-            If width for each column should be recalculated(default True).
-            Note that width is always calculated if it wasn't set
-            explicitly when this method is called for the first time ,
-            regardless of the value of `recalculate_width`.
+    def get_string(self):
+        """Get the table as a string.
 
         Returns
         -------
@@ -1425,27 +1081,22 @@ class BeautifulTable(object):
             Table as a string.
         """
 
-        if len(self._table) == 0:
+        if len(self.rows) == 0:
             return ""
 
         string_ = []
-        for line in self._get_string(
-            [], append=False, recalculate_width=recalculate_width
-        ):
+        for line in self._get_string([], append=False):
             string_.append(line)
 
         return "\n".join(string_)
 
-    def to_csv(self, file_name, delimiter=","):
+    def to_csv(self, file_name, *args, **kwargs):
         """Export table to CSV format.
 
         Parameters
         ----------
         file_name : str
-            Path to CSV file which BeautifulTable will write to.
-
-        delimiter : str, optional
-            Delimiter used as value separator. Defaults to comma (',').
+            Path to CSV file.
         """
 
         if not isinstance(file_name, str):
@@ -1455,27 +1106,25 @@ class BeautifulTable(object):
                 )
             )
 
-        try:
-            with open(file_name, mode="wt", newline="") as csv_file:
-                csv_writer = csv.writer(
-                    csv_file, delimiter=delimiter, quoting=csv.QUOTE_MINIMAL
-                )
-                csv_writer.writerow(self.column_headers)  # write header
-                csv_writer.writerows(self._table)  # write table
-        except OSError:
-            raise
+        with open(file_name, mode="wt", newline="") as csv_file:
+            csv_writer = csv.writer(csv_file, *args, **kwargs)
+            if bool(
+                "".join(
+                    x if x is not None else "" for x in self.columns.header
+                ).strip()
+            ):
+                csv_writer.writerow(self.columns.header)
+            csv_writer.writerows(self.rows)
 
-    def from_csv(self, file_name, delimiter=",", header_exists=True):
+    def from_csv(self, file_name, header=True, **kwargs):
         """Create table from CSV file.
 
         Parameters
         ----------
         file_name : str
-            Path to CSV file which `BeautifulTable` will read from.
-        delimiter : str, optional
-            Delimiter used as value separator. Defaults to comma (`,`).
-        header_exists : bool, optional
-            First row in CSV file should be set as table header.
+            Path to CSV file.
+        header : bool, optional
+            Whether First row in CSV file should be parsed as table header.
 
         Raises
         ------
@@ -1492,16 +1141,11 @@ class BeautifulTable(object):
                 )
             )
 
-        try:
-            with open(file_name, mode="rt", newline="") as csv_file:
-                csv_file = csv.reader(csv_file, delimiter=delimiter)
+        with open(file_name, mode="rt", newline="") as csv_file:
+            csv_reader = csv.reader(csv_file, **kwargs)
 
-                if header_exists:
-                    self.column_headers = next(csv_file)
-
-                for row in csv_file:
-                    self.append_row(row)
-
-                return self
-        except FileNotFoundError:
-            raise
+            if header:
+                self.columns.header = next(csv_reader)
+            for row in csv_reader:
+                self.rows.append(row)
+            return self

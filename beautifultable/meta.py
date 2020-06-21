@@ -1,22 +1,22 @@
-from .base import BaseRow
+from .base import BTBaseRow
 from .enums import Alignment
 
 
-class TableMetaData(BaseRow):
+class MetaData(BTBaseRow):
     def __init__(self, table, row):
         for i in row:
             self.validate(i)
-        super(TableMetaData, self).__init__(table, row)
+        super(MetaData, self).__init__(table, row)
 
     def __setitem__(self, key, value):
         self.validate(value)
-        super(TableMetaData, self).__setitem__(key, value)
+        super(MetaData, self).__setitem__(key, value)
 
     def validate(self, value):
         pass
 
 
-class AlignmentMetaData(TableMetaData):
+class AlignmentMetaData(MetaData):
     def validate(self, value):
         if not isinstance(value, Alignment):
             allowed = (
@@ -30,7 +30,7 @@ class AlignmentMetaData(TableMetaData):
             raise TypeError(error_msg)
 
 
-class PositiveIntegerMetaData(TableMetaData):
+class NonNegativeIntegerMetaData(MetaData):
     def validate(self, value):
         if isinstance(value, int) and value >= 0:
             pass

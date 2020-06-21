@@ -1,2 +1,0 @@
-class BeautifulTableDeprecationWarning(DeprecationWarning):
-    pass
