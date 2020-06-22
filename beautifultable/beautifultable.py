@@ -348,8 +348,8 @@ class BeautifulTable(object):
     def default_padding(self, value):
         if not isinstance(value, int):
             raise TypeError("padding must be an integer")
-        elif value <= 0:
-            raise ValueError("padding must be more than 0")
+        elif value < 0:
+            raise ValueError("padding must be equal to or greater than 0")
         else:
             self._default_padding = value
 
