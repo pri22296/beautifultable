@@ -3,7 +3,7 @@ import os
 from setuptools import setup
 from codecs import open
 
-
+install_requires = ["lxml"]
 extras_require = {}
 
 this_dir = os.path.abspath(os.path.dirname(__file__))
@@ -30,6 +30,7 @@ setup(
     download_url=download_url,
     license=about["__license__"],
     keywords="table terminal ascii",
+    install_requires=install_requires,
     extras_require=extras_require,
     classifiers=[
         "Development Status :: 3 - Alpha",
