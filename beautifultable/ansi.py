@@ -15,7 +15,9 @@ from .compat import to_unicode
 
 class ANSIMultiByteString(object):
 
-    ANSI_REGEX = re.compile(r"(\x1B\[[0-?]*[ -/]*[@-~])")
+    ANSI_REGEX = re.compile(
+        r"(\x1B(?:[()][AB012]|[@-Z\\-_]|\[[0-?]*[ -/]*[@-~]))"
+    )
     ANSI_RESET = "\x1b[0m"
 
     def __init__(self, string):

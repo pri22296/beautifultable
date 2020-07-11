@@ -1,14 +1,13 @@
 """Module containing some utility methods"""
 
 import warnings
-
+import functools
 
 from .ansi import ANSIMultiByteString
 from .compat import to_unicode
-from .exceptions import BeautifulTableDeprecationWarning
 
 
-def _convert_to_numeric(item):
+def to_numeric(item):
     """
     Helper method to convert a string to float or int if possible.
 
@@ -37,10 +36,12 @@ def _convert_to_numeric(item):
         return num
 
 
-def get_output_str(item, detect_numerics, precision, sign_value):
+def pre_process(item, detect_numerics, precision, sign_value):
     """Returns the final string which should be displayed"""
+    if item is None:
+        return ""
     if detect_numerics:
-        item = _convert_to_numeric(item)
+        item = to_numeric(item)
     if isinstance(item, float):
         item = round(item, precision)
     try:
@@ -61,10 +62,69 @@ def textwrap(item, width):
     return obj.wrap(width)
 
 
-def raise_suppressed(exp):
-    exp.__cause__ = None
-    raise exp
+def deprecation_message(
+    old_name, deprecated_in, removed_in, extra_msg
+):  # pragma: no cover
+    return (
+        "'{}' has been deprecated in 'v{}' and will be removed in 'v{}'. "
+        "{}".format(old_name, deprecated_in, removed_in, extra_msg)
+    )
 
 
-def deprecation(message):
-    warnings.warn(message, BeautifulTableDeprecationWarning)
+def deprecated(
+    deprecated_in, removed_in, replacement=None, details=None,
+):  # pragma: no cover
+    def decorator(f):
+        @functools.wraps(f)
+        def wrapper(*args, **kwds):
+            nonlocal details
+            if not details:
+                if replacement:
+                    details = replacement.__qualname__
+                    details = details.replace(
+                        "BTColumns", "BeautifulTable.columns",
+                    )
+                    details = details.replace("BTRows", "BeautifulTable.rows",)
+                    details = details.replace(
+                        "BTColumnHeader", "BeautifulTable.columns.header",
+                    )
+                    details = details.replace(
+                        "BTRowHeader", "BeautifulTable.rows.header",
+                    )
+                    details = "Use '{}' instead.".format(details)
+                else:
+                    details = ""
+            message = deprecation_message(
+                f.__qualname__, deprecated_in, removed_in, details,
+            )
+            if replacement:
+                f.__doc__ = "{}\n\n{}".format(replacement.__doc__, message)
+            warnings.warn(message, FutureWarning)
+            return f(*args, **kwds)
+
+        return wrapper
+
+    return decorator
+
+
+def deprecated_param(
+    deprecated_in, removed_in, old_name, new_name=None, details=None,
+):  # pragma: no cover
+    def decorator(f):
+        @functools.wraps(f)
+        def wrapper(*args, **kwargs):
+            nonlocal details
+            if not details:
+                details = (
+                    "Use '{}' instead.".format(new_name) if new_name else ""
+                )
+            message = deprecation_message(
+                old_name, deprecated_in, removed_in, details,
+            )
+            if old_name in kwargs:
+                warnings.warn(message, FutureWarning)
+            return f(*args, **kwargs)
+
+        return wrapper
+
+    return decorator

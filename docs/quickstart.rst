@@ -6,98 +6,118 @@ Quickstart
 Building the Table
 =========================================================================
 
-Building a table is very easy. You can append rows and columns
-in the table. Let's create our first :class:`~.BeautifulTable`.
+Building a table is very easy. :class:`~.BeautifulTable` provides two views
+``rows`` and ``columns``. You can use them to modify their respective properties.
+
+Let's create our first table and add some rows.
 
 .. code:: python
 
    >>> from beautifultable import BeautifulTable
    >>> table = BeautifulTable()
-   >>> table.column_headers = ["name", "rank", "gender"]
-   >>> table.append_row(["Jacob", 1, "boy"])
-   >>> table.append_row(["Isabella", 1, "girl"])
-   >>> table.append_row(["Ethan", 2, "boy"])
-   >>> table.append_row(["Sophia", 2, "girl"])
-   >>> table.append_row(["Michael", 3, "boy"])
+   >>> table.rows.append(["Jacob", 1, "boy"])
+   >>> table.rows.append(["Isabella", 1, "girl"])
+   >>> table.rows.append(["Ethan", 2, "boy"])
+   >>> table.rows.append(["Sophia", 2, "girl"])
+   >>> table.rows.append(["Michael", 3, "boy"])
+   >>> table.columns.header = ["name", "rank", "gender"]
+   >>> table.rows.header = ["S1", "S2", "S3", "S4", "S5"]
    >>> print(table)
-   +----------+------+--------+
-   |   name   | rank | gender |
-   +----------+------+--------+
-   |  Jacob   |  1   |  boy   |
-   +----------+------+--------+
-   | Isabella |  1   |  girl  |
-   +----------+------+--------+
-   |  Ethan   |  2   |  boy   |
-   +----------+------+--------+
-   |  Sophia  |  2   |  girl  |
-   +----------+------+--------+
-   | Michael  |  3   |  boy   |
-   +----------+------+--------+
+   +----+----------+------+--------+
+   |    |   name   | rank | gender |
+   +----+----------+------+--------+
+   | S1 |  Jacob   |  1   |  boy   |
+   +----+----------+------+--------+
+   | S2 | Isabella |  1   |  girl  |
+   +----+----------+------+--------+
+   | S3 |  Ethan   |  2   |  boy   |
+   +----+----------+------+--------+
+   | S4 |  Sophia  |  2   |  girl  |
+   +----+----------+------+--------+
+   | S5 | Michael  |  3   |  boy   |
+   +----+----------+------+--------+
 
 We created our first table. Let's add some more data to it.
 But this time we will add a new column.
 
 .. code:: python
 
-   >>> table.append_column("year", ["2010", "2012", "2008", "2010", "2011"])
+   >>> table.columns.append(["2010", "2012", "2008", "2010", "2011"], header="year")
    >>> print(table)
-   +----------+------+--------+------+
-   |   name   | rank | gender | year |
-   +----------+------+--------+------+
-   |  Jacob   |  1   |  boy   | 2010 |
-   +----------+------+--------+------+
-   | Isabella |  1   |  girl  | 2012 |
-   +----------+------+--------+------+
-   |  Ethan   |  2   |  boy   | 2008 |
-   +----------+------+--------+------+
-   |  Sophia  |  2   |  girl  | 2010 |
-   +----------+------+--------+------+
-   | Michael  |  3   |  boy   | 2011 |
-   +----------+------+--------+------+
+   +----+----------+------+--------+------+
+   |    |   name   | rank | gender | year |
+   +----+----------+------+--------+------+
+   | S1 |  Jacob   |  1   |  boy   | 2010 |
+   +----+----------+------+--------+------+
+   | S2 | Isabella |  1   |  girl  | 2012 |
+   +----+----------+------+--------+------+
+   | S3 |  Ethan   |  2   |  boy   | 2008 |
+   +----+----------+------+--------+------+
+   | S4 |  Sophia  |  2   |  girl  | 2010 |
+   +----+----------+------+--------+------+
+   | S5 | Michael  |  3   |  boy   | 2011 |
+   +----+----------+------+--------+------+
 
 You can also build a :class:`~.BeautifulTable` using slicing. Slicing creates a
 new table with it's own copy of data. But it retains the properties
-of the original object.
+of the original object. You can slice both rows or columns.
 
 .. code:: python
 
-   >>> new_table = table[:3]
+   >>> new_table = table.rows[:3]
    >>> print(new_table)
-   +----------+------+--------+------+
-   |   name   | rank | gender | year |
-   +----------+------+--------+------+
-   |  Jacob   |  1   |  boy   | 2010 |
-   +----------+------+--------+------+
-   | Isabella |  1   |  girl  | 2012 |
-   +----------+------+--------+------+
-   |  Ethan   |  2   |  boy   | 2008 |
-   +----------+------+--------+------+
+   +----+----------+------+--------+------+
+   |    |   name   | rank | gender | year |
+   +----+----------+------+--------+------+
+   | S1 |  Jacob   |  1   |  boy   | 2010 |
+   +----+----------+------+--------+------+
+   | S2 | Isabella |  1   |  girl  | 2012 |
+   +----+----------+------+--------+------+
+   | S3 |  Ethan   |  2   |  boy   | 2008 |
+   +----+----------+------+--------+------+
+
+
+.. code:: python
+
+   >>> new_table = table.columns[:3]
+   >>> print(new_table)
+   +----+----------+------+--------+
+   |    |   name   | rank | gender |
+   +----+----------+------+--------+
+   | S1 |  Jacob   |  1   |  boy   |
+   +----+----------+------+--------+
+   | S2 | Isabella |  1   |  girl  |
+   +----+----------+------+--------+
+   | S3 |  Ethan   |  2   |  boy   |
+   +----+----------+------+--------+
+   | S4 |  Sophia  |  2   |  girl  |
+   +----+----------+------+--------+
+   | S5 | Michael  |  3   |  boy   |
+   +----+----------+------+--------+
 
 As you can see how easy it is to create a Table with **beautifultable**.
-Now lets move on to see some common use cases. Note that not all
-features are described here. See the API Documentation to get a
-detailed look at all the features.
+Now lets move on to see some common use cases. For details, please refer the API Documentation.
 
 
 =========================================================================
 Accessing Rows
 =========================================================================
 
-You can access a row using it's index. It works just like a python
-list. It returns a **RowData** object.
+You can access a row using it's index or it's header. It returns a **BTRowData** object.
 
 .. code:: python
 
-   >>> print(list(table[3]))
+   >>> print(list(table.rows[3]))
    ['Sophia', 2, 'girl', '2010']
 
-To access a particular field of a row, you can use the index, or the header.
+To access a particular field of a row, you can again use the index, or the header
+of the required column.
 
 .. code:: python
 
-   >>> print(table[3][2])
+   >>> print(table.rows[3][2])
    girl
-   >>> print(table[3]['gender'])
+   >>> print(table.rows[3]['gender'])
    girl
 
 
@@ -105,66 +125,67 @@ To access a particular field of a row, you can use the index, or the header.
 Accessing Columns
 =========================================================================
 
-Columns can be accessed using their header names or their index.
-But since name of headers can be duplicated, There are methods
-provided to access columns using their index. If columns are accessed
-using their names, and if more than one column exists with that name
-as it's header, then the first column found would be returned.
-
-It should be noted here that the returned column is not a list. It is
-an iterator.
+You can access a column using it's index or it's header. It returns a **BTColumnData** object.
 
 .. code:: python
 
-   >>> print(list(table['name']))
+   >>> print(list(table.columns['name']))
    ['Jacob', 'Isabella', 'Ethan', 'Sophia', 'Michael']
+
+To access a particular field of a column, you can again use the index, or the header
+of the required row.
+
+.. code:: python
+
+   >>> print(table.columns[2][3])
+   girl
+   >>> print(table.columns[2]['S4'])
+   girl
 
 =========================================================================
 Counting Rows and Columns
 =========================================================================
 
-You can get the number of columns in the table by accessing the
-:attr:`~.BeautifulTable.column_count` property.
+You can get the number of columns or rows in the table by using the
+``len`` function. You can also use the :attr:`~.BeautifulTable.shape`
+attribute.
 
 .. code:: python
 
-   >>> print(table.column_count)
+   >>> print(len(table.columns))
    3
-
-To get the number of rows, you can just use the ``len`` function.
-
-.. code:: python
-
-   >>> print(len(table))
+   >>> print(len(table.rows))
    5
+   >>> print(table.shape)
+   (5,3)
 
 =========================================================================
 Inserting Rows and Columns
 =========================================================================
 
-BeautifulTable provides 2 methods, :meth:`~.BeautifulTable.insert_row` and
-:meth:`~.BeautifulTable.insert_column` for this purpose.
+BeautifulTable provides 2 methods, :meth:`~.BTRowCollection.insert` and
+:meth:`~.BTColumnCollection.insert` for this purpose.
 
 .. code:: python
 
-   >>> table.insert_row(3, ['Gary', 2, 'boy', 2009])
-   >>> table.insert_column(2, 'marks', [78, 67, 82, 56, 86, 74])
+   >>> table.rows.insert(3, ['Gary', 2, 'boy', 2009], header='S6')
+   >>> table.columns.insert(2, [78, 67, 82, 56, 86, 74], header='marks')
    >>> print(table)
-   +----------+------+-------+--------+------+
-   |   name   | rank | marks | gender | year |
-   +----------+------+-------+--------+------+
-   |  Jacob   |  1   |  78   |  boy   | 2010 |
-   +----------+------+-------+--------+------+
-   | Isabella |  1   |  67   |  girl  | 2012 |
-   +----------+------+-------+--------+------+
-   |  Ethan   |  2   |  82   |  boy   | 2008 |
-   +----------+------+-------+--------+------+
-   |   Gary   |  2   |  56   |  boy   | 2009 |
-   +----------+------+-------+--------+------+
-   |  Sophia  |  2   |  86   |  girl  | 2010 |
-   +----------+------+-------+--------+------+
-   | Michael  |  3   |  74   |  boy   | 2011 |
-   +----------+------+-------+--------+------+
+   +----+----------+------+-------+--------+------+
+   |    |   name   | rank | marks | gender | year |
+   +----+----------+------+-------+--------+------+
+   | S1 |  Jacob   |  1   |  78   |  boy   | 2010 |
+   +----+----------+------+-------+--------+------+
+   | S2 | Isabella |  1   |  67   |  girl  | 2012 |
+   +----+----------+------+-------+--------+------+
+   | S3 |  Ethan   |  2   |  82   |  boy   | 2008 |
+   +----+----------+------+-------+--------+------+
+   | S6 |   Gary   |  2   |  56   |  boy   | 2009 |
+   +----+----------+------+-------+--------+------+
+   | S4 |  Sophia  |  2   |  86   |  girl  | 2010 |
+   +----+----------+------+-------+--------+------+
+   | S5 | Michael  |  3   |  74   |  boy   | 2011 |
+   +----+----------+------+-------+--------+------+
 
 
 =========================================================================
@@ -176,38 +197,36 @@ statement.
 
 .. code:: python
 
-   >>> del table[3]
-   >>> del table['year']
+   >>> del table.rows[3]
+   >>> del table.columns['year']
    >>> print(table)
-   +----------+------+-------+--------+
-   |   name   | rank | marks | gender |
-   +----------+------+-------+--------+
-   |  Jacob   |  1   |  78   |  boy   |
-   +----------+------+-------+--------+
-   | Isabella |  1   |  67   |  girl  |
-   +----------+------+-------+--------+
-   |  Ethan   |  2   |  82   |  boy   |
-   +----------+------+-------+--------+
-   |  Sophia  |  2   |  86   |  girl  |
-   +----------+------+-------+--------+
-   | Michael  |  3   |  74   |  boy   |
-   +----------+------+-------+--------+
+   +----+----------+------+-------+--------+
+   |    |   name   | rank | marks | gender |
+   +----+----------+------+-------+--------+
+   | S1 |  Jacob   |  1   |  78   |  boy   |
+   +----+----------+------+-------+--------+
+   | S2 | Isabella |  1   |  67   |  girl  |
+   +----+----------+------+-------+--------+
+   | S3 |  Ethan   |  2   |  82   |  boy   |
+   +----+----------+------+-------+--------+
+   | S4 |  Sophia  |  2   |  86   |  girl  |
+   +----+----------+------+-------+--------+
+   | S5 | Michael  |  3   |  74   |  boy   |
+   +----+----------+------+-------+--------+
 
-You can also use the helper methods :meth:`~.BeautifulTable.pop_row`,
-:meth:`~.BeautifulTable.pop_column` to do the same thing. Both these
-methods take the index of the row, or column to be removed.
+You can also use the helper methods :meth:`~.BTRowCollection.pop`,
+:meth:`~.BTColumnCollection.pop` to do the same thing. Both these
+methods take the index or header of the row/column to be removed.
 
-Instead of the index, you can also pass the header of the column to
-:meth:`~.BeautifulTable.pop_column`. Therefore the following 2
-snippets are equivalent.
+Therefore the following 2 snippets are equivalent.
 
 .. code:: python
 
-   >>> table.pop_column('marks')
+   >>> table.columns.pop('marks')
 
 .. code:: python
 
-   >>> table.pop_column(2)
+   >>> table.columns.pop(2)
 
 
 =========================================================================
@@ -218,15 +237,15 @@ Let's change the name in the 4th row to ``'Sophie'``.
 
 .. code:: python
 
-   >>> table[3][0] = 'Sophie' # index of 4th row is 3
-   >>> print(table[3])
+   >>> table.rows[3][0] = 'Sophie' # index of 4th row is 3
+   >>> print(list(table.rows[3]))
    ['Sophie', 2, 86, 'girl']
 
 You could have done the same thing using the header.
 
 .. code:: python
 
-   >>> table[3]['name'] = 'Sophie'
+   >>> table.rows[3]['name'] = 'Sophie'
 
 
 Or, you can also change the entire row, or even multiple rows
@@ -234,82 +253,94 @@ using slicing.
 
 .. code:: python
 
-   >>> table[3] = ['Sophie', 2, 56, 'girl']
+   >>> table.rows[3] = ['Sophie', 2, 56, 'girl']
 
 
 You can also update existing columns as shown below.
 
 .. code:: python
 
-   >>> table['marks'] = [75, 46, 89, 56, 82]
+   >>> table.columns['marks'] = [75, 46, 89, 56, 82]
    >>> print(table)
-   +----------+------+-------+--------+
-   |   name   | rank | marks | gender |
-   +----------+------+-------+--------+
-   |  Jacob   |  1   |  75   |  boy   |
-   +----------+------+-------+--------+
-   | Isabella |  1   |  46   |  girl  |
-   +----------+------+-------+--------+
-   |  Ethan   |  2   |  89   |  boy   |
-   +----------+------+-------+--------+
-   |  Sophie  |  2   |  56   |  girl  |
-   +----------+------+-------+--------+
-   | Michael  |  3   |  82   |  boy   |
-   +----------+------+-------+--------+
+   +----+----------+------+-------+--------+
+   |    |   name   | rank | marks | gender |
+   +----+----------+------+-------+--------+
+   | S1 |  Jacob   |  1   |  75   |  boy   |
+   +----+----------+------+-------+--------+
+   | S2 | Isabella |  1   |  46   |  girl  |
+   +----+----------+------+-------+--------+
+   | S3 |  Ethan   |  2   |  89   |  boy   |
+   +----+----------+------+-------+--------+
+   | S4 |  Sophie  |  2   |  56   |  girl  |
+   +----+----------+------+-------+--------+
+   | S5 | Michael  |  3   |  82   |  boy   |
+   +----+----------+------+-------+--------+
 
-The methods :meth:`~.BeautifulTable.update_row` and
-:meth:`~.BeautifulTable.update_column` can be used to perform the operations
-discussed in this section.
+The methods :meth:`~.BTRowCollection.update` and :meth:`~.BTColumnCollection.update`
+can be used to perform the operations discussed in this section.
 
 Note that you can only update existing columns but can't create
 a new column using this method. For that you need to use the
-methods :meth:`~.BeautifulTable.append_column` or
-:meth:`~.BeautifulTable.insert_column`.
+methods :meth:`~.BTRowCollection.append`, :meth:`~.BTRowCollection.insert`,
+:meth:`~.BTColumnCollection.append` or :meth:`~.BTColumnCollection.insert`.
 
 
 =========================================================================
 Searching for rows or columns headers
 =========================================================================
 
-Cheking if a header is in the table.
+Cheking if a column header is in the table.
 
 .. code:: python
 
-   >>> 'rank' in table
+   >>> 'rank' in table.columns.header
+   True
+
+Cheking if a row header is in the table.
+
+.. code:: python
+
+   >>> 'S2' in table.rows.header
    True
 
 Cheking if a row is in table
 
 .. code:: python
 
-   >>> ["Ethan", 2, 89, "boy"] in table
+   >>> ["Ethan", 2, 89, "boy"] in table.rows
    True
 
+Cheking if a column is in table
+
+.. code:: python
+
+   >>> ["Jacob", "Isabella", "Ethan", "Sophie", "Michael"] in table.columns
+   True
 
 =========================================================================
 Sorting based on a Column
 =========================================================================
 
-You can also :meth:`~.BeautifulTable.sort` the table based on a column by
-specifying it's index or it's header.
+You can also :meth:`~.:meth:`~.BTRowCollection.sort` the table based on a column
+by specifying it's index or it's header.
 
 .. code:: python
 
-   >>> table.sort('name')
+   >>> table.rows.sort('marks')
    >>> print(table)
-   +----------+------+-------+--------+
-   |   name   | rank | marks | gender |
-   +----------+------+-------+--------+
-   |  Ethan   |  2   |  89   |  boy   |
-   +----------+------+-------+--------+
-   | Isabella |  1   |  46   |  girl  |
-   +----------+------+-------+--------+
-   |  Jacob   |  1   |  75   |  boy   |
-   +----------+------+-------+--------+
-   | Michael  |  3   |  82   |  boy   |
-   +----------+------+-------+--------+
-   |  Sophie  |  2   |  56   |  girl  |
-   +----------+------+-------+--------+
+   +----+----------+------+-------+--------+
+   |    |   name   | rank | marks | gender |
+   +----+----------+------+-------+--------+
+   | S2 | Isabella |  1   |  46   |  girl  |
+   +----+----------+------+-------+--------+
+   | S4 |  Sophia  |  2   |  56   |  girl  |
+   +----+----------+------+-------+--------+
+   | S1 |  Jacob   |  1   |  75   |  boy   |
+   +----+----------+------+-------+--------+
+   | S5 | Michael  |  3   |  82   |  boy   |
+   +----+----------+------+-------+--------+
+   | S3 |  Ethan   |  2   |  89   |  boy   |
+   +----+----------+------+-------+--------+
 
 =========================================================================
 Customizing the look of the Table
@@ -323,22 +354,63 @@ Let's change the way some columns are aligned in our table.
 
 .. code:: python
 
-   >>> table.column_alignments['name'] = BeautifulTable.ALIGN_LEFT
-   >>> table.column_alignments['gender'] = BeautifulTable.ALIGN_RIGHT
+   >>> table.columns.alignment['name'] = BeautifulTable.ALIGN_LEFT
+   >>> table.columns.alignment['gender'] = BeautifulTable.ALIGN_RIGHT
    >>> print(table)
-   +----------+------+--------+------+
-   | name     | rank | gender | year |
-   +----------+------+--------+------+
-   | Jacob    |  1   |    boy | 2010 |
-   +----------+------+--------+------+
-   | Isabella |  1   |   girl | 2012 |
-   +----------+------+--------+------+
-   | Ethan    |  2   |    boy | 2008 |
-   +----------+------+--------+------+
-   | Sophia   |  2   |   girl | 2010 |
-   +----------+------+--------+------+
-   | Michael  |  3   |    boy | 2011 |
-   +----------+------+--------+------+
+   +----+----------+------+-------+--------+
+   |    | name     | rank | marks | gender |
+   +----+----------+------+-------+--------+
+   | S2 | Isabella |  1   |  46   |   girl |
+   +----+----------+------+-------+--------+
+   | S4 | Sophia   |  2   |  56   |   girl |
+   +----+----------+------+-------+--------+
+   | S1 | Jacob    |  1   |  75   |    boy |
+   +----+----------+------+-------+--------+
+   | S5 | Michael  |  3   |  82   |    boy |
+   +----+----------+------+-------+--------+
+   | S3 | Ethan    |  2   |  89   |    boy |
+   +----+----------+------+-------+--------+
+
+You can also set all columns to a specific alignment
+
+.. code:: python
+
+   >>> table.columns.alignment = BeautifulTable.ALIGN_RIGHT
+   >>> print(table)
+   +----+----------+------+-------+--------+
+   |    |     name | rank | marks | gender |
+   +----+----------+------+-------+--------+
+   | S2 | Isabella |    1 |    46 |   girl |
+   +----+----------+------+-------+--------+
+   | S4 |   Sophia |    2 |    56 |   girl |
+   +----+----------+------+-------+--------+
+   | S1 |    Jacob |    1 |    75 |    boy |
+   +----+----------+------+-------+--------+
+   | S5 |  Michael |    3 |    82 |    boy |
+   +----+----------+------+-------+--------+
+   | S3 |    Ethan |    2 |    89 |    boy |
+   +----+----------+------+-------+--------+
+
+Headers can have a different alignment that the column.
+
+.. code:: python
+
+   >>> table.columns.header.alignment= BeautifulTable.ALIGN_RIGHT
+   >>> table.columns.alignment = BeautifulTable.ALIGN_LEFT
+   >>> print(table)
+   +----+----------+------+-------+--------+
+   |    |     name | rank | marks | gender |
+   +----+----------+------+-------+--------+
+   | S2 | Isabella | 1    | 46    | girl   |
+   +----+----------+------+-------+--------+
+   | S4 | Sophia   | 2    | 56    | girl   |
+   +----+----------+------+-------+--------+
+   | S1 | Jacob    | 1    | 75    | boy    |
+   +----+----------+------+-------+--------+
+   | S5 | Michael  | 3    | 82    | boy    |
+   +----+----------+------+-------+--------+
+   | S3 | Ethan    | 2    | 89    | boy    |
+   +----+----------+------+-------+--------+
 
 
 -------------------------------------------------------------------------
@@ -350,25 +422,25 @@ the alignment.
 
 .. code:: python
 
-   >>> table.left_padding_widths['rank'] = 5
-   >>> table.right_padding_widths['rank'] = 3
+   >>> table.columns.padding_left['rank'] = 5
+   >>> table.columns.padding_right['rank'] = 3
    >>> print(table)
-   +----------+------------+--------+------+
-   | name     |     rank   | gender | year |
-   +----------+------------+--------+------+
-   | Jacob    |      1     |    boy | 2010 |
-   +----------+------------+--------+------+
-   | Isabella |      1     |   girl | 2012 |
-   +----------+------------+--------+------+
-   | Ethan    |      2     |    boy | 2008 |
-   +----------+------------+--------+------+
-   | Sophia   |      2     |   girl | 2010 |
-   +----------+------------+--------+------+
-   | Michael  |      3     |    boy | 2011 |
-   +----------+------------+--------+------+
+   +----+----------+------------+--------+
+   |    |   name   |     rank   | gender |
+   +----+----------+------------+--------+
+   | S1 |  Jacob   |      1     |  boy   |
+   +----+----------+------------+--------+
+   | S2 | Isabella |      1     |  girl  |
+   +----+----------+------------+--------+
+   | S3 |  Ethan   |      2     |  boy   |
+   +----+----------+------------+--------+
+   | S4 |  Sophia  |      2     |  girl  |
+   +----+----------+------------+--------+
+   | S5 | Michael  |      3     |  boy   |
+   +----+----------+------------+--------+
 
 
-You can use a helper method :meth:`~.BeautifulTable.set_padding_widths` to
+You can use a helper attribute :attr:`~.BTColumnCollection.padding` to
 set the left and right padding to a common value.
 
 
@@ -386,19 +458,19 @@ of the table. The following styles are available:
 
      >>> table.set_style(BeautifulTable.STYLE_DEFAULT)
      >>> print(table)
-     +----------+------+--------+
-     |   name   | rank | gender |
-     +----------+------+--------+
-     |  Jacob   |  1   |  boy   |
-     +----------+------+--------+
-     | Isabella |  1   |  girl  |
-     +----------+------+--------+
-     |  Ethan   |  2   |  boy   |
-     +----------+------+--------+
-     |  Sophia  |  2   |  girl  |
-     +----------+------+--------+
-     | Michael  |  3   |  boy   |
-     +----------+------+--------+
+     +----+----------+------+--------+
+     |    |   name   | rank | gender |
+     +----+----------+------+--------+
+     | S1 |  Jacob   |  1   |  boy   |
+     +----+----------+------+--------+
+     | S2 | Isabella |  1   |  girl  |
+     +----+----------+------+--------+
+     | S3 |  Ethan   |  2   |  boy   |
+     +----+----------+------+--------+
+     | S4 |  Sophia  |  2   |  girl  |
+     +----+----------+------+--------+
+     | S5 | Michael  |  3   |  boy   |
+     +----+----------+------+--------+
 
 * **STYLE_NONE**
 
@@ -406,12 +478,12 @@ of the table. The following styles are available:
 
      >>> table.set_style(BeautifulTable.STYLE_NONE)
      >>> print(table)
-        name    rank  gender
-       Jacob     1     boy
-      Isabella   1     girl
-       Ethan     2     boy
-       Sophia    2     girl
-      Michael    3     boy
+           name    rank  gender
+     S1   Jacob     1     boy
+     S2  Isabella   1     girl
+     S3   Ethan     2     boy
+     S4   Sophia    2     girl
+     S5  Michael    3     boy
 
 * **STYLE_DOTTED**
 
@@ -419,15 +491,15 @@ of the table. The following styles are available:
 
      >>> table.set_style(BeautifulTable.STYLE_DOTTED)
      >>> print(table)
-     ............................
-     :   name   : rank : gender :
-     ............................
-     :  Jacob   :  1   :  boy   :
-     : Isabella :  1   :  girl  :
-     :  Ethan   :  2   :  boy   :
-     :  Sophia  :  2   :  girl  :
-     : Michael  :  3   :  boy   :
-     ............................
+     .................................
+     :    :   name   : rank : gender :
+     .................................
+     : S1 :  Jacob   :  1   :  boy   :
+     : S2 : Isabella :  1   :  girl  :
+     : S3 :  Ethan   :  2   :  boy   :
+     : S4 :  Sophia  :  2   :  girl  :
+     : S5 : Michael  :  3   :  boy   :
+     .................................
 
 * **STYLE_SEPARATED**
 
@@ -435,19 +507,19 @@ of the table. The following styles are available:
 
      >>> table.set_style(BeautifulTable.STYLE_SEPARATED)
      >>> print(table)
-     +==========+======+========+
-     |   name   | rank | gender |
-     +==========+======+========+
-     |  Jacob   |  1   |  boy   |
-     +----------+------+--------+
-     | Isabella |  1   |  girl  |
-     +----------+------+--------+
-     |  Ethan   |  2   |  boy   |
-     +----------+------+--------+
-     |  Sophia  |  2   |  girl  |
-     +----------+------+--------+
-     | Michael  |  3   |  boy   |
-     +----------+------+--------+
+     +====+==========+======+========+
+     |    |   name   | rank | gender |
+     +====+==========+======+========+
+     | S1 |  Jacob   |  1   |  boy   |
+     +----+----------+------+--------+
+     | S2 | Isabella |  1   |  girl  |
+     +----+----------+------+--------+
+     | S3 |  Ethan   |  2   |  boy   |
+     +----+----------+------+--------+
+     | S4 |  Sophia  |  2   |  girl  |
+     +----+----------+------+--------+
+     | S5 | Michael  |  3   |  boy   |
+     +----+----------+------+--------+
 
 * **STYLE_COMPACT**
 
@@ -455,13 +527,13 @@ of the table. The following styles are available:
 
      >>> table.set_style(BeautifulTable.STYLE_COMPACT)
      >>> print(table)
-        name     rank   gender
-     ---------- ------ --------
-       Jacob      1      boy
-      Isabella    1      girl
-       Ethan      2      boy
-       Sophia     2      girl
-      Michael     3      boy
+             name     rank   gender
+     ---- ---------- ------ --------
+     S1    Jacob      1      boy
+     S2   Isabella    1      girl
+     S3    Ethan      2      boy
+     S4    Sophia     2      girl
+     S5   Michael     3      boy
 
 * **STYLE_MYSQL**
 
@@ -469,19 +541,19 @@ of the table. The following styles are available:
 
      >>> table.set_style(BeautifulTable.STYLE_MYSQL)
      >>> print(table)  # Yes, the default style is same as this style
-     +----------+------+--------+
-     |   name   | rank | gender |
-     +----------+------+--------+
-     |  Jacob   |  1   |  boy   |
-     +----------+------+--------+
-     | Isabella |  1   |  girl  |
-     +----------+------+--------+
-     |  Ethan   |  2   |  boy   |
-     +----------+------+--------+
-     |  Sophia  |  2   |  girl  |
-     +----------+------+--------+
-     | Michael  |  3   |  boy   |
-     +----------+------+--------+
+     +----+----------+------+--------+
+     |    |   name   | rank | gender |
+     +----+----------+------+--------+
+     | S1 |  Jacob   |  1   |  boy   |
+     +----+----------+------+--------+
+     | S2 | Isabella |  1   |  girl  |
+     +----+----------+------+--------+
+     | S3 |  Ethan   |  2   |  boy   |
+     +----+----------+------+--------+
+     | S4 |  Sophia  |  2   |  girl  |
+     +----+----------+------+--------+
+     | S5 | Michael  |  3   |  boy   |
+     +----+----------+------+--------+
 
 * **STYLE_MARKDOWN**
 
@@ -489,13 +561,13 @@ of the table. The following styles are available:
 
      >>> table.set_style(BeautifulTable.STYLE_MARKDOWN)
      >>> print(table)  # Markdown alignment not supported currently
-     |   name   | rank | gender |
-     |----------|------|--------|
-     |  Jacob   |  1   |  boy   |
-     | Isabella |  1   |  girl  |
-     |  Ethan   |  2   |  boy   |
-     |  Sophia  |  2   |  girl  |
-     | Michael  |  3   |  boy   |
+     |    |   name   | rank | gender |
+     |----|----------|------|--------|
+     | S1 |  Jacob   |  1   |  boy   |
+     | S2 | Isabella |  1   |  girl  |
+     | S3 |  Ethan   |  2   |  boy   |
+     | S4 |  Sophia  |  2   |  girl  |
+     | S5 | Michael  |  3   |  boy   |
 
 * **STYLE_RST**
 
@@ -503,15 +575,15 @@ of the table. The following styles are available:
 
      >>> table.set_style(BeautifulTable.STYLE_RST)
      >>> print(table)
-     ========== ====== ========
-        name     rank   gender
-     ========== ====== ========
-       Jacob      1      boy
-      Isabella    1      girl
-       Ethan      2      boy
-       Sophia     2      girl
-      Michael     3      boy
-     ========== ====== ========
+     ==== ========== ====== ========
+             name     rank   gender
+     ==== ========== ====== ========
+     S1    Jacob      1      boy
+     S2   Isabella    1      girl
+     S3    Ethan      2      boy
+     S4    Sophia     2      girl
+     S5   Michael     3      boy
+     ==== ========== ====== ========
 
 * **STYLE_BOX**
 
@@ -519,19 +591,19 @@ of the table. The following styles are available:
 
      >>> table.set_style(BeautifulTable.STYLE_BOX)
      >>> print(table)
-     ┌──────────┬──────┬────────┐
-     │   name   │ rank │ gender │
-     ├──────────┼──────┼────────┤
-     │  Jacob   │  1   │  boy   │
-     ├──────────┼──────┼────────┤
-     │ Isabella │  1   │  girl  │
-     ├──────────┼──────┼────────┤
-     │  Ethan   │  2   │  boy   │
-     ├──────────┼──────┼────────┤
-     │  Sophia  │  2   │  girl  │
-     ├──────────┼──────┼────────┤
-     │ Michael  │  3   │  boy   │
-     └──────────┴──────┴────────┘
+     ┌────┬──────────┬──────┬────────┐
+     │    │   name   │ rank │ gender │
+     ├────┼──────────┼──────┼────────┤
+     │ S1 │  Jacob   │  1   │  boy   │
+     ├────┼──────────┼──────┼────────┤
+     │ S2 │ Isabella │  1   │  girl  │
+     ├────┼──────────┼──────┼────────┤
+     │ S3 │  Ethan   │  2   │  boy   │
+     ├────┼──────────┼──────┼────────┤
+     │ S4 │  Sophia  │  2   │  girl  │
+     ├────┼──────────┼──────┼────────┤
+     │ S5 │ Michael  │  3   │  boy   │
+     └────┴──────────┴──────┴────────┘
 
 * **STYLE_BOX_DOUBLED**
 
@@ -539,19 +611,19 @@ of the table. The following styles are available:
 
      >>> table.set_style(BeautifulTable.STYLE_BOX_DOUBLED)
      >>> print(table)
-     ╔══════════╦══════╦════════╗
-     ║   name   ║ rank ║ gender ║
-     ╠══════════╬══════╬════════╣
-     ║  Jacob   ║  1   ║  boy   ║
-     ╠══════════╬══════╬════════╣
-     ║ Isabella ║  1   ║  girl  ║
-     ╠══════════╬══════╬════════╣
-     ║  Ethan   ║  2   ║  boy   ║
-     ╠══════════╬══════╬════════╣
-     ║  Sophia  ║  2   ║  girl  ║
-     ╠══════════╬══════╬════════╣
-     ║ Michael  ║  3   ║  boy   ║
-     ╚══════════╩══════╩════════╝
+     ╔════╦══════════╦══════╦════════╗
+     ║    ║   name   ║ rank ║ gender ║
+     ╠════╬══════════╬══════╬════════╣
+     ║ S1 ║  Jacob   ║  1   ║  boy   ║
+     ╠════╬══════════╬══════╬════════╣
+     ║ S2 ║ Isabella ║  1   ║  girl  ║
+     ╠════╬══════════╬══════╬════════╣
+     ║ S3 ║  Ethan   ║  2   ║  boy   ║
+     ╠════╬══════════╬══════╬════════╣
+     ║ S4 ║  Sophia  ║  2   ║  girl  ║
+     ╠════╬══════════╬══════╬════════╣
+     ║ S5 ║ Michael  ║  3   ║  boy   ║
+     ╚════╩══════════╩══════╩════════╝
 
 * **STYLE_BOX_ROUNDED**
 
@@ -559,19 +631,19 @@ of the table. The following styles are available:
 
      >>> table.set_style(BeautifulTable.STYLE_BOX_ROUNDED)
      >>> print(table)
-     ╭──────────┬──────┬────────╮
-     │   name   │ rank │ gender │
-     ├──────────┼──────┼────────┤
-     │  Jacob   │  1   │  boy   │
-     ├──────────┼──────┼────────┤
-     │ Isabella │  1   │  girl  │
-     ├──────────┼──────┼────────┤
-     │  Ethan   │  2   │  boy   │
-     ├──────────┼──────┼────────┤
-     │  Sophia  │  2   │  girl  │
-     ├──────────┼──────┼────────┤
-     │ Michael  │  3   │  boy   │
-     ╰──────────┴──────┴────────╯
+     ╭────┬──────────┬──────┬────────╮
+     │    │   name   │ rank │ gender │
+     ├────┼──────────┼──────┼────────┤
+     │ S1 │  Jacob   │  1   │  boy   │
+     ├────┼──────────┼──────┼────────┤
+     │ S2 │ Isabella │  1   │  girl  │
+     ├────┼──────────┼──────┼────────┤
+     │ S3 │  Ethan   │  2   │  boy   │
+     ├────┼──────────┼──────┼────────┤
+     │ S4 │  Sophia  │  2   │  girl  │
+     ├────┼──────────┼──────┼────────┤
+     │ S5 │ Michael  │  3   │  boy   │
+     ╰────┴──────────┴──────┴────────╯
 
 * **STYLE_GRID**
 
@@ -579,19 +651,19 @@ of the table. The following styles are available:
 
      >>> table.set_style(BeautifulTable.STYLE_GRID)
      >>> print(table)
-     ╔══════════╤══════╤════════╗
-     ║   name   │ rank │ gender ║
-     ╟──────────┼──────┼────────╢
-     ║  Jacob   │  1   │  boy   ║
-     ╟──────────┼──────┼────────╢
-     ║ Isabella │  1   │  girl  ║
-     ╟──────────┼──────┼────────╢
-     ║  Ethan   │  2   │  boy   ║
-     ╟──────────┼──────┼────────╢
-     ║  Sophia  │  2   │  girl  ║
-     ╟──────────┼──────┼────────╢
-     ║ Michael  │  3   │  boy   ║
-     ╚══════════╧══════╧════════╝
+     ╔════╤══════════╤══════╤════════╗
+     ║    │   name   │ rank │ gender ║
+     ╟────┼──────────┼──────┼────────╢
+     ║ S1 │  Jacob   │  1   │  boy   ║
+     ╟────┼──────────┼──────┼────────╢
+     ║ S2 │ Isabella │  1   │  girl  ║
+     ╟────┼──────────┼──────┼────────╢
+     ║ S3 │  Ethan   │  2   │  boy   ║
+     ╟────┼──────────┼──────┼────────╢
+     ║ S4 │  Sophia  │  2   │  girl  ║
+     ╟────┼──────────┼──────┼────────╢
+     ║ S5 │ Michael  │  3   │  boy   ║
+     ╚════╧══════════╧══════╧════════╝
 
 For more finer customization, you can change what characters are used to draw
 various parts of the table. Here we show you an example of how you can use
@@ -608,19 +680,19 @@ this feature. You can read the API Reference for more details.
    >>> table.column_separator_char = ':'
    >>> table.row_separator_char = '~'
    >>> print(table)
-   <~><~><~><~><~><~><~><~><~><
-   o   name   : rank : gender o
-   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   o  Jacob   :  1   :  boy   o
-   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   o Isabella :  1   :  girl  o
-   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   o  Ethan   :  2   :  boy   o
-   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   o  Sophia  :  2   :  girl  o
-   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   o Michael  :  3   :  boy   o
-   ============================
+   <~><~><~><~><~><~><~><~><~><~><~>
+   o    :   name   : rank : gender o
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   o S1 :  Jacob   :  1   :  boy   o
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   o S2 : Isabella :  1   :  girl  o
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   o S3 :  Ethan   :  2   :  boy   o
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   o S4 :  Sophia  :  2   :  girl  o
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   o S5 : Michael  :  3   :  boy   o
+   =================================
 
 As you can see, you can change quite a lot about your *BeautifulTable* instance.
 For further sections, We switch the look of the table to *default* again.
@@ -633,29 +705,37 @@ Colored Tables
 ansi escape sequences. You can also use any library which makes use of
 these sequences to produce colored text output.
 
+::
+
+    python3 -m pip install termcolor
+
 .. code:: python
 
-   >>> table.append_row([colored("John", 'red'), 4, colored("boy", 'blue')])
+   >>> from termcolor import colored
+
+.. code:: python
+
+   >>> table.rows.append([colored("John", 'red'), 4, colored("boy", 'blue')])
    >>> print(table)
 
 .. raw:: html
 
    <p style="font-family: monospace; background-color: #eeffcc;">
-   +----------+------+--------+<br />
-   |&nbsp;&nbsp; name&nbsp;&nbsp; | rank | gender |<br />
-   +----------+------+--------+<br />
-   |&nbsp; Jacob&nbsp;&nbsp; |&nbsp; 1 &nbsp; |&nbsp; boy&nbsp;&nbsp; |<br />
-   +----------+------+--------+<br />
-   | Isabella |&nbsp; 1&nbsp;&nbsp; |&nbsp; girl&nbsp; |<br />
-   +----------+------+--------+<br />
-   |&nbsp; Ethan&nbsp;&nbsp; |&nbsp; 2&nbsp;&nbsp; |&nbsp; boy&nbsp;&nbsp; |<br />
-   +----------+------+--------+<br />
-   |&nbsp; Sophia&nbsp; |&nbsp; 2&nbsp;&nbsp; |&nbsp; girl&nbsp; |<br />
-   +----------+------+--------+<br />
-   | Michael&nbsp; |&nbsp; 3&nbsp;&nbsp; |&nbsp; boy&nbsp;&nbsp; |<br />
-   +----------+------+--------+<br />
-   |&nbsp;&nbsp; <span style="color: #ff0000;">John</span>&nbsp;&nbsp; |&nbsp; 4&nbsp;&nbsp; |&nbsp; <span style="color: #0000ff;">boy</span>&nbsp;&nbsp; |<br />
-   +----------+------+--------+
+   +----+----------+------+--------+<br />
+   |&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp; name&nbsp;&nbsp; | rank | gender |<br />
+   +----+----------+------+--------+<br />
+   | S1 |&nbsp; Jacob&nbsp;&nbsp; |&nbsp; 1 &nbsp; |&nbsp; boy&nbsp;&nbsp; |<br />
+   +----+----------+------+--------+<br />
+   | S2 | Isabella |&nbsp; 1&nbsp;&nbsp; |&nbsp; girl&nbsp; |<br />
+   +----+----------+------+--------+<br />
+   | S3 |&nbsp; Ethan&nbsp;&nbsp; |&nbsp; 2&nbsp;&nbsp; |&nbsp; boy&nbsp;&nbsp; |<br />
+   +----+----------+------+--------+<br />
+   | S4 |&nbsp; Sophia&nbsp; |&nbsp; 2&nbsp;&nbsp; |&nbsp; girl&nbsp; |<br />
+   +----+----------+------+--------+<br />
+   | S5 | Michael&nbsp; |&nbsp; 3&nbsp;&nbsp; |&nbsp; boy&nbsp;&nbsp; |<br />
+   +----+----------+------+--------+<br />
+   | S6 |&nbsp;&nbsp; <span style="color: #ff0000;">John</span>&nbsp;&nbsp; |&nbsp; 4&nbsp;&nbsp; |&nbsp; <span style="color: #0000ff;">boy</span>&nbsp;&nbsp; |<br />
+   +----+----------+------+--------+
    </p>
 
 You can also use these sequences for making texts bold, italics, etc.
@@ -670,10 +750,10 @@ a new line. **beautifultable** parses ``\n`` as a paragraph change.
 .. code:: python
 
    >>> new_table = BeautifulTable(max_width=40)
-   >>> new_table.column_headers = ["Heading 1", "Heading 2"]
-   >>> new_table.append_row(["first Line\nsecond Line", "single line"])
-   >>> new_table.append_row(["first Line\nsecond Line\nthird Line", "first Line\nsecond Line"])
-   >>> new_table.append_row(["single line", "this is a very long first line\nThis is a very long second line"])
+   >>> new_table.columns.header = ["Heading 1", "Heading 2"]
+   >>> new_table.rows.append(["first Line\nsecond Line", "single line"])
+   >>> new_table.rows.append(["first Line\nsecond Line\nthird Line", "first Line\nsecond Line"])
+   >>> new_table.rows.append(["single line", "this is a very long first line\nThis is a very long second line"])
    >>> print(new_table)
    +-------------+------------------------+
    |  Heading 1  |       Heading 2        |
@@ -702,40 +782,36 @@ works.
 .. code:: python
 
    >>> subtable = BeautifulTable()
-   >>> subtable.column_headers = ["name", "rank", "gender"]
-   >>> subtable.append_row(["Jacob", 1, "boy"])
-   >>> subtable.append_row(["Isabella", 1, "girl"])
+   >>> subtable.rows.append(["Jacob", 1, "boy"])
+   >>> subtable.rows.append(["Isabella", 1, "girl"])
+   >>> subtable.left_border_char = ''
+   >>> subtable.right_border_char = ''
+   >>> subtable.top_border_char = ''
+   >>> subtable.bottom_border_char = ''
    >>> parent_table = BeautifulTable()
-   >>> parent_table.column_headers = ["Heading 1", "Heading 2"]
-   >>> parent_table.append_row(["Sample text", "Another sample text"])
-   >>> parent_table.append_row([subtable, "More sample text"])
+   >>> parent_table.columns.header = ["Heading 1", "Heading 2"]
+   >>> parent_table.rows.append(["Sample text", "Another sample text"])
+   >>> parent_table.rows.append([subtable, "More sample text"])
+   >>> parent_table.columns.padding_left[0] = 0
+   >>> parent_table.columns.padding_right[0] = 0
    >>> print(parent_table)
-   +------------------------------+---------------------+
-   |          Heading 1           |      Heading 2      |
-   +------------------------------+---------------------+
-   |         Sample text          | Another sample text |
-   +------------------------------+---------------------+
-   | +----------+------+--------+ |  More sample text   |
-   | |   name   | rank | gender | |                     |
-   | +----------+------+--------+ |                     |
-   | |  Jacob   |  1   |  boy   | |                     |
-   | +----------+------+--------+ |                     |
-   | | Isabella |  1   |  girl  | |                     |
-   | +----------+------+--------+ |                     |
-   +------------------------------+---------------------+
+   +---------------------+---------------------+
+   |      Heading 1      |      Heading 2      |
+   +---------------------+---------------------+
+   |     Sample text     | Another sample text |
+   +---------------------+---------------------+
+   |  Jacob   | 1 | boy  |  More sample text   |
+   |----------+---+------|                     |
+   | Isabella | 1 | girl |                     |
+   +---------------------+---------------------+
 
 
 =========================================================================
 Support for Multibyte Unicode characters
 =========================================================================
 
-**beautifultable** comes with in-built support for multibyte unicode such as
-east-asian characters. To enable support, You need to install the *wcwidth*
-library from PyPI.
-
-::
-
-    pip install wcwidth
+**beautifultable** comes with built-in support for multibyte unicode such as
+east-asian characters.
 
 
 You can do much more with BeautifulTable but this much should give you a
