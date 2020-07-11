@@ -6,9 +6,9 @@ Example
 -------
 >>> from beautifultable import BeautifulTable
 >>> table = BeautifulTable()
->>> table.column_headers = ['1st column', '2nd column']
+>>> table.columns.header = ['1st column', '2nd column']
 >>> for i in range(5):
-...    table.append_row([i, i*i])
+...    table.rows.apppend([i, i*i])
 ...
 >>> print(table)
 +------------+------------+

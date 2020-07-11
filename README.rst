@@ -88,19 +88,20 @@ Here is an example of how you can use beautifultable::
     >>> table.rows.header = ["S1", "S2", "S3", "S4", "S5"]
     >>> table.columns.header = ["name", "rank", "gender"]
     >>> print(table)
-    +----------+------+--------+
-    |   name   | rank | gender |
-    +----------+------+--------+
-    |  Jacob   |  1   |  boy   |
-    +----------+------+--------+
-    | Isabella |  1   |  girl  |
-    +----------+------+--------+
-    |  Ethan   |  2   |  boy   |
-    +----------+------+--------+
-    |  Sophia  |  2   |  girl  |
-    +----------+------+--------+
-    | Michael  |  3   |  boy   |
-    +----------+------+--------+
+    +----+----------+------+--------+
+    |    |   name   | rank | gender |
+    +----+----------+------+--------+
+    | S1 |  Jacob   |  1   |  boy   |
+    +----+----------+------+--------+
+    | S2 | Isabella |  1   |  girl  |
+    +----+----------+------+--------+
+    | S3 |  Ethan   |  2   |  boy   |
+    +----+----------+------+--------+
+    | S4 |  Sophia  |  2   |  girl  |
+    +----+----------+------+--------+
+    | S5 | Michael  |  3   |  boy   |
+    +----+----------+------+--------+
+
 
 You can learn more about beautifultable at this `Tutorial <http://beautifultable.readthedocs.io/en/latest/quickstart.html>`_
 
