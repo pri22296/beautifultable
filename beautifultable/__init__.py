@@ -8,6 +8,7 @@ from .beautifultable import (  # noqa F401
     BTColumnCollection,
     BTRowHeader,
     BTColumnHeader,
+    BTBorder,
     __all__,
 )
 from . import enums
