@@ -266,7 +266,6 @@ class BTRowData(BTBaseRow):
                             else " " * termwidth(table.columns.separator)
                         )
                     content.append(item)
-                # content = table.column_separator_char.join(row_)
                 content = "".join(content)
                 content = (
                     table.border.left
@@ -593,7 +592,7 @@ class BTRowCollection(object):
         BeautifulTable:
             Filtered copy of the BeautifulTable instance.
         """
-        new_table = self._table.copy()
+        new_table = self._table.rows[:]
         new_table.rows.clear()
         for row in filter(key, self):
             new_table.rows.append(row)

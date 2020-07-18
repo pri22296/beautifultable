@@ -6,7 +6,7 @@ Quickstart
 Building the Table
 =========================================================================
 
-Building a table is very easy. :class:`~.BeautifulTable` provides two views
+Building a table is very easy. :class:`.BeautifulTable` provides two views
 ``rows`` and ``columns``. You can use them to modify their respective properties.
 
 Let's create our first table and add some rows.
@@ -89,7 +89,7 @@ So, We created our first table. Let's add a new column.
    | S5 | Michael  |  3   |  boy   | 2011 |
    +----+----------+------+--------+------+
 
-You can also build a :class:`~.BeautifulTable` using slicing. Slicing creates a
+You can also build a :class:`.BeautifulTable` using slicing. Slicing creates a
 new table with it's own copy of data. But it retains the properties
 of the original object. You can slice both rows or columns.
 
@@ -178,7 +178,7 @@ Counting Rows and Columns
 =========================================================================
 
 You can get the number of columns or rows in the table by using the
-``len`` function. You can also use the :attr:`~.BeautifulTable.shape`
+``len`` function. You can also use the :attr:`.BeautifulTable.shape`
 attribute.
 
 .. code:: python
@@ -194,8 +194,8 @@ attribute.
 Inserting Rows and Columns
 =========================================================================
 
-BeautifulTable provides 2 methods, :meth:`~.BTRowCollection.insert` and
-:meth:`~.BTColumnCollection.insert` for this purpose.
+BeautifulTable provides 2 methods, :meth:`.BTRowCollection.insert` and
+:meth:`.BTColumnCollection.insert` for this purpose.
 
 .. code:: python
 
@@ -245,8 +245,8 @@ statement.
    | S5 | Michael  |  3   |  74   |  boy   |
    +----+----------+------+-------+--------+
 
-You can also use the helper methods :meth:`~.BTRowCollection.pop`,
-:meth:`~.BTColumnCollection.pop` to do the same thing. Both these
+You can also use the helper methods :meth:`.BTRowCollection.pop`,
+:meth:`.BTColumnCollection.pop` to do the same thing. Both these
 methods take the index or header of the row/column to be removed.
 
 Therefore the following 2 snippets are equivalent.
@@ -307,13 +307,13 @@ You can also update existing columns as shown below.
    | S5 | Michael  |  3   |  82   |  boy   |
    +----+----------+------+-------+--------+
 
-The methods :meth:`~.BTRowCollection.update` and :meth:`~.BTColumnCollection.update`
+The methods :meth:`.BTRowCollection.update` and :meth:`.BTColumnCollection.update`
 can be used to perform the operations discussed in this section.
 
 Note that you can only update existing columns but can't create
 a new column using this method. For that you need to use the
-methods :meth:`~.BTRowCollection.append`, :meth:`~.BTRowCollection.insert`,
-:meth:`~.BTColumnCollection.append` or :meth:`~.BTColumnCollection.insert`.
+methods :meth:`.BTRowCollection.append`, :meth:`.BTRowCollection.insert`,
+:meth:`.BTColumnCollection.append` or :meth:`.BTColumnCollection.insert`.
 
 
 =========================================================================
@@ -352,7 +352,7 @@ Cheking if a column is in table
 Sorting based on a Column
 =========================================================================
 
-You can also :meth:`~.:meth:`~.BTRowCollection.sort` the table based on a column
+You can also :meth:`.BTRowCollection.sort` the table based on a column
 by specifying it's index or it's header.
 
 .. code:: python
@@ -471,7 +471,7 @@ the alignment.
    +----+----------+------------+--------+
 
 
-You can use a helper attribute :attr:`~.BTColumnCollection.padding` to
+You can use a helper attribute :attr:`.BTColumnCollection.padding` to
 set the left and right padding to a common value.
 
 
@@ -480,7 +480,7 @@ Styling
 -------------------------------------------------------------------------
 
 **beautifultable** comes with several predefined styles for various use cases.
-You can use the :meth:`~.BeautifulTable.set_style` method to set the style
+You can use the :meth:`.BeautifulTable.set_style` method to set the style
 of the table. The following styles are available:
 
 * **STYLE_DEFAULT**
@@ -703,13 +703,13 @@ this feature. You can read the API Reference for more details.
 .. code:: python
 
    >>> table.set_style(BeautifulTable.STYLE_NONE)  # clear all formatting
-   >>> table.left_border_char = 'o'
-   >>> table.right_border_char = 'o'
-   >>> table.top_border_char = '<~>'
-   >>> table.bottom_border_char = '='
-   >>> table.header_separator_char = '^'
-   >>> table.column_separator_char = ':'
-   >>> table.row_separator_char = '~'
+   >>> table.border.left = 'o'
+   >>> table.border.right = 'o'
+   >>> table.border.top = '<~>'
+   >>> table.border.bottom = '='
+   >>> table.columns.header.separator = '^'
+   >>> table.columns.separator = ':'
+   >>> table.rows.separator = '~'
    >>> print(table)
    <~><~><~><~><~><~><~><~><~><~><~>
    o    :   name   : rank : gender o
@@ -743,9 +743,6 @@ these sequences to produce colored text output.
 .. code:: python
 
    >>> from termcolor import colored
-
-.. code:: python
-
    >>> table.rows.append([colored("John", 'red'), 4, colored("boy", 'blue')])
    >>> print(table)
 
@@ -806,7 +803,7 @@ a new line. **beautifultable** parses ``\n`` as a paragraph change.
 Subtables
 -------------------------------------------------------------------------
 
-You can even render a :class:`~.BeautifulTable` instance inside another
+You can even render a :class:`.BeautifulTable` instance inside another
 table. To do that, just pass the table as any regular text and it just
 works.
 

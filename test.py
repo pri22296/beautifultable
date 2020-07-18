@@ -369,7 +369,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +----+----------+------+--------+
 | S5 | Michael  |  3   |  boy   |
 +----+----------+------+--------+"""
-        self.assertEqual(string, self.table.get_string())
+        self.assertEqual(string, str(self.table))
 
     def test_stream(self):
         def generator():
@@ -412,7 +412,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +----+----------+------+--------+
 | S5 | Michael  |  3   |  boy   |
 +----+----------+------+--------+"""
-        self.assertEqual(string, self.table.get_string())
+        self.assertEqual(string, str(self.table))
 
     def test_right_align(self):
         self.table.columns.alignment[0] = self.table.ALIGN_RIGHT
@@ -429,7 +429,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +----+----------+------+--------+
 | S5 |  Michael |  3   |  boy   |
 +----+----------+------+--------+"""
-        self.assertEqual(string, self.table.get_string())
+        self.assertEqual(string, str(self.table))
 
     def test_mixed_align(self):
         self.table.columns.alignment = [
@@ -450,7 +450,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +----+----------+------+--------+
 | S5 | Michael  |  3   |    boy |
 +----+----------+------+--------+"""
-        self.assertEqual(string, self.table.get_string())
+        self.assertEqual(string, str(self.table))
 
     def test_align_all(self):
         self.table.columns.alignment = self.table.ALIGN_LEFT
@@ -467,7 +467,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +----+----------+------+--------+
 | S5 | Michael  | 3    | boy    |
 +----+----------+------+--------+"""
-        self.assertEqual(string, self.table.get_string())
+        self.assertEqual(string, str(self.table))
 
     def test_sign_plus(self):
         self.table.sign = self.table.SM_PLUS
@@ -484,7 +484,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +----+----------+------+--------+
 | S5 | Michael  |  +3  |  boy   |
 +----+----------+------+--------+"""
-        self.assertEqual(string, self.table.get_string())
+        self.assertEqual(string, str(self.table))
 
     def test_wep_wrap(self):
         self.create_table(20)
@@ -519,7 +519,7 @@ class TableOperationsTestCase(unittest.TestCase):
 | 5 | ael  |   | o |
 |   |      |   | y |
 +---+------+---+---+"""
-        self.assertEqual(string, self.table.get_string())
+        self.assertEqual(string, str(self.table))
 
     def test_wep_strip(self):
         self.create_table(20)
@@ -537,7 +537,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +---+------+---+---+
 | S | Mich | 3 | b |
 +---+------+---+---+"""
-        self.assertEqual(string, self.table.get_string())
+        self.assertEqual(string, str(self.table))
 
     def test_wep_ellipsis(self):
         self.create_table(20)
@@ -555,7 +555,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +---+------+---+---+
 | . | M... | 3 | . |
 +---+------+---+---+"""
-        self.assertEqual(string, self.table.get_string())
+        self.assertEqual(string, str(self.table))
 
     def test_empty_header(self):
         self.table.columns.header = ["", " ", "  "]
@@ -570,7 +570,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +----+----------+---+------+
 | S5 | Michael  | 3 | boy  |
 +----+----------+---+------+"""
-        self.assertEqual(string, self.table.get_string())
+        self.assertEqual(string, str(self.table))
 
     def test_eastasian_characters(self):
         string = u"""+----+------------+------+--------+
@@ -589,7 +589,7 @@ class TableOperationsTestCase(unittest.TestCase):
 | S6 | こんにちは |  2   |  boy   |
 +----+------------+------+--------+"""
         self.table.rows.append([u"こんにちは", 2, "boy"], header="S6")
-        self.assertEqual(string, self.table.get_string())
+        self.assertEqual(string, str(self.table))
 
     def test_newline(self):
         string = """+---+---+
@@ -598,7 +598,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +---+---+"""
         table = BeautifulTable()
         table.rows.append(["0", "a\nb"])
-        self.assertEqual(string, table.get_string())
+        self.assertEqual(string, str(table))
 
     def test_newline_multiple_columns(self):
         string = """+---+---+
@@ -608,7 +608,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +---+---+"""
         table = BeautifulTable()
         table.rows.append(["a\nb\nc", "p\nq"])
-        self.assertEqual(string, table.get_string())
+        self.assertEqual(string, str(table))
 
     # Test for ANSI sequences
 
@@ -618,7 +618,7 @@ class TableOperationsTestCase(unittest.TestCase):
 | \x1b[31mAdam\x1b[0m | 2 | boy |
 +------+---+-----+"""
         table.rows.append(["\x1b[31mAdam\x1b[0m", 2, "boy"])
-        self.assertEqual(string, table.get_string())
+        self.assertEqual(string, str(table))
 
     def test_ansi_wrap(self):
         table = BeautifulTable(maxwidth=30)
@@ -628,7 +628,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +-----------------+---+------+"""
         long_string = "\x1b[31mThis is a very \x1b[0m\x1b[32mlong name\x1b[0m"
         table.rows.append([long_string, 2, "girl"])
-        self.assertEqual(string, table.get_string())
+        self.assertEqual(string, str(table))
 
     def test_ansi_wrap_mb(self):
         table = BeautifulTable(maxwidth=30)
@@ -638,7 +638,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +-----------------+---+------+"""
         long_string = u"\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
         table.rows.append([long_string, 2, "girl"])
-        self.assertEqual(string, table.get_string())
+        self.assertEqual(string, str(table))
 
     def test_ansi_ellipsis(self):
         table = BeautifulTable(maxwidth=30)
@@ -648,7 +648,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +-----------------+---+------+"""
         long_string = "\x1b[31mThis is a very \x1b[0m\x1b[32mlong name\x1b[0m"
         table.rows.append([long_string, 2, "girl"])
-        self.assertEqual(string, table.get_string())
+        self.assertEqual(string, str(table))
 
     def test_ansi_ellipsis_mb(self):
         table = BeautifulTable(maxwidth=30)
@@ -658,7 +658,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +-----------------+---+------+"""
         long_string = u"\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
         table.rows.append([long_string, 2, "girl"])
-        self.assertEqual(string, table.get_string())
+        self.assertEqual(string, str(table))
 
     def test_ansi_strip(self):
         table = BeautifulTable(maxwidth=30)
@@ -668,7 +668,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +-----------------+---+------+"""
         long_string = "\x1b[31mThis is a very \x1b[0m\x1b[32mlong name\x1b[0m"
         table.rows.append([long_string, 2, "girl"])
-        self.assertEqual(string, table.get_string())
+        self.assertEqual(string, str(table))
 
     def test_ansi_strip_mb(self):
         table = BeautifulTable(maxwidth=30)
@@ -678,7 +678,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +-----------------+---+------+"""
         long_string = u"\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
         table.rows.append([long_string, 2, "girl"])
-        self.assertEqual(string, table.get_string())
+        self.assertEqual(string, str(table))
 
     # Test on empty table
 
@@ -686,18 +686,18 @@ class TableOperationsTestCase(unittest.TestCase):
         self.create_table(20)
         for i in range(3):
             self.table.columns.pop()
-        self.assertEqual(self.table.get_string(), "")
+        self.assertEqual(str(self.table), "")
 
     def test_empty_table_by_row(self):
         self.create_table(20)
         for i in range(5):
             self.table.rows.pop()
-        self.assertEqual(self.table.get_string(), "")
+        self.assertEqual(str(self.table), "")
 
     def test_table_width_zero(self):
         self.create_table(20)
         self.table.clear(True)
-        self.assertEqual(self.table.width, 0)
+        self.assertEqual(self.table._width, 0)
 
     def test_table_auto_width(self):
         row_list = ["abcdefghijklmopqrstuvwxyz", 1234, "none"]
