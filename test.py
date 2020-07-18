@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 
-import unittest
 import os
+import unittest
+import itertools
 
 from beautifultable import BeautifulTable
 
@@ -26,7 +27,7 @@ class TableOperationsTestCase(unittest.TestCase):
         self.table = table
 
     def compare_iterable(self, iterable1, iterable2):
-        for item1, item2 in zip(iterable1, iterable2):
+        for item1, item2 in itertools.zip_longest(iterable1, iterable2):
             self.assertEqual(item1, item2)
 
     # Test for table operations
@@ -369,6 +370,32 @@ class TableOperationsTestCase(unittest.TestCase):
 | S5 | Michael  |  3   |  boy   |
 +----+----------+------+--------+"""
         self.assertEqual(string, self.table.get_string())
+
+    def test_stream(self):
+        def generator():
+            for i in range(1, 6):
+                yield [i, i ** 2]
+
+        table = BeautifulTable()
+        table.columns.header = ["Number", "It's Square"]
+        self.compare_iterable(
+            table.stream(generator()),
+            [
+                "+--------+-------------+",
+                "| Number | It's Square |",
+                "+--------+-------------+",
+                "|   1    |      1      |",
+                "+--------+-------------+",
+                "|   2    |      4      |",
+                "+--------+-------------+",
+                "|   3    |      9      |",
+                "+--------+-------------+",
+                "|   4    |     16      |",
+                "+--------+-------------+",
+                "|   5    |     25      |",
+                "+--------+-------------+",
+            ],
+        )
 
     def test_left_align(self):
         self.table.columns.alignment[0] = self.table.ALIGN_LEFT

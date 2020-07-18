@@ -29,10 +29,18 @@ from __future__ import division, unicode_literals
 
 import copy
 import csv
+import warnings
 
 from . import enums
 
-from .utils import pre_process, termwidth, deprecated, deprecated_param
+from .utils import (
+    pre_process,
+    termwidth,
+    deprecated,
+    deprecated_param,
+    deprecation_message,
+    ensure_type,
+)
 from .compat import basestring, Iterable, to_unicode
 from .base import BTBaseList
 from .helpers import (
@@ -49,7 +57,128 @@ __all__ = [
     "BTColumnCollection",
     "BTRowHeader",
     "BTColumnHeader",
+    "BTBorder",
 ]
+
+
+class BTBorder(object):
+    """Class to control how each section of the table's border is rendered.
+
+    To disable a behaviour, just set its corresponding attribute
+    to an empty string
+
+    Attributes
+    ----------
+
+    top : str
+        Character used to draw the top border.
+
+    left : str
+        Character used to draw the left border.
+
+    bottom : str
+        Character used to draw the bottom border.
+
+    right : str
+        Character used to draw the right border.
+
+    top_left : str
+        Left most character of the top border.
+
+    bottom_left : str
+        Left most character of the bottom border.
+
+    bottom_right : str
+        Right most character of the bottom border.
+
+    top_right : str
+        Right most character of the top border.
+
+    header_left : str
+        Left most character of the header separator.
+
+    header_right : str
+        Right most character of the header separator.
+
+    top_junction : str
+        Junction character for top border.
+
+    left_junction : str
+        Left most character of the row separator.
+
+    bottom_junction : str
+        Junction character for bottom border.
+
+    right_junction : str
+        Right most character of the row separator.
+    """
+
+    def __init__(
+        self,
+        top,
+        left,
+        bottom,
+        right,
+        top_left,
+        bottom_left,
+        bottom_right,
+        top_right,
+        header_left,
+        header_right,
+        top_junction,
+        left_junction,
+        bottom_junction,
+        right_junction,
+    ):
+        self.top = left
+        self.left = right
+        self.bottom = top
+        self.right = bottom
+
+        self.top_left = top_left
+        self.bottom_left = bottom_left
+        self.bottom_right = bottom_right
+        self.top_right = top_right
+
+        self.header_left = header_left
+        self.header_right = header_right
+
+        self.top_junction = top_junction
+        self.left_junction = left_junction
+        self.bottom_junction = bottom_junction
+        self.right_junction = right_junction
+
+
+def _make_getter(attr):
+    return lambda self: getattr(self, attr)
+
+
+def _make_setter(attr):
+    return lambda self, value: setattr(
+        self, attr, ensure_type(value, basestring)
+    )
+
+
+for prop, attr in [
+    (x, "_{}".format(x))
+    for x in (
+        "top",
+        "left",
+        "bottom",
+        "right",
+        "top_left",
+        "bottom_left",
+        "bottom_right",
+        "top_right",
+        "header_left",
+        "header_right",
+        "top_junction",
+        "left_junction",
+        "bottom_junction",
+        "right_junction",
+    )
+]:
+    setattr(BTBorder, prop, property(_make_getter(attr), _make_setter(attr)))
 
 
 class BTTableData(BTBaseList):
@@ -68,10 +197,6 @@ class BTTableData(BTBaseList):
 
 class BeautifulTable(object):
     """Utility Class to print data in tabular format to terminal.
-    The instance attributes can be used to customize the look of the
-    table. To disable a behaviour, just set its corresponding attribute
-    to an empty string. For example, if Top border should not be drawn,
-    set `top_border_char` to ''.
 
     Parameters
     ----------
@@ -96,75 +221,9 @@ class BeautifulTable(object):
 
     Attributes
     ----------
-
-    left_border_char : str
-        Character used to draw the left border.
-
-    right_border_char : str
-        Character used to draw the right border.
-
-    top_border_char : str
-        Character used to draw the top border.
-
-    bottom_border_char : str
-        Character used to draw the bottom border.
-
-    header_separator_char : str
-        Character used to draw the line seperating Header from data.
-
-    row_separator_char : str
-        Character used to draw the line seperating two rows.
-
-    column_separator_char : str
-        Character used to draw the line seperating two columns.
-
-    intersect_top_left : str
-        Left most character of the top border.
-
-    intersect_top_mid : str
-        Intersection character for top border.
-
-    intersect_top_right : str
-        Right most character of the top border.
-
-    intersect_header_left : str
-        Left most character of the header separator.
-
-    intersect_header_mid : str
-        Intersection character for header separator.
-
-    intersect_header_right : str
-        Right most character of the header separator.
-
-    intersect_row_left : str
-        Left most character of the row separator.
-
-    intersect_row_mid : str
-        Intersection character for row separator.
-
-    intersect_row_right : str
-        Right most character of the row separator.
-
-    intersect_bottom_left : str
-        Left most character of the bottom border.
-
-    intersect_bottom_mid : str
-        Intersection character for bottom border.
-
-    intersect_bottom_right : str
-        Right most character of the bottom border.
-
     precision : int
         All float values will have maximum number of digits after the decimal,
         capped by this value(Default 3).
-
-    serialno : bool
-        Whether automatically generated serial number should be printed for
-        each row(Default False).
-
-    serialno_header : str
-        The header of the autogenerated serial number column. This value is
-        only used if serialno is True(Default SN).
 
     detect_numerics : bool
         Whether numeric strings should be automatically detected(Default True).
@@ -200,8 +259,6 @@ class BeautifulTable(object):
         if kwargs["sign_mode"] is not None:
             sign = kwargs["sign_mode"]
 
-        self.set_style(enums.STYLE_DEFAULT)
-
         self.precision = precision
         self._serialno = serialno
         self._serialno_header = serialno_header
@@ -217,6 +274,13 @@ class BeautifulTable(object):
         self.columns = BTColumnCollection(
             self, default_alignment, default_padding
         )
+
+        self._header_separator = ""
+        self._header_junction = ""
+        self._column_separator = ""
+        self._row_separator = ""
+        self.border = ""
+        self.set_style(enums.STYLE_DEFAULT)
 
     def __copy__(self):
         obj = type(self)()
@@ -284,13 +348,12 @@ class BeautifulTable(object):
             "intersect_bottom_mid",
             "intersect_bottom_right",
         )
-        if to_unicode(name) in attrs and not isinstance(value, basestring):
-            value_type = type(value).__name__
-            raise TypeError(
-                (
-                    "Expected {attr} to be of type 'str', " "got '{attr_type}'"
-                ).format(attr=name, attr_type=value_type)
+        if to_unicode(name) in attrs:
+            warnings.warn(
+                deprecation_message(name, "1.0.0", "1.2.0", None),
+                FutureWarning,
             )
+            value = ensure_type(value, basestring, name)
         super(BeautifulTable, self).__setattr__(name, value)
 
     @deprecated(
@@ -337,6 +400,7 @@ class BeautifulTable(object):
     # ************************Properties Begin Here************************
     @property
     def shape(self):
+        """Read only attribute which returns the shape of the table."""
         return (len(self.rows), len(self.columns))
 
     @property
@@ -369,6 +433,44 @@ class BeautifulTable(object):
             error_msg = "allowed values for sign are: " + ", ".join(allowed)
             raise ValueError(error_msg)
         self._sign = value
+
+    @property
+    def border(self):
+        """Characters used to draw the border of the table.
+
+        You can set this directly to a character or use it's several attribute
+        to control how each section of the table is rendered.
+        It is an instance of :class:`~.BTBorder`
+        """
+        return self._border
+
+    @border.setter
+    def border(self, value):
+        self._border = BTBorder(
+            top=value,
+            left=value,
+            bottom=value,
+            right=value,
+            top_left=value,
+            bottom_left=value,
+            bottom_right=value,
+            top_right=value,
+            header_left=value,
+            header_right=value,
+            top_junction=value,
+            left_junction=value,
+            bottom_junction=value,
+            right_junction=value,
+        )
+
+    @property
+    def junction(self):
+        """Character used to draw junctions in the row separator."""
+        return self._junction
+
+    @junction.setter
+    def junction(self, value):
+        self._junction = ensure_type(value, basestring)
 
     @property
     @deprecated("1.0.0", "1.2.0", BTRowCollection.header.fget)
@@ -408,11 +510,9 @@ class BeautifulTable(object):
         is not possible to print a given table with the width provided, this
         value will automatically adjust.
         """
-        offset = (len(self.columns) - 1) * termwidth(
-            self.column_separator_char
-        )
-        offset += termwidth(self.left_border_char)
-        offset += termwidth(self.right_border_char)
+        offset = (len(self.columns) - 1) * termwidth(self.columns.separator)
+        offset += termwidth(self.border.left)
+        offset += termwidth(self.border.right)
         self._maxwidth = max(self._maxwidth, offset + len(self.columns))
         return self._maxwidth
 
@@ -658,25 +758,29 @@ class BeautifulTable(object):
             error_msg = "allowed values for style are: " + ", ".join(allowed)
             raise ValueError(error_msg)
         style_template = style.value
-        self.left_border_char = style_template.left_border_char
-        self.right_border_char = style_template.right_border_char
-        self.top_border_char = style_template.top_border_char
-        self.bottom_border_char = style_template.bottom_border_char
-        self.header_separator_char = style_template.header_separator_char
-        self.column_separator_char = style_template.column_separator_char
-        self.row_separator_char = style_template.row_separator_char
-        self.intersect_top_left = style_template.intersect_top_left
-        self.intersect_top_mid = style_template.intersect_top_mid
-        self.intersect_top_right = style_template.intersect_top_right
-        self.intersect_header_left = style_template.intersect_header_left
-        self.intersect_header_mid = style_template.intersect_header_mid
-        self.intersect_header_right = style_template.intersect_header_right
-        self.intersect_row_left = style_template.intersect_row_left
-        self.intersect_row_mid = style_template.intersect_row_mid
-        self.intersect_row_right = style_template.intersect_row_right
-        self.intersect_bottom_left = style_template.intersect_bottom_left
-        self.intersect_bottom_mid = style_template.intersect_bottom_mid
-        self.intersect_bottom_right = style_template.intersect_bottom_right
+        self.border.left = style_template.left_border_char
+        self.border.right = style_template.right_border_char
+        self.border.top = style_template.top_border_char
+        self.border.bottom = style_template.bottom_border_char
+
+        self.border.top_left = style_template.intersect_top_left
+        self.border.bottom_left = style_template.intersect_bottom_left
+        self.border.bottom_right = style_template.intersect_bottom_right
+        self.border.top_right = style_template.intersect_top_right
+
+        self.border.header_left = style_template.intersect_header_left
+        self.border.header_right = style_template.intersect_header_right
+
+        self.columns.header.separator = style_template.header_separator_char
+        self.columns.separator = style_template.column_separator_char
+        self.rows.separator = style_template.row_separator_char
+
+        self.border.top_junction = style_template.intersect_top_mid
+        self.border.left_junction = style_template.intersect_row_left
+        self.border.bottom_junction = style_template.intersect_bottom_mid
+        self.border.right_junction = style_template.intersect_row_right
+        self.columns.header.junction = style_template.intersect_header_mid
+        self.junction = style_template.intersect_row_mid
 
     def _compute_width(self):
         """Calculate width of column automatically based on data."""
@@ -834,20 +938,19 @@ class BeautifulTable(object):
         if not char.isspace():
             # If left border is enabled and it is visible
             visible_junc = not intersect_left.isspace()
-            if termwidth(self.left_border_char) > 0:
-                if not (self.left_border_char.isspace() and visible_junc):
+            if termwidth(self.border.left) > 0:
+                if not (self.border.left.isspace() and visible_junc):
                     length = min(
-                        termwidth(self.left_border_char),
-                        termwidth(intersect_left),
+                        termwidth(self.border.left), termwidth(intersect_left),
                     )
                     for i in range(length):
                         line[i] = intersect_left[i] if mask[0] else " "
             visible_junc = not intersect_right.isspace()
             # If right border is enabled and it is visible
-            if termwidth(self.right_border_char) > 0:
-                if not (self.right_border_char.isspace() and visible_junc):
+            if termwidth(self.border.right) > 0:
+                if not (self.border.right.isspace() and visible_junc):
                     length = min(
-                        termwidth(self.right_border_char),
+                        termwidth(self.border.right),
                         termwidth(intersect_right),
                     )
                     for i in range(length):
@@ -856,16 +959,16 @@ class BeautifulTable(object):
                         )
             visible_junc = not intersect_mid.isspace()
             # If column separator is enabled and it is visible
-            if termwidth(self.column_separator_char):
-                if not (self.column_separator_char.isspace() and visible_junc):
-                    index = termwidth(self.left_border_char)
+            if termwidth(self.columns.separator):
+                if not (self.columns.separator.isspace() and visible_junc):
+                    index = termwidth(self.border.left)
                     for i in range(len(self.columns) - 1):
                         if not mask[i]:
                             for j in range(self.columns.width[i]):
                                 line[index + j] = " "
                         index += self.columns.width[i]
                         length = min(
-                            termwidth(self.column_separator_char),
+                            termwidth(self.columns.separator),
                             termwidth(intersect_mid),
                         )
                         for j in range(length):
@@ -875,46 +978,46 @@ class BeautifulTable(object):
                                 if (mask[i] or mask[i + 1])
                                 else " "
                             )
-                        index += termwidth(self.column_separator_char)
+                        index += termwidth(self.columns.separator)
 
         return "".join(line)
 
     def _get_top_border(self, *args, **kwargs):
         return self._get_horizontal_line(
-            self.top_border_char,
-            self.intersect_top_left,
-            self.intersect_top_mid,
-            self.intersect_top_right,
+            self.border.top,
+            self.border.top_left,
+            self.border.top_junction,
+            self.border.top_right,
             *args,
             **kwargs
         )
 
     def _get_header_separator(self, *args, **kwargs):
         return self._get_horizontal_line(
-            self.header_separator_char,
-            self.intersect_header_left,
-            self.intersect_header_mid,
-            self.intersect_header_right,
+            self.columns.header.separator,
+            self.border.header_left,
+            self.columns.header.junction,
+            self.border.header_right,
             *args,
             **kwargs
         )
 
     def _get_row_separator(self, *args, **kwargs):
         return self._get_horizontal_line(
-            self.row_separator_char,
-            self.intersect_row_left,
-            self.intersect_row_mid,
-            self.intersect_row_right,
+            self.rows.separator,
+            self.border.left_junction,
+            self.junction,
+            self.border.right_junction,
             *args,
             **kwargs
         )
 
     def _get_bottom_border(self, *args, **kwargs):
         return self._get_horizontal_line(
-            self.bottom_border_char,
-            self.intersect_bottom_left,
-            self.intersect_bottom_mid,
-            self.intersect_bottom_right,
+            self.border.bottom,
+            self.border.bottom_left,
+            self.border.bottom_junction,
+            self.border.bottom_right,
             *args,
             **kwargs
         )
@@ -933,18 +1036,16 @@ class BeautifulTable(object):
         if len(self.columns) == 0:
             return 0
         width = sum(self.columns.width)
-        width += (len(self.columns) - 1) * termwidth(
-            self.column_separator_char
-        )
-        width += termwidth(self.left_border_char)
-        width += termwidth(self.right_border_char)
+        width += (len(self.columns) - 1) * termwidth(self.columns.separator)
+        width += termwidth(self.border.left)
+        width += termwidth(self.border.right)
         return width
 
     @deprecated("1.0.0", "1.2.0", width.fget)
     def get_table_width(self):  # pragma: no cover
         return self.width
 
-    def _get_string(self, rows, append=False, recalculate_width=True):
+    def _get_string(self, rows=None, append=False, recalculate_width=True):
         row_header_visible = bool(
             "".join(
                 x if x is not None else "" for x in self.rows.header
@@ -966,7 +1067,7 @@ class BeautifulTable(object):
             if row_header_visible:
                 self.columns.insert(0, self.rows.header)
 
-        if len(self.rows) > 0:
+        if len(self.rows) > 0 or rows is not None:
             if column_header_visible:
                 self.rows.insert(0, self.columns.header)
 
@@ -993,43 +1094,48 @@ class BeautifulTable(object):
 
         try:
             # Rendering the top border
-            if self.top_border_char:
+            if self.border.top:
                 yield self._get_top_border()
 
             # Print column headers if not empty or only spaces
             row_iterator = iter(self.rows)
             if column_header_visible:
-                yield next(row_iterator)._get_string(
-                    align=self.columns.header.alignment
-                )
-                if self.header_separator_char:
-                    yield self._get_header_separator()
+                if len(self.rows) > 1 or rows is not None:
+                    yield next(row_iterator)._get_string(
+                        align=self.columns.header.alignment
+                    )
+                    if self.columns.header.separator:
+                        yield self._get_header_separator()
 
             # Printing rows
             first_row_encountered = False
             for i, row in enumerate(row_iterator):
-                if first_row_encountered and self.row_separator_char:
+                if first_row_encountered and self.rows.separator:
                     yield self._get_row_separator()
                 first_row_encountered = True
                 content = to_unicode(row)
                 yield content
 
-            # Printing additional rows
-            prev_length = len(self.rows)
-            for i, row in enumerate(rows, start=1):
-                if first_row_encountered and self.row_separator_char:
-                    yield self._get_row_separator()
-                first_row_encountered = True
-                if self._serialno:
-                    row.insert(0, prev_length + i)
-                self.rows.append(row)
-                content = to_unicode(self.rows[-1])
-                if not append:
-                    self.rows.pop()
-                yield content
+            if rows is not None:
+                # Printing additional rows
+                prev_length = len(self.rows)
+                for i, row in enumerate(rows, start=1):
+                    if first_row_encountered and self.rows.separator:
+                        yield self._get_row_separator()
+                    first_row_encountered = True
+                    if self._serialno:
+                        row.insert(0, prev_length + i)
+                    if len(self.columns) > 1 and row_header_visible:
+                        self.rows.append([None] + list(row))
+                    else:
+                        self.rows.append(row)
+                    content = to_unicode(self.rows[-1])
+                    if not append:
+                        self.rows.pop()
+                    yield content
 
             # Rendering the bottom border
-            if self.bottom_border_char:
+            if self.border.bottom:
                 yield self._get_bottom_border()
         except Exception:
             raise
@@ -1045,14 +1151,15 @@ class BeautifulTable(object):
 
                 if self._serialno:
                     self.columns.pop(0)
+        return
 
     def stream(self, rows, append=False):
         """Get a generator for the table.
 
-        This should be used in cases where data takes time to retrieve and
-        it is required to be displayed as soon as possible. Any existing rows
-        in the table shall also be returned. It is essential that atleast one
-        of title, width or existing rows set prior to calling this method.
+        This should be used in cases where data takes time to retrieve and it
+        is required to be displayed as soon as possible. Any existing rows in
+        the table shall also be returned. It is essential that atleast one of
+        column header, width or existing rows set before calling this method.
 
         Parameters
         ----------

@@ -4,7 +4,7 @@ import operator
 
 from . import enums
 from .base import BTBaseRow, BTBaseColumn
-from .utils import pre_process, termwidth, textwrap
+from .utils import pre_process, termwidth, textwrap, ensure_type
 from .compat import basestring, Iterable, to_unicode, zip_longest
 from .meta import AlignmentMetaData, NonNegativeIntegerMetaData
 
@@ -55,6 +55,24 @@ class BTColumnHeader(BTBaseRow):
         if isinstance(value, enums.Alignment):
             value = [value] * len(self)
         self._alignment = AlignmentMetaData(self._table, value)
+
+    @property
+    def separator(self):
+        """Character used to draw the line seperating header from the table."""
+        return self._table._header_separator
+
+    @separator.setter
+    def separator(self, value):
+        self._table._header_separator = ensure_type(value, basestring)
+
+    @property
+    def junction(self):
+        """Character used to draw junctions in the header separator."""
+        return self._table._header_junction
+
+    @junction.setter
+    def junction(self, value):
+        self._table._header_junction = ensure_type(value, basestring)
 
     def __setitem__(self, key, value):
         self._validate_item(value)
@@ -243,22 +261,22 @@ class BTRowData(BTBaseRow):
                 for j, item in enumerate(row_):
                     if j > 0:
                         content.append(
-                            table.column_separator_char
+                            table.columns.separator
                             if (mask[j - 1] or mask[j])
-                            else " " * termwidth(table.column_separator_char)
+                            else " " * termwidth(table.columns.separator)
                         )
                     content.append(item)
                 # content = table.column_separator_char.join(row_)
                 content = "".join(content)
                 content = (
-                    table.left_border_char
+                    table.border.left
                     if mask[0]
-                    else " " * termwidth(table.left_border_char)
+                    else " " * termwidth(table.border.left)
                 ) + content
                 content += (
-                    table.right_border_char
+                    table.border.right
                     if mask[-1]
-                    else " " * termwidth(table.right_border_char)
+                    else " " * termwidth(table.border.right)
                 )
                 string.append(content)
         return "\n".join(string)
@@ -301,6 +319,15 @@ class BTRowCollection(object):
     @header.setter
     def header(self, value):
         self._header = BTRowHeader(self._table, value)
+
+    @property
+    def separator(self):
+        """Character used to draw the line seperating two rows."""
+        return self._table._row_separator
+
+    @separator.setter
+    def separator(self, value):
+        self._table._row_separator = ensure_type(value, basestring)
 
     def _canonical_key(self, key):
         if isinstance(key, (int, slice)):
@@ -816,6 +843,15 @@ class BTColumnCollection(object):
             raise ValueError("default_padding must be a non-negative integer")
         else:
             self._default_padding = value
+
+    @property
+    def separator(self):
+        """Character used to draw the line seperating two columns."""
+        return self._table._column_separator
+
+    @separator.setter
+    def separator(self, value):
+        self._table._column_separator = ensure_type(value, basestring)
 
     def __len__(self):
         return self._table._ncol

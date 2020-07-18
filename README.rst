@@ -48,6 +48,7 @@ Features included but not limited to:
 * Plenty of predefined *styles* for multiple use cases and option to
   create custom ones.
 * Support for *Unicode* characters.
+* Supports streaming table when data is slow to retrieve.
   
 .. inclusion-marker-introduction-end
 
@@ -130,7 +131,7 @@ Changelog
 **************************************************************************
 
 ==========
-v1.0.0
+Unreleased
 ==========
 
 * Added two new views ``rows`` and ``columns`` to the ``BeautifulTable`` class. Most of the existing
@@ -139,9 +140,13 @@ v1.0.0
   deprecated methods will now raise a ``FutureWarning``. Special methods such as ``__len__``, ``__iter__``,
   etc. have also been moved to the respective views. For details, refer the
   API documentation and the Updated Tutorial
+* The existing styling attributes have also been deprecated. A new ``border`` property can be accessed
+  to control all styling attributes affecting the border. Rest of the attributes can be accessed from
+  it's respective view.
 * Added support for row headers. As a result rows can now be accessed by their keys similar
   to columns
-* Added two new methods ``to_csv`` and ``from_csv`` to directly export/import using a csv file. (Thanks to @dinko-pehar)
+* Added two new methods ``to_csv`` and ``from_csv`` to directly export/import using a
+  csv file. (Thanks to `@dinko-pehar <https://github.com/dinko-pehar>`_)
 * Added ``filter`` method to generate a new table with only certain rows
 * Added a new ``shape`` attribute to the ``BeautifulTable`` class which returns a tuple of form (nrow, ncol)
 * Added alignment attribute to the ``BeautifulTable.columns.header`` object which can be used to
@@ -159,7 +164,7 @@ v1.0.0
 * Fixed an issue where table was malformed if ``blessings`` was used to generate colored strings.
 * Fixed issues with the existing implementation of ``__iter__``, ``__copy__`` and ``__deepcopy__`` which
   should now work more reliably
-* Fixed an issue where default padding could not be set to 0. (Thanks to @furlongm)
+* Fixed an issue where default padding could not be set to 0. (Thanks to `@furlongm <https://github.com/furlongm>`_)
 * Fixed several memory leak issues by ensuring that all internal objects hold only a weak reference
   to the table instance.
 * Dropped support for Python 2

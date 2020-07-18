@@ -36,6 +36,17 @@ def to_numeric(item):
         return num
 
 
+def ensure_type(value, *types, varname="value"):
+    if not isinstance(value, types):
+        expected_types_str = "/".join([t.__name__ for t in types])
+        raise TypeError(
+            ("Expected '{}' to be of type '{}', " "got '{}'").format(
+                varname, expected_types_str, type(value).__name__
+            )
+        )
+    return value
+
+
 def pre_process(item, detect_numerics, precision, sign_value):
     """Returns the final string which should be displayed"""
     if item is None:

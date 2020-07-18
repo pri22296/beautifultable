@@ -37,8 +37,39 @@ Let's create our first table and add some rows.
    | S5 | Michael  |  3   |  boy   |
    +----+----------+------+--------+
 
-We created our first table. Let's add some more data to it.
-But this time we will add a new column.
+BeautifulTable initializes the shape lazily. Here when you appended the first row,
+the number of columns was set to 3. Further rows had to be of length 3. If you had
+set the columns and/or row headers beforehand as follows, the table shape would already be
+set to (5, 3). Hence you would just set the rows directly using their indices or keys.
+
+.. code:: python
+
+   >>> from beautifultable import BeautifulTable
+   >>> table = BeautifulTable()
+   >>> table.columns.header = ["name", "rank", "gender"]
+   >>> table.rows.header = ["S1", "S2", "S3", "S4", "S5"]
+   >>> table.rows[0] = ["Jacob", 1, "boy"]
+   >>> table.rows[1] = ["Isabella", 1, "girl"]
+   >>> table.rows[2] = ["Ethan", 2, "boy"]
+   >>> table.rows[3] = ["Sophia", 2, "girl"]
+   >>> table.rows[4]  =["Michael", 3, "boy"]
+   >>> print(table)
+   +----+----------+------+--------+
+   |    |   name   | rank | gender |
+   +----+----------+------+--------+
+   | S1 |  Jacob   |  1   |  boy   |
+   +----+----------+------+--------+
+   | S2 | Isabella |  1   |  girl  |
+   +----+----------+------+--------+
+   | S3 |  Ethan   |  2   |  boy   |
+   +----+----------+------+--------+
+   | S4 |  Sophia  |  2   |  girl  |
+   +----+----------+------+--------+
+   | S5 | Michael  |  3   |  boy   |
+   +----+----------+------+--------+
+
+
+So, We created our first table. Let's add a new column.
 
 .. code:: python
 
@@ -805,6 +836,46 @@ works.
    | Isabella | 1 | girl |                     |
    +---------------------+---------------------+
 
+=========================================================================
+Streaming Tables
+=========================================================================
+
+There are situations where data retrieval is slow such as when data is
+recieved over a network and you want to display the data as soon as
+possible. In these cases, you can use streaming tables to render the table
+with the help of a generator.
+
+Streaming table do have their limitation. The width calculation routine
+requires you to either set it manually or specify the column header or
+add atleast 1 row. You also cannot have row headers for streaming tables.
+
+.. code:: python
+
+   >>> import time
+   >>> def time_taking_process():
+   ...     for i in range(5):
+   ...         time.sleep(1)
+   ...         yield [i, i**2]
+   ...
+   ...
+   >>> table = BeautifulTable()
+   >>> table.columns.header = ["Number", "It's Square"]
+   >>> for line in table.stream(time_taking_process()):
+   ...     print(line)
+   ...
+   +--------+-------------+
+   | Number | It's Square |
+   +--------+-------------+
+   |   0    |      0      |
+   +--------+-------------+
+   |   1    |      1      |
+   +--------+-------------+
+   |   2    |      4      |
+   +--------+-------------+
+   |   3    |      9      |
+   +--------+-------------+
+   |   4    |     16      |
+   +--------+-------------+
 
 =========================================================================
 Support for Multibyte Unicode characters
@@ -812,7 +883,6 @@ Support for Multibyte Unicode characters
 
 **beautifultable** comes with built-in support for multibyte unicode such as
 east-asian characters.
-
 
 You can do much more with BeautifulTable but this much should give you a
 good start. Those of you who are interested to have more control can

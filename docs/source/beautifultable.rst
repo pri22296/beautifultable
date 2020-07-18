@@ -29,3 +29,6 @@ Module contents
     :members:
     :special-members: __getitem__,  __setitem__
     :inherited-members:
+
+.. autoclass:: beautifultable.BTBorder
+    :members:
