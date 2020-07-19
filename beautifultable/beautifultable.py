@@ -104,13 +104,13 @@ class BTBorder(object):
         Junction character for top border.
 
     left_junction : str
-        Left most character of the row separator.
+        Junction character for left border.
 
     bottom_junction : str
         Junction character for bottom border.
 
     right_junction : str
-        Right most character of the row separator.
+        Junction character for right border.
     """
 
     def __init__(
@@ -216,8 +216,18 @@ class BeautifulTable(object):
         All float values will have maximum number of digits after the decimal,
         capped by this value(Default 3).
 
+    serialno : bool, optional
+        If true, a column will be rendered with serial numbers(**DEPRECATED**).
+
+    serialno_header: str, optional
+        The header of the serial number column if rendered(**DEPRECATED**).
+
     detect_numerics : bool, optional
         Whether numeric strings should be automatically detected(Default True).
+
+    sign : SignMode, optional
+        Parameter to control how signs in numeric data are displayed.
+        (default beautifultable.SM_MINUS).
 
     Attributes
     ----------
@@ -395,7 +405,14 @@ class BeautifulTable(object):
         return repr(self._data)
 
     def __str__(self):
-        return self.get_string()
+        if len(self.rows) == 0 or len(self.columns) == 0:
+            return ""
+
+        string_ = []
+        for line in self._get_string([], append=False):
+            string_.append(line)
+
+        return "\n".join(string_)
 
     # ************************Properties Begin Here************************
     @property
@@ -784,7 +801,7 @@ class BeautifulTable(object):
 
     def _compute_width(self):
         """Calculate width of column automatically based on data."""
-        table_width = self.width
+        table_width = self._width
         lpw, rpw = self.columns.padding_left, self.columns.padding_right
         pad_widths = [(lpw[i] + rpw[i]) for i in range(len(self.columns))]
         maxwidths = [0 for index in range(len(self.columns))]
@@ -869,14 +886,8 @@ class BeautifulTable(object):
         self.columns.padding_left = pad_width
         self.columns.padding_right = pad_width
 
+    @deprecated("1.0.0", "1.2.0")
     def copy(self):
-        """Return a shallow copy of the table.
-
-        Returns
-        -------
-        BeautifulTable:
-            shallow copy of the BeautifulTable instance.
-        """
         return copy.copy(self)
 
     @deprecated_param("1.0.0", "1.2.0", "clear_metadata", "reset_columns")
@@ -920,7 +931,7 @@ class BeautifulTable(object):
         str
             String which will be printed as a line in the table.
         """
-        width = self.width
+        width = self._width
 
         if mask is None:
             mask = [True] * len(self.columns)
@@ -1023,7 +1034,7 @@ class BeautifulTable(object):
         )
 
     @property
-    def width(self):
+    def _width(self):
         """Get the actual width of the table as number of characters.
 
         Column width should be set prior to calling this method.
@@ -1041,21 +1052,22 @@ class BeautifulTable(object):
         width += termwidth(self.border.right)
         return width
 
-    @deprecated("1.0.0", "1.2.0", width.fget)
+    @deprecated("1.0.0", "1.2.0", _width.fget)
     def get_table_width(self):  # pragma: no cover
-        return self.width
+        return self._width
 
     def _get_string(self, rows=None, append=False, recalculate_width=True):
         row_header_visible = bool(
             "".join(
                 x if x is not None else "" for x in self.rows.header
             ).strip()
-        )
+        ) and (len(self.columns) > 0)
+
         column_header_visible = bool(
             "".join(
                 x if x is not None else "" for x in self.columns.header
             ).strip()
-        )
+        ) and (len(self.rows) > 0 or rows is not None)
 
         # Preparing table for printing serialno, row headers and column headers
         if len(self.columns) > 0:
@@ -1064,33 +1076,16 @@ class BeautifulTable(object):
                     0, range(1, len(self.rows) + 1), self._serialno_header
                 )
 
-            if row_header_visible:
-                self.columns.insert(0, self.rows.header)
+        if row_header_visible:
+            self.columns.insert(0, self.rows.header)
 
-        if len(self.rows) > 0 or rows is not None:
-            if column_header_visible:
-                self.rows.insert(0, self.columns.header)
+        if column_header_visible:
+            self.rows.insert(0, self.columns.header)
 
         if (self.columns._auto_width and recalculate_width) or sum(
             self.columns.width
         ) == 0:
             self._compute_width()
-
-        if len(self.columns) > 0:
-            if self._serialno:
-                index = 1 if row_header_visible else 0
-                if self.columns.width[index] == 0:
-                    self.columns.width[index] = (
-                        max(len(i) for i in self.rows.header)
-                        + 2 * self.columns.default_padding
-                    )
-
-            if row_header_visible:
-                if self.columns.width[0] == 0:
-                    self.columns.width[0] = (
-                        max(4, len(self._serialno_header))
-                        + 2 * self.columns.default_padding
-                    )
 
         try:
             # Rendering the top border
@@ -1100,12 +1095,11 @@ class BeautifulTable(object):
             # Print column headers if not empty or only spaces
             row_iterator = iter(self.rows)
             if column_header_visible:
-                if len(self.rows) > 1 or rows is not None:
-                    yield next(row_iterator)._get_string(
-                        align=self.columns.header.alignment
-                    )
-                    if self.columns.header.separator:
-                        yield self._get_header_separator()
+                yield next(row_iterator)._get_string(
+                    align=self.columns.header.alignment
+                )
+                if self.columns.header.separator:
+                    yield self._get_header_separator()
 
             # Printing rows
             first_row_encountered = False
@@ -1125,7 +1119,7 @@ class BeautifulTable(object):
                     first_row_encountered = True
                     if self._serialno:
                         row.insert(0, prev_length + i)
-                    if len(self.columns) > 1 and row_header_visible:
+                    if row_header_visible:
                         self.rows.append([None] + list(row))
                     else:
                         self.rows.append(row)
@@ -1141,14 +1135,13 @@ class BeautifulTable(object):
             raise
         finally:
             # Cleanup
-            if len(self.rows) > 0:
-                if column_header_visible:
-                    self.rows.pop(0)
+            if column_header_visible:
+                self.rows.pop(0)
+
+            if row_header_visible:
+                self.columns.pop(0)
 
             if len(self.columns) > 0:
-                if row_header_visible:
-                    self.columns.pop(0)
-
                 if self._serialno:
                     self.columns.pop(0)
         return
@@ -1179,23 +1172,9 @@ class BeautifulTable(object):
         ):
             yield line
 
+    @deprecated("1.0.0", "1.2.0", str)
     def get_string(self):
-        """Get the table as a string.
-
-        Returns
-        -------
-        str:
-            Table as a string.
-        """
-
-        if len(self.rows) == 0:
-            return ""
-
-        string_ = []
-        for line in self._get_string([], append=False):
-            string_.append(line)
-
-        return "\n".join(string_)
+        return str(self)
 
     def to_csv(self, file_name, *args, **kwargs):
         """Export table to CSV format.

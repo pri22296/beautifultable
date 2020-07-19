@@ -131,7 +131,7 @@ Changelog
 **************************************************************************
 
 ==========
-Unreleased
+v1.0.0
 ==========
 
 * Added two new views ``rows`` and ``columns`` to the ``BeautifulTable`` class. Most of the existing
@@ -145,25 +145,25 @@ Unreleased
   it's respective view.
 * Added support for row headers. As a result rows can now be accessed by their keys similar
   to columns
-* Added two new methods ``to_csv`` and ``from_csv`` to directly export/import using a
+* Added two new methods ``to_csv`` and ``from_csv`` to directly export/import to a
   csv file. (Thanks to `@dinko-pehar <https://github.com/dinko-pehar>`_)
-* Added ``filter`` method to generate a new table with only certain rows
+* Added ``BeautifulTable.rows.filter`` method to generate a new table with only certain rows
 * Added a new ``shape`` attribute to the ``BeautifulTable`` class which returns a tuple of form (nrow, ncol)
-* Added alignment attribute to the ``BeautifulTable.columns.header`` object which can be used to
-  have a seperate header alignment. The default behaviour is to inherit ``BeautifulTable.columns.header``
-* Updated ``sort`` method to now also accept any callables as a key.
+* Added new attribute ``BeautifulTable.columns.header.alignment`` which can be used to have
+  a seperate header alignment. The default behaviour is to inherit ``BeautifulTable.columns.alignment``
+* Updated ``BeautifulTable.rows.sort`` (earlier ``BeautifulTable.sort``) method to now
+  also accept any callables as a key.
 * Updated behaviour of ``BeautifulTable.columns.width`` (earlier ``BeautifulTable.column_widths``).
   It no longer overrides user specified widths by default. You can reset it to default
   by setting it to **"auto"**
 * Deprecated attribute ``serialno`` and ``serialno_header``. User can now easily implement
   this functionality by using row headers if required
-* Deprecated method ``get_table_width()``. You can now access the ``BeautifulTable.width`` attribute
-  to get the same result.
+* Deprecated methods ``get_table_width()``, ``copy()`` and ``get_string()``.
 * Deprecated constructor arguments and class attributes named ``sign_mode``, ``numeric_precision``,
   ``max_width`` and renamed to ``sign``, ``precision`` and ``maxwidth`` respectively
-* Fixed an issue where table was malformed if ``blessings`` was used to generate colored strings.
+* Fixed an issue where table was malformed if ``blessings`` module was used to generate colored strings.
 * Fixed issues with the existing implementation of ``__iter__``, ``__copy__`` and ``__deepcopy__`` which
-  should now work more reliably
+  should now work more reliably.
 * Fixed an issue where default padding could not be set to 0. (Thanks to `@furlongm <https://github.com/furlongm>`_)
 * Fixed several memory leak issues by ensuring that all internal objects hold only a weak reference
   to the table instance.

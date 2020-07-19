@@ -63,7 +63,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'BeautifulTable'
-copyright = '2016, Priyam Singh'
+copyright = '2020, Priyam Singh'
 author = 'Priyam Singh'
 
 # The version info for the project you're documenting, acts as replacement for
