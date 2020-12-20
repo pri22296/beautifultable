@@ -83,7 +83,10 @@ def deprecation_message(
 
 
 def deprecated(
-    deprecated_in, removed_in, replacement=None, details=None,
+    deprecated_in,
+    removed_in,
+    replacement=None,
+    details=None,
 ):  # pragma: no cover
     def decorator(f):
         @functools.wraps(f)
@@ -93,20 +96,29 @@ def deprecated(
                 if replacement:
                     details = replacement.__qualname__
                     details = details.replace(
-                        "BTColumns", "BeautifulTable.columns",
-                    )
-                    details = details.replace("BTRows", "BeautifulTable.rows",)
-                    details = details.replace(
-                        "BTColumnHeader", "BeautifulTable.columns.header",
+                        "BTColumns",
+                        "BeautifulTable.columns",
                     )
                     details = details.replace(
-                        "BTRowHeader", "BeautifulTable.rows.header",
+                        "BTRows",
+                        "BeautifulTable.rows",
+                    )
+                    details = details.replace(
+                        "BTColumnHeader",
+                        "BeautifulTable.columns.header",
+                    )
+                    details = details.replace(
+                        "BTRowHeader",
+                        "BeautifulTable.rows.header",
                     )
                     details = "Use '{}' instead.".format(details)
                 else:
                     details = ""
             message = deprecation_message(
-                f.__qualname__, deprecated_in, removed_in, details,
+                f.__qualname__,
+                deprecated_in,
+                removed_in,
+                details,
             )
             if replacement:
                 f.__doc__ = "{}\n\n{}".format(replacement.__doc__, message)
@@ -119,7 +131,11 @@ def deprecated(
 
 
 def deprecated_param(
-    deprecated_in, removed_in, old_name, new_name=None, details=None,
+    deprecated_in,
+    removed_in,
+    old_name,
+    new_name=None,
+    details=None,
 ):  # pragma: no cover
     def decorator(f):
         @functools.wraps(f)
@@ -130,7 +146,10 @@ def deprecated_param(
                     "Use '{}' instead.".format(new_name) if new_name else ""
                 )
             message = deprecation_message(
-                old_name, deprecated_in, removed_in, details,
+                old_name,
+                deprecated_in,
+                removed_in,
+                details,
             )
             if old_name in kwargs:
                 warnings.warn(message, FutureWarning)

@@ -130,6 +130,26 @@ class TableOperationsTestCase(unittest.TestCase):
         last_column = self.table.columns[len(self.table.columns) - 1]
         self.compare_iterable(column, last_column)
 
+    def test_append_column_empty_table(self):
+        self.table = BeautifulTable()
+        title = "year"
+        column = ["2010", "2012", "2008", "2010", "2011"]
+        self.table.columns.append(column, header=title)
+        string = """+------+
+| year |
++------+
+| 2010 |
++------+
+| 2012 |
++------+
+| 2008 |
++------+
+| 2010 |
++------+
+| 2011 |
++------+"""
+        self.assertEqual(string, str(self.table))
+
     def test_insert_column(self):
         column = ["2010", "2012", "2008", "2010", "2011"]
         title = "year"

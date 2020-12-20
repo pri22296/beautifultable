@@ -814,7 +814,10 @@ class BeautifulTable(object):
                 header, self.detect_numerics, self.precision, self.sign.value
             ).split("\n"):
                 output_str = pre_process(
-                    i, self.detect_numerics, self.precision, self.sign.value,
+                    i,
+                    self.detect_numerics,
+                    self.precision,
+                    self.sign.value,
                 )
                 max_length = max(max_length, termwidth(output_str))
             maxwidths[index] += max_length
@@ -952,7 +955,8 @@ class BeautifulTable(object):
             if termwidth(self.border.left) > 0:
                 if not (self.border.left.isspace() and visible_junc):
                     length = min(
-                        termwidth(self.border.left), termwidth(intersect_left),
+                        termwidth(self.border.left),
+                        termwidth(intersect_left),
                     )
                     for i in range(length):
                         line[i] = intersect_left[i] if mask[0] else " "

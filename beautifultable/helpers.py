@@ -239,7 +239,10 @@ class BTRowData(BTBaseRow):
         for row in map(list, zip_longest(*rows, fillvalue="")):
             for i in range(len(row)):
                 row[i] = pre_process(
-                    row[i], table.detect_numerics, table.precision, sign.value,
+                    row[i],
+                    table.detect_numerics,
+                    table.precision,
+                    sign.value,
                 )
             for row_ in self._clamp_row(row):
                 for i in range(len(table.columns)):
@@ -1145,7 +1148,9 @@ class BTColumnCollection(object):
             self.padding_left = [padding_left]
             self.padding_right = [padding_right]
             self.alignment = [alignment]
-            self._table._data = [BTRowData(self._table, [i]) for i in column]
+            self._table._data = type(self._table._data)(
+                self._table, [BTRowData(self._table, [i]) for i in column]
+            )
         else:
             if (not isinstance(header, basestring)) and (header is not None):
                 raise TypeError(
