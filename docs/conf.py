@@ -63,8 +63,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'BeautifulTable'
-copyright = '2020, Priyam Singh'
-author = 'Priyam Singh'
+copyright = '2021, Priyam Singh'
+author = beautifultable.__author__
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

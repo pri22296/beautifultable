@@ -1,7 +1,7 @@
 import os
+import codecs
 
 from setuptools import setup
-from codecs import open
 
 install_requires = ["wcwidth"]
 extras_require = {}
@@ -10,10 +10,10 @@ this_dir = os.path.abspath(os.path.dirname(__file__))
 version_path = os.path.join(this_dir, "beautifultable", "__version__.py")
 
 about = {}
-with open(version_path, "r", "utf-8") as f:
+with codecs.open(version_path, "r", "utf-8") as f:
     exec(f.read(), about)
 
-with open("README.rst", "r", "utf-8") as f:
+with codecs.open("README.rst", "r", "utf-8") as f:
     readme = f.read()
 
 download_url = "{}/tarball/{}".format(about["__url__"], about["__version__"])
@@ -33,7 +33,7 @@ setup(
     extras_require=extras_require,
     install_requires=install_requires,
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
