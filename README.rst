@@ -36,7 +36,7 @@ Introduction
 **************************************************************************
 
 This Package provides BeautifulTable class for easily printing
-tabular data in a visually appealing ASCII format to a terminal. 
+tabular data in a visually appealing format to a terminal. 
 
 Features included but not limited to:
 
@@ -129,6 +129,13 @@ Installation
 **************************************************************************
 Changelog
 **************************************************************************
+
+==========
+v1.0.1
+==========
+
+* Fixed an issue where appending a column with a header to an empty table left the table instance in
+  an inconsistent state.
 
 ==========
 v1.0.0
