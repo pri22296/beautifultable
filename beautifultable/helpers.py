@@ -774,7 +774,7 @@ class BTColumnCollection(object):
         ============================  =========================================
          Option                        Meaning
         ============================  =========================================
-         beautifulbable.WEP_WRAP       An item is wrapped so every line fits
+         beautifultable.WEP_WRAP       An item is wrapped so every line fits
                                        within it's column width.
 
          beautifultable.WEP_STRIP      An item is stripped to fit in it's
