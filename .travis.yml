@@ -2,10 +2,6 @@ language: python
 
 matrix:
   include:
-    - python: 3.4
-      env: TOXENV=py34
-    - python: 3.5
-      env: TOXENV=py35
     - python: 3.6
       env: TOXENV=py36
     - python: 3.7
@@ -16,15 +12,19 @@ matrix:
       dist: xenial
       sudo: true
       env: TOXENV=py38
+    - python: 3.9
+      dist: bionic
+      sudo: true
+      env: TOXENV=py39
     - python: pypy3
       env: TOXENV=pypy3
-    - python: 3.4
+    - python: 3.8
       env: TOXENV=flake8
-    - python: 3.4
+    - python: 3.8
       env:
         - TOXENV=coverage
         - COVERAGE_REPORT=codecov
-    - python: 3.6
+    - python: 3.8
       env: TOXENV=black
 
 install:
