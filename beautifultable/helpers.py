@@ -285,10 +285,22 @@ class BTRowData(BTBaseRow):
 
     def __str__(self):
         return self._get_string()
+    
+    def aslist(self):
+        return self.value
+
+    def asdict(self):
+        if self._table.columns.header[0] is None or self._table.columns.header[0] == '':
+            raise Warning(f"Column header is not provided")
+        dict = {}
+        for header, row_val in zip(self._table.columns.header, self.value):
+            dict[header] = row_val 
+        return dict 
 
 
 class BTColumnData(BTBaseColumn):
-    pass
+    def aslist(self):
+        return self.value
 
 
 class BTRowCollection(object):
