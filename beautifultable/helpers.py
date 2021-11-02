@@ -285,6 +285,12 @@ class BTRowData(BTBaseRow):
 
     def __str__(self):
         return self._get_string()
+    
+    def asdict(self):
+        dict = {}
+        for header, row_val in zip(self._table.columns.header, self.value):
+            dict[header] = row_val 
+        return dict 
 
 
 class BTColumnData(BTBaseColumn):
