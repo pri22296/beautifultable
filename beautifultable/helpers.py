@@ -302,6 +302,9 @@ class BTColumnData(BTBaseColumn):
     def aslist(self):
         return self.value
 
+    def asdict(self):
+        raise Warning(f"Currently supported for rows only")
+
 
 class BTRowCollection(object):
     def __init__(self, table):
