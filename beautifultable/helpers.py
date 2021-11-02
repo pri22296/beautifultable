@@ -290,12 +290,12 @@ class BTRowData(BTBaseRow):
         return self.value
 
     def asdict(self):
-        if self._table.columns.header[0] is None or self._table.columns.header[0] == '':
-            raise Warning(f"Column header is not provided")
-        dict = {}
+        header_rowval_map = {}
         for header, row_val in zip(self._table.columns.header, self.value):
-            dict[header] = row_val 
-        return dict 
+            if header is None or header == '':
+                raise Warning(f"Column header is not provided or invalid")
+            header_rowval_map[header] = row_val
+        return header_rowval_map
 
 
 class BTColumnData(BTBaseColumn):
@@ -303,7 +303,7 @@ class BTColumnData(BTBaseColumn):
         return self.value
 
     def asdict(self):
-        raise Warning(f"Currently supported for rows only")
+        raise NotImplementedError(f"Currently supported for rows only")
 
 
 class BTRowCollection(object):
