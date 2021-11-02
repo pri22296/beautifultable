@@ -285,7 +285,7 @@ class BTRowData(BTBaseRow):
 
     def __str__(self):
         return self._get_string()
-    
+
     def aslist(self):
         """Return list of row values."""
         return self.value

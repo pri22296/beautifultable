@@ -105,7 +105,7 @@ class TableOperationsTestCase(unittest.TestCase):
 
     def test_column_asdict(self):
         with self.assertRaises(NotImplementedError):
-            [column.asdict() for column in self.table.columns]
+            header_colval_map = [column.asdict() for column in self.table.columns]
 
     def test_column_count(self):
         self.assertEqual(len(self.table.columns), 3)
