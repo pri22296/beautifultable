@@ -97,6 +97,16 @@ class TableOperationsTestCase(unittest.TestCase):
 
     # Tests for column operations
 
+    def test_column_aslist(self):
+        self.assertEqual([column.aslist() for column in
+                     self.table.columns], [['Jacob', 'Isabella', 'Ethan'
+                     , 'Sophia', 'Michael'], [1, 1, 2, 2, 3], ['boy',
+                     'girl', 'boy', 'girl', 'boy']])
+
+    def test_column_asdict(self):
+        with self.assertRaises(NotImplementedError):
+            header_colval_map = [column.asdict() for column in self.table.columns]
+
     def test_column_count(self):
         self.assertEqual(len(self.table.columns), 3)
 
@@ -201,6 +211,20 @@ class TableOperationsTestCase(unittest.TestCase):
         self.compare_iterable(self.table.columns[2], [c[1] for c in columns])
 
     # Tests for row operations
+
+    def test_row_asdict(self):
+        self.assertEqual([row.asdict() for row in self.table.rows],
+                     [{'name': 'Jacob', 'rank': 1, 'gender': 'boy'},
+                     {'name': 'Isabella', 'rank': 1, 'gender': 'girl'},
+                     {'name': 'Ethan', 'rank': 2, 'gender': 'boy'},
+                     {'name': 'Sophia', 'rank': 2, 'gender': 'girl'},
+                     {'name': 'Michael', 'rank': 3, 'gender': 'boy'}])
+
+    def test_row_aslist(self):
+        self.assertEqual([row.aslist() for row in self.table.rows],
+                     [['Jacob', 1, 'boy'], ['Isabella', 1, 'girl'],
+                     ['Ethan', 2, 'boy'], ['Sophia', 2, 'girl'],
+                     ['Michael', 3, 'boy']])
 
     def test_row_count(self):
         self.assertEqual(len(self.table.rows), 5)

@@ -286,9 +286,33 @@ class BTRowData(BTBaseRow):
     def __str__(self):
         return self._get_string()
 
+    def aslist(self):
+        """Return list of row values."""
+        return self.value
+
+    def asdict(self):
+        """
+        Return dictionary where key is column header and value as row value and
+        raise a Warning if coulmn header invalid(not provided) or empty.
+        """
+        header_rowval_map = {}
+        for header, row_val in zip(self._table.columns.header, self.value):
+            if header is None or header == '':
+                raise Warning(f"Column header is not provided or invalid")
+            header_rowval_map[header] = row_val
+        return header_rowval_map
+
 
 class BTColumnData(BTBaseColumn):
-    pass
+    def aslist(self):
+        """Return list of column values."""
+        return self.value
+
+    def asdict(self):
+        """
+        Raise a NotImplementedError as currently it is not implemented
+        """
+        raise NotImplementedError(f"Currently supported for rows only")
 
 
 class BTRowCollection(object):
