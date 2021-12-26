@@ -15,9 +15,7 @@ from .compat import to_unicode
 
 class ANSIMultiByteString(object):
 
-    ANSI_REGEX = re.compile(
-        r"(\x1B(?:[()][AB012]|[@-Z\\-_]|\[[0-?]*[ -/]*[@-~]))"
-    )
+    ANSI_REGEX = re.compile(r"(\x1B(?:[()][AB012]|[@-Z\\-_]|\[[0-?]*[ -/]*[@-~]))")
     ANSI_RESET = "\x1b[0m"
 
     def __init__(self, string):
@@ -41,9 +39,9 @@ class ANSIMultiByteString(object):
                         w = wcwidth(char)
                         if w == -1:
                             raise ValueError(
-                                (
-                                    "Unsupported Literal {} in " "string {}"
-                                ).format(repr(char), repr(token))
+                                ("Unsupported Literal {} in " "string {}").format(
+                                    repr(char), repr(token)
+                                )
                             )
                         self._termwidth += w
                         self._string.append(char)
@@ -56,11 +54,7 @@ class ANSIMultiByteString(object):
     def __getitem__(self, key):
         if isinstance(key, int):
             if self._state[key]:
-                return (
-                    "".join(self._state[key])
-                    + self._string[key]
-                    + self.ANSI_RESET
-                )
+                return "".join(self._state[key]) + self._string[key] + self.ANSI_RESET
             return self._string[key]
         if isinstance(key, slice):
             return self._slice(key)

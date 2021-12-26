@@ -142,9 +142,7 @@ def deprecated_param(
         def wrapper(*args, **kwargs):
             nonlocal details
             if not details:
-                details = (
-                    "Use '{}' instead.".format(new_name) if new_name else ""
-                )
+                details = "Use '{}' instead.".format(new_name) if new_name else ""
             message = deprecation_message(
                 old_name,
                 deprecated_in,

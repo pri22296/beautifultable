@@ -98,10 +98,14 @@ class TableOperationsTestCase(unittest.TestCase):
     # Tests for column operations
 
     def test_column_aslist(self):
-        self.assertEqual([column.aslist() for column in
-                     self.table.columns], [['Jacob', 'Isabella', 'Ethan'
-                     , 'Sophia', 'Michael'], [1, 1, 2, 2, 3], ['boy',
-                     'girl', 'boy', 'girl', 'boy']])
+        self.assertEqual(
+            [column.aslist() for column in self.table.columns],
+            [
+                ["Jacob", "Isabella", "Ethan", "Sophia", "Michael"],
+                [1, 1, 2, 2, 3],
+                ["boy", "girl", "boy", "girl", "boy"],
+            ],
+        )
 
     def test_column_asdict(self):
         with self.assertRaises(NotImplementedError):
@@ -213,18 +217,28 @@ class TableOperationsTestCase(unittest.TestCase):
     # Tests for row operations
 
     def test_row_asdict(self):
-        self.assertEqual([row.asdict() for row in self.table.rows],
-                     [{'name': 'Jacob', 'rank': 1, 'gender': 'boy'},
-                     {'name': 'Isabella', 'rank': 1, 'gender': 'girl'},
-                     {'name': 'Ethan', 'rank': 2, 'gender': 'boy'},
-                     {'name': 'Sophia', 'rank': 2, 'gender': 'girl'},
-                     {'name': 'Michael', 'rank': 3, 'gender': 'boy'}])
+        self.assertEqual(
+            [row.asdict() for row in self.table.rows],
+            [
+                {"name": "Jacob", "rank": 1, "gender": "boy"},
+                {"name": "Isabella", "rank": 1, "gender": "girl"},
+                {"name": "Ethan", "rank": 2, "gender": "boy"},
+                {"name": "Sophia", "rank": 2, "gender": "girl"},
+                {"name": "Michael", "rank": 3, "gender": "boy"},
+            ],
+        )
 
     def test_row_aslist(self):
-        self.assertEqual([row.aslist() for row in self.table.rows],
-                     [['Jacob', 1, 'boy'], ['Isabella', 1, 'girl'],
-                     ['Ethan', 2, 'boy'], ['Sophia', 2, 'girl'],
-                     ['Michael', 3, 'boy']])
+        self.assertEqual(
+            [row.aslist() for row in self.table.rows],
+            [
+                ["Jacob", 1, "boy"],
+                ["Isabella", 1, "girl"],
+                ["Ethan", 2, "boy"],
+                ["Sophia", 2, "girl"],
+                ["Michael", 3, "boy"],
+            ],
+        )
 
     def test_row_count(self):
         self.assertEqual(len(self.table.rows), 5)
@@ -390,12 +404,8 @@ class TableOperationsTestCase(unittest.TestCase):
         self.assertFalse("score" in self.table.columns.header)
 
     def test_column_contains(self):
-        self.assertTrue(
-            ["boy", "girl", "boy", "girl", "boy"] in self.table.columns
-        )
-        self.assertFalse(
-            ["boy", "girl", "girl", "girl", "boy"] in self.table.columns
-        )
+        self.assertTrue(["boy", "girl", "boy", "girl", "boy"] in self.table.columns)
+        self.assertFalse(["boy", "girl", "girl", "girl", "boy"] in self.table.columns)
 
     # Test for printing operations
 

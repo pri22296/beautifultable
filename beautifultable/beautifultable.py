@@ -154,9 +154,7 @@ def _make_getter(attr):
 
 
 def _make_setter(attr):
-    return lambda self, value: setattr(
-        self, attr, ensure_type(value, basestring)
-    )
+    return lambda self, value: setattr(self, attr, ensure_type(value, basestring))
 
 
 for prop, attr in [
@@ -281,9 +279,7 @@ class BeautifulTable(object):
         self._data = BTTableData(self)
 
         self.rows = BTRowCollection(self)
-        self.columns = BTColumnCollection(
-            self, default_alignment, default_padding
-        )
+        self.columns = BTColumnCollection(self, default_alignment, default_padding)
 
         self._header_separator = ""
         self._header_junction = ""
@@ -294,9 +290,7 @@ class BeautifulTable(object):
 
     def __copy__(self):
         obj = type(self)()
-        obj.__dict__.update(
-            {k: copy.copy(v) for k, v in self.__dict__.items()}
-        )
+        obj.__dict__.update({k: copy.copy(v) for k, v in self.__dict__.items()})
 
         obj.rows._table = obj
         obj.rows.header._table = obj
@@ -396,9 +390,7 @@ class BeautifulTable(object):
             return key in self.rows
         else:
             raise TypeError(
-                ("'key' must be str or Iterable, " "not {}").format(
-                    type(key).__name__
-                )
+                ("'key' must be str or Iterable, " "not {}").format(type(key).__name__)
             )
 
     def __repr__(self):
@@ -444,8 +436,7 @@ class BeautifulTable(object):
     def sign(self, value):
         if not isinstance(value, enums.SignMode):
             allowed = (
-                "{}.{}".format(type(self).__name__, i.name)
-                for i in enums.SignMode
+                "{}.{}".format(type(self).__name__, i.name) for i in enums.SignMode
             )
             error_msg = "allowed values for sign are: " + ", ".join(allowed)
             raise ValueError(error_msg)
@@ -768,10 +759,7 @@ class BeautifulTable(object):
             * beautifultable.STYLE_GRID
         """
         if not isinstance(style, enums.Style):
-            allowed = (
-                "{}.{}".format(type(self).__name__, i.name)
-                for i in enums.Style
-            )
+            allowed = ("{}.{}".format(type(self).__name__, i.name) for i in enums.Style)
             error_msg = "allowed values for style are: " + ", ".join(allowed)
             raise ValueError(error_msg)
         style_template = style.value
@@ -876,9 +864,7 @@ class BeautifulTable(object):
                     extra_width = int(width * extra / actual_space)
                     self.columns.width[i] += extra_width
                     if i == (len(shrinked_columns) - 1):
-                        extra = (
-                            self._maxwidth - offset - sum(self.columns.width)
-                        )
+                        extra = self._maxwidth - offset - sum(self.columns.width)
                         self.columns.width[index] += extra
 
         for i in range(len(self.columns)):
@@ -969,9 +955,7 @@ class BeautifulTable(object):
                         termwidth(intersect_right),
                     )
                     for i in range(length):
-                        line[-i - 1] = (
-                            intersect_right[-i - 1] if mask[-1] else " "
-                        )
+                        line[-i - 1] = intersect_right[-i - 1] if mask[-1] else " "
             visible_junc = not intersect_mid.isspace()
             # If column separator is enabled and it is visible
             if termwidth(self.columns.separator):
@@ -989,9 +973,7 @@ class BeautifulTable(object):
                         for j in range(length):
                             # TODO: we should also hide junctions based on mask
                             line[index + j] = (
-                                intersect_mid[j]
-                                if (mask[i] or mask[i + 1])
-                                else " "
+                                intersect_mid[j] if (mask[i] or mask[i + 1]) else " "
                             )
                         index += termwidth(self.columns.separator)
 
@@ -1062,15 +1044,11 @@ class BeautifulTable(object):
 
     def _get_string(self, rows=None, append=False, recalculate_width=True):
         row_header_visible = bool(
-            "".join(
-                x if x is not None else "" for x in self.rows.header
-            ).strip()
+            "".join(x if x is not None else "" for x in self.rows.header).strip()
         ) and (len(self.columns) > 0)
 
         column_header_visible = bool(
-            "".join(
-                x if x is not None else "" for x in self.columns.header
-            ).strip()
+            "".join(x if x is not None else "" for x in self.columns.header).strip()
         ) and (len(self.rows) > 0 or rows is not None)
 
         # Preparing table for printing serialno, row headers and column headers
@@ -1171,9 +1149,7 @@ class BeautifulTable(object):
         iterable:
             string representation of the table as a generators
         """
-        for line in self._get_string(
-            rows, append=append, recalculate_width=False
-        ):
+        for line in self._get_string(rows, append=append, recalculate_width=False):
             yield line
 
     @deprecated("1.0.0", "1.2.0", str)
@@ -1199,9 +1175,7 @@ class BeautifulTable(object):
         with open(file_name, mode="wt", newline="") as csv_file:
             csv_writer = csv.writer(csv_file, *args, **kwargs)
             if bool(
-                "".join(
-                    x if x is not None else "" for x in self.columns.header
-                ).strip()
+                "".join(x if x is not None else "" for x in self.columns.header).strip()
             ):
                 csv_writer.writerow(self.columns.header)
             csv_writer.writerows(self.rows)
