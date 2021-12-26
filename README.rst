@@ -16,9 +16,6 @@ beautifultable
 .. image:: https://api.codacy.com/project/badge/Grade/7a76eb35ad4e450eaf00339e98381511
     :target: https://www.codacy.com/app/pri22296/beautifultable?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pri22296/beautifultable&amp;utm_campaign=Badge_Grade
 
-.. image:: https://travis-ci.org/pri22296/beautifultable.svg?branch=master
-    :target: https://travis-ci.org/pri22296/beautifultable
-
 .. image:: https://readthedocs.org/projects/beautifultable/badge/?version=latest
     :alt: Documentation Status
     :target: http://beautifultable.readthedocs.io/en/latest/?badge=latest
@@ -130,9 +127,9 @@ Installation
 Changelog
 **************************************************************************
 
-==========
+===========
 Development
-==========
+===========
 
 * Drop support for Python 3.4 and 3.5, add python 3.9
 
