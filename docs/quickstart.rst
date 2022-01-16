@@ -809,20 +809,23 @@ works.
 
 .. code:: python
 
+   >>> # Setting up the inner table
    >>> subtable = BeautifulTable()
    >>> subtable.rows.append(["Jacob", 1, "boy"])
    >>> subtable.rows.append(["Isabella", 1, "girl"])
-   >>> subtable.left_border_char = ''
-   >>> subtable.right_border_char = ''
-   >>> subtable.top_border_char = ''
-   >>> subtable.bottom_border_char = ''
-   >>> parent_table = BeautifulTable()
-   >>> parent_table.columns.header = ["Heading 1", "Heading 2"]
-   >>> parent_table.rows.append(["Sample text", "Another sample text"])
-   >>> parent_table.rows.append([subtable, "More sample text"])
-   >>> parent_table.columns.padding_left[0] = 0
-   >>> parent_table.columns.padding_right[0] = 0
-   >>> print(parent_table)
+   >>> subtable.border.left = ''
+   >>> subtable.border.right = ''
+   >>> subtable.border.top = ''
+   >>> subtable.border.right = ''
+   >>>
+   >>> # Setting up the outer table
+   >>> table = BeautifulTable()
+   >>> table.columns.header = ["Heading 1", "Heading 2"]
+   >>> table.rows.append(["Sample text", "Another sample text"])
+   >>> table.rows.append([subtable, "More sample text"])
+   >>> table.columns.padding_left[0] = 0
+   >>> table.columns.padding_right[0] = 0
+   >>> print(table)
    +---------------------+---------------------+
    |      Heading 1      |      Heading 2      |
    +---------------------+---------------------+

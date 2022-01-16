@@ -130,10 +130,10 @@ class BTBorder(object):
         bottom_junction,
         right_junction,
     ):
-        self.top = left
-        self.left = right
-        self.bottom = top
-        self.right = bottom
+        self.top = top
+        self.left = left
+        self.bottom = bottom
+        self.right = right
 
         self.top_left = top_left
         self.bottom_left = bottom_left
