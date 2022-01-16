@@ -16,6 +16,9 @@ beautifultable
 .. image:: https://api.codacy.com/project/badge/Grade/7a76eb35ad4e450eaf00339e98381511
     :target: https://www.codacy.com/app/pri22296/beautifultable?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pri22296/beautifultable&amp;utm_campaign=Badge_Grade
 
+.. image:: https://github.com/pri22296/beautifultable/actions/workflows/build.yml/badge.svg?branch=master
+    :target: https://github.com/pri22296/beautifultable/actions/workflows/build.yml
+
 .. image:: https://readthedocs.org/projects/beautifultable/badge/?version=latest
     :alt: Documentation Status
     :target: http://beautifultable.readthedocs.io/en/latest/?badge=latest
@@ -131,7 +134,9 @@ Changelog
 Development
 ===========
 
-* Drop support for Python 3.4 and 3.5, add python 3.9
+* Drop support for Python 3.4, 3.5 and 3.6
+* Add python 3.9 and 3.10
+* Added `asdict` and `aslist` method on the row object. (Thanks to `@Agent-Hellboy <https://github.com/Agent-Hellboy>`_)
 
 ==========
 v1.0.1
