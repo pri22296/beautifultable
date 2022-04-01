@@ -1257,7 +1257,6 @@ class BeautifulTable(object):
 
         for header in headers:
             self.columns.append([data[header][indx] for indx in row_header], header=header)
-
         if list(range(len(row_header))) != row_header:
             self.rows.header = row_header
         return self
