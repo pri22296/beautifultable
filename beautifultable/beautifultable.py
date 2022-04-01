@@ -31,7 +31,7 @@ import copy
 import csv
 import warnings
 
-import pandas as pd 
+import pandas as pd
 
 from . import enums
 
@@ -1224,7 +1224,7 @@ class BeautifulTable(object):
         table : BeautifullTable
 
         """
-        # If there are column headers then it will act as a column of datafarme 
+        # If there are column headers then it will act as a column of datafarme
         headers = list(self.columns.header)
         if headers.count(None) == len(headers):
             headers = None
@@ -1232,9 +1232,11 @@ class BeautifulTable(object):
         # If there are row headers then it will act as an Index
         index = list(self.rows.header)
         if index.count(None) == len(index):
-            index = None 
+            index = None
 
-        return pd.DataFrame([list(row) for row in list(self._data)],columns=headers, index=index)
+        return pd.DataFrame(
+            [list(row) for row in list(self._data)], columns=headers, index=index
+        )
 
     def from_df(self, df):
         """Import table from dataframe.
@@ -1252,7 +1254,9 @@ class BeautifulTable(object):
         row_header = list(df.index)
 
         for header in headers:
-            self.columns.append([data[header][indx] for indx in row_header], header=str(header))
+            self.columns.append(
+                [data[header][indx] for indx in row_header], header=str(header)
+            )
         if list(range(len(row_header))) != row_header:
             self.rows.header = row_header
         return self

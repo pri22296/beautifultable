@@ -811,37 +811,42 @@ class TableOperationsTestCase(unittest.TestCase):
         df = self.table.to_df()
         self.assertEqual(self.table.rows.header, df.index)
         self.assertEqual(self.table.columns.header, list(df.columns))
-        self.assertEqual([list(row) for row in list(df.values)], [list(row) for row in list(self.table._data)])
-    
+        self.assertEqual(
+            [list(row) for row in list(df.values)],
+            [list(row) for row in list(self.table._data)],
+        )
+
     def test_df_import(self):
         df = self.create_dataframe()
         table = BeautifulTable()
         table = table.from_df(df)
         self.assertEqual(self.table.rows.header, df.index)
         self.assertEqual(self.table.columns.header, list(df.columns))
-        self.assertEqual([list(row) for row in list(df.values)], [list(row) for row in list(self.table._data)])
+        self.assertEqual(
+            [list(row) for row in list(df.values)],
+            [list(row) for row in list(self.table._data)],
+        )
 
     def test_df_export_scenario1(self):
         table = BeautifulTable()
         table.rows.append(["Jacob", 1, "boy"])
         table.rows.append(["Isabella", 2, "girl"])
         df = table.to_df()
-        self.assertEqual(table.rows.header, [None,None])
-        self.assertEqual(table.columns.header, [None,None,None])
-        self.assertEqual(list(df.index), [0,1])
-        self.assertEqual(list(df.columns), [0,1,2])
+        self.assertEqual(table.rows.header, [None, None])
+        self.assertEqual(table.columns.header, [None, None, None])
+        self.assertEqual(list(df.index), [0, 1])
+        self.assertEqual(list(df.columns), [0, 1, 2])
 
     def test_df_export_scenario2(self):
         table = BeautifulTable()
         table.rows.append(["Jacob", 1, "boy"])
         table.rows.append(["Isabella", 2, "girl"])
-        table.columns.header = [None,'rank','gender']
+        table.columns.header = [None, "rank", "gender"]
         df = table.to_df()
-        self.assertEqual(table.rows.header, [None,None])
-        self.assertEqual(table.columns.header, [None,'rank','gender'])
-        self.assertEqual(list(df.index), [0,1])
-        self.assertEqual(list(df.columns), [None,'rank','gender'])
-
+        self.assertEqual(table.rows.header, [None, None])
+        self.assertEqual(table.columns.header, [None, "rank", "gender"])
+        self.assertEqual(list(df.index), [0, 1])
+        self.assertEqual(list(df.columns), [None, "rank", "gender"])
 
 
 if __name__ == "__main__":
