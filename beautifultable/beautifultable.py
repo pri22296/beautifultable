@@ -1246,7 +1246,6 @@ class BeautifulTable(object):
             mk_dict[j] = table_data[i]
         return pd.DataFrame(data=mk_dict, index=index)
 
-
     def from_df(self, df):
         """Import table from dataframe.
 

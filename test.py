@@ -31,7 +31,7 @@ class TableOperationsTestCase(unittest.TestCase):
 
     def create_dataframe(self):
         self.df = self.table.to_df()
-        
+
     def compare_iterable(self, iterable1, iterable2):
         for item1, item2 in itertools.zip_longest(iterable1, iterable2):
             self.assertEqual(item1, item2)
@@ -817,6 +817,7 @@ class TableOperationsTestCase(unittest.TestCase):
         table = BeautifulTable()
         table = table.from_df(self.df)
         self.assertEqual(self.table.rows.header, self.df.index)
+
 
 if __name__ == "__main__":
     unittest.main()

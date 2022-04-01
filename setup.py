@@ -3,7 +3,7 @@ import codecs
 
 from setuptools import setup
 
-install_requires = ["wcwidth","pandas"]
+install_requires = ["wcwidth", "pandas"]
 extras_require = {}
 
 this_dir = os.path.abspath(os.path.dirname(__file__))
