@@ -1230,20 +1230,14 @@ class BeautifulTable(object):
             If header is not there in table
         """
 
-        header = self.columns.header
-        header = list(header)
-        if not header:
+        headers = self.columns.header
+        headers = list(headers)
+        if not headers:
             raise AttributeError("Dataframe needs a header")
 
         # index will act as a row header for beautifultable
         index = list(self.rows.header)
-        table_data = []
-        for i in self:
-            table_data.append(list(i))
-        table_data = list(map(list, zip(*table_data)))
-        mk_dict = {}
-        for i, j in enumerate(header):
-            mk_dict[j] = table_data[i]
+        mk_dict = {header: self.columns[header] for header in headers}
         return pd.DataFrame(data=mk_dict, index=index)
 
     def from_df(self, df):
@@ -1254,23 +1248,16 @@ class BeautifulTable(object):
         df : pandas.Dataframe
         """
         data = df.to_dict()
-
         # dataframe columns will act as a column headers
-        header = list(data.keys())
-        self.columns.header = header
+        headers = list(data.keys())
 
         # Index of dataframe will act as a row headers
         row_header = df.index
         row_header = list(row_header)
-        rows = []
-        for row in data.keys():
-            cols = []
-            for col in data[row].keys():
-                cols.append(data[row][col])
-            rows.append(cols)
-        rows = list(map(list, zip(*rows)))
-        for row in rows:
-            self.rows.append(row)
+
+        for header in headers:
+            self.columns.append([data[header][indx] for indx in row_header], header=header)
+
         if list(range(len(row_header))) != row_header:
             self.rows.header = row_header
         return self
