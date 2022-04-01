@@ -5,12 +5,15 @@ import os
 import unittest
 import itertools
 
+import pandas as pd
+
 from beautifultable import BeautifulTable
 
 
 class TableOperationsTestCase(unittest.TestCase):
     def setUp(self):
         self.create_table()
+        self.create_dataframe()
 
     def create_table(self, maxwidth=80):
         table = BeautifulTable(maxwidth=maxwidth)
@@ -26,6 +29,9 @@ class TableOperationsTestCase(unittest.TestCase):
 
         self.table = table
 
+    def create_dataframe(self):
+        self.df = self.table.to_df()
+        
     def compare_iterable(self, iterable1, iterable2):
         for item1, item2 in itertools.zip_longest(iterable1, iterable2):
             self.assertEqual(item1, item2)
@@ -802,6 +808,15 @@ class TableOperationsTestCase(unittest.TestCase):
         # Teardown step.
         os.remove("beautiful_table.csv")
 
+    def test_df__export(self):
+        df = self.table.to_df()
+        self.assertEqual(self.table.rows.header, df.index)
+        self.assertEqual(self.table.columns.header, list(df.columns))
+
+    def test_df_import(self):
+        table = BeautifulTable()
+        table = table.from_df(self.df)
+        self.assertEqual(self.table.rows.header, self.df.index)
 
 if __name__ == "__main__":
     unittest.main()
