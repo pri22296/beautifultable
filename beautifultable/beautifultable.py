@@ -30,9 +30,8 @@ from __future__ import division, unicode_literals
 import copy
 import csv
 import warnings
-from numpy import r_
 
-import pandas as pd
+import pandas as pd 
 
 from . import enums
 
@@ -1222,23 +1221,20 @@ class BeautifulTable(object):
 
         Parameters
         ----------
-        table : Beautifuletable
+        table : BeautifullTable
 
-        Raises
-        ------
-        AttributeError
-            If header is not there in table
         """
+        # If there are column headers then it will act as a column of datafarme 
+        headers = list(self.columns.header)
+        if headers.count(None) == len(headers):
+            headers = None
 
-        headers = self.columns.header
-        headers = list(headers)
-        if not headers:
-            raise AttributeError("Dataframe needs a header")
-
-        # index will act as a row header for beautifultable
+        # If there are row headers then it will act as an Index
         index = list(self.rows.header)
-        mk_dict = {header: self.columns[header] for header in headers}
-        return pd.DataFrame(data=mk_dict, index=index)
+        if index.count(None) == len(index):
+            index = None 
+
+        return pd.DataFrame([list(row) for row in list(self._data)],columns=headers, index=index)
 
     def from_df(self, df):
         """Import table from dataframe.
@@ -1248,15 +1244,15 @@ class BeautifulTable(object):
         df : pandas.Dataframe
         """
         data = df.to_dict()
-        # dataframe columns will act as a column headers
+
+        # Dataframe columns will act as a column headers
         headers = list(data.keys())
 
         # Index of dataframe will act as a row headers
-        row_header = df.index
-        row_header = list(row_header)
+        row_header = list(df.index)
 
         for header in headers:
-            self.columns.append([data[header][indx] for indx in row_header], header=header)
+            self.columns.append([data[header][indx] for indx in row_header], header=str(header))
         if list(range(len(row_header))) != row_header:
             self.rows.header = row_header
         return self
