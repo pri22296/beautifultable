@@ -30,6 +30,9 @@ from __future__ import division, unicode_literals
 import copy
 import csv
 import warnings
+from numpy import r_
+
+import pandas as pd
 
 from . import enums
 
@@ -1213,3 +1216,62 @@ class BeautifulTable(object):
             for row in csv_reader:
                 self.rows.append(row)
             return self
+
+    def to_df(self):
+        """Export table to dataframe.
+
+        Parameters
+        ----------
+        table : Beautifuletable
+
+        Raises
+        ------
+        AttributeError
+            If header is not there in table
+        """
+
+        header = self.columns.header
+        header = list(header)
+        if not header:
+            raise AttributeError("Dataframe needs a header")
+
+        # index will act as a row header for beautifultable
+        index = list(self.rows.header)
+        table_data = []
+        for i in self:
+            table_data.append(list(i))
+        table_data = list(map(list, zip(*table_data)))
+        mk_dict = {}
+        for i, j in enumerate(header):
+            mk_dict[j] = table_data[i]
+        return pd.DataFrame(data=mk_dict, index=index)
+
+
+    def from_df(self, df):
+        """Import table from dataframe.
+
+        Parameters
+        ----------
+        df : pandas.Dataframe
+        """
+        data = df.to_dict()
+
+        # dataframe columns will act as a column headers
+        header = list(data.keys())
+        self.columns.header = header
+
+        # Index of dataframe will act as a row headers
+        row_header = df.index
+        row_header = list(row_header)
+        rows = []
+        for row in data.keys():
+            cols = []
+            for col in data[row].keys():
+                cols.append(data[row][col])
+            rows.append(cols)
+        rows = list(map(list, zip(*rows)))
+        for row in rows:
+            self.rows.append(row)
+        if list(range(len(row_header))) != row_header:
+            self.rows.header = row_header
+        return self
