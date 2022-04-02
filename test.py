@@ -824,7 +824,7 @@ class TableOperationsTestCase(unittest.TestCase):
         self.assertEqual(self.table.columns.header, list(df.columns))
         self.assertEqual(
             [list(row) for row in list(df.values)],
-            [list(row) for row in list(self.table._data)],
+            [list(row) for row in list(self.table.rows)],
         )
 
     def test_df_export_scenario1(self):

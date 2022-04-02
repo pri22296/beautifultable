@@ -1221,7 +1221,7 @@ class BeautifulTable(object):
 
         Parameters
         ----------
-        table : BeautifullTable
+        table : BeautifulTable
 
         """
         # If there are column headers then it will act as a column of datafarme
@@ -1235,7 +1235,7 @@ class BeautifulTable(object):
             index = None
 
         return pd.DataFrame(
-            [list(row) for row in list(self._data)], columns=headers, index=index
+            [list(row) for row in self.rows], columns=headers, index=index
         )
 
     def from_df(self, df):
