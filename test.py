@@ -433,7 +433,7 @@ class TableOperationsTestCase(unittest.TestCase):
     def test_stream(self):
         def generator():
             for i in range(1, 6):
-                yield [i, i ** 2]
+                yield [i, i**2]
 
         table = BeautifulTable()
         table.columns.header = ["Number", "It's Square"]
@@ -632,7 +632,7 @@ class TableOperationsTestCase(unittest.TestCase):
         self.assertEqual(string, str(self.table))
 
     def test_eastasian_characters(self):
-        string = u"""+----+------------+------+--------+
+        string = """+----+------------+------+--------+
 |    |    name    | rank | gender |
 +----+------------+------+--------+
 | S1 |   Jacob    |  1   |  boy   |
@@ -647,7 +647,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +----+------------+------+--------+
 | S6 | こんにちは |  2   |  boy   |
 +----+------------+------+--------+"""
-        self.table.rows.append([u"こんにちは", 2, "boy"], header="S6")
+        self.table.rows.append(["こんにちは", 2, "boy"], header="S6")
         self.assertEqual(string, str(self.table))
 
     def test_newline(self):
@@ -691,11 +691,11 @@ class TableOperationsTestCase(unittest.TestCase):
 
     def test_ansi_wrap_mb(self):
         table = BeautifulTable(maxwidth=30)
-        string = u"""+-----------------+---+------+
+        string = """+-----------------+---+------+
 | \x1b[31mこれは非常に長\x1b[0m  | 2 | girl |
 |   \x1b[31mい\x1b[0m\x1b[32m名前です\x1b[0m    |   |      |
 +-----------------+---+------+"""
-        long_string = u"\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
+        long_string = "\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
         table.rows.append([long_string, 2, "girl"])
         self.assertEqual(string, str(table))
 
@@ -712,10 +712,10 @@ class TableOperationsTestCase(unittest.TestCase):
     def test_ansi_ellipsis_mb(self):
         table = BeautifulTable(maxwidth=30)
         table.columns.width_exceed_policy = table.WEP_ELLIPSIS
-        string = u"""+-----------------+---+------+
+        string = """+-----------------+---+------+
 | \x1b[31mこれは非常に\x1b[0m... | 2 | girl |
 +-----------------+---+------+"""
-        long_string = u"\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
+        long_string = "\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
         table.rows.append([long_string, 2, "girl"])
         self.assertEqual(string, str(table))
 
@@ -732,10 +732,10 @@ class TableOperationsTestCase(unittest.TestCase):
     def test_ansi_strip_mb(self):
         table = BeautifulTable(maxwidth=30)
         table.columns.width_exceed_policy = table.WEP_STRIP
-        string = u"""+-----------------+---+------+
+        string = """+-----------------+---+------+
 | \x1b[31mこれは非常に長\x1b[0m  | 2 | girl |
 +-----------------+---+------+"""
-        long_string = u"\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
+        long_string = "\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
         table.rows.append([long_string, 2, "girl"])
         self.assertEqual(string, str(table))
 

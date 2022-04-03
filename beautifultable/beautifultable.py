@@ -31,8 +31,6 @@ import copy
 import csv
 import warnings
 
-import pandas as pd
-
 from . import enums
 
 from .utils import (
@@ -1224,6 +1222,11 @@ class BeautifulTable(object):
         table : BeautifulTable
 
         """
+        try:
+            pd = __import__("pandas")
+        except ModuleNotFoundError as e:
+            raise ModuleNotFoundError("Please Install pandas to use this API") from e
+
         # If there are column headers then it will act as a column of datafarme
         headers = list(self.columns.header)
         if headers.count(None) == len(headers):
