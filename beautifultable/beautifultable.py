@@ -1223,9 +1223,12 @@ class BeautifulTable(object):
 
         """
         try:
-            pd = __import__("pandas")
-        except ModuleNotFoundError as e:
-            raise ModuleNotFoundError("Please Install pandas to use this API") from e
+            import pandas as pd
+        except ImportError:
+            pd = None
+
+        if pd is None:
+            raise ("Please Install pandas to use this API")
 
         # If there are column headers then it will act as a column of datafarme
         headers = list(self.columns.header)
@@ -1260,6 +1263,5 @@ class BeautifulTable(object):
             self.columns.append(
                 [data[header][indx] for indx in row_header], header=str(header)
             )
-        if list(range(len(row_header))) != row_header:
-            self.rows.header = row_header
+
         return self

@@ -4,7 +4,6 @@
 import os
 import unittest
 import itertools
-import warnings
 
 import pandas as pd
 
@@ -851,6 +850,4 @@ class TableOperationsTestCase(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", category=ImportWarning)
-        unittest.main()
+    unittest.main()
