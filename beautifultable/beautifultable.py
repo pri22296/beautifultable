@@ -1213,3 +1213,55 @@ class BeautifulTable(object):
             for row in csv_reader:
                 self.rows.append(row)
             return self
+
+    def to_df(self):
+        """Export table to dataframe.
+
+        Parameters
+        ----------
+        table : BeautifulTable
+
+        """
+        try:
+            import pandas as pd
+        except ImportError:
+            pd = None
+
+        if pd is None:
+            raise ("Please Install pandas to use this API")
+
+        # If there are column headers then it will act as a column of datafarme
+        headers = list(self.columns.header)
+        if headers.count(None) == len(headers):
+            headers = None
+
+        # If there are row headers then it will act as an Index
+        index = list(self.rows.header)
+        if index.count(None) == len(index):
+            index = None
+
+        return pd.DataFrame(
+            [list(row) for row in self.rows], columns=headers, index=index
+        )
+
+    def from_df(self, df):
+        """Import table from dataframe.
+
+        Parameters
+        ----------
+        df : pandas.Dataframe
+        """
+        data = df.to_dict()
+
+        # Dataframe columns will act as a column headers
+        headers = list(data.keys())
+
+        # Index of dataframe will act as a row headers
+        row_header = list(df.index)
+
+        for header in headers:
+            self.columns.append(
+                [data[header][indx] for indx in row_header], header=str(header)
+            )
+
+        return self

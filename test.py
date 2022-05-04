@@ -5,6 +5,8 @@ import os
 import unittest
 import itertools
 
+import pandas as pd
+
 from beautifultable import BeautifulTable
 
 
@@ -25,6 +27,9 @@ class TableOperationsTestCase(unittest.TestCase):
         table.rows.header = ["S1", "S2", "S3", "S4", "S5"]
 
         self.table = table
+
+    def create_dataframe(self):
+        return self.table.to_df()
 
     def compare_iterable(self, iterable1, iterable2):
         for item1, item2 in itertools.zip_longest(iterable1, iterable2):
@@ -428,7 +433,7 @@ class TableOperationsTestCase(unittest.TestCase):
     def test_stream(self):
         def generator():
             for i in range(1, 6):
-                yield [i, i ** 2]
+                yield [i, i**2]
 
         table = BeautifulTable()
         table.columns.header = ["Number", "It's Square"]
@@ -627,7 +632,7 @@ class TableOperationsTestCase(unittest.TestCase):
         self.assertEqual(string, str(self.table))
 
     def test_eastasian_characters(self):
-        string = u"""+----+------------+------+--------+
+        string = """+----+------------+------+--------+
 |    |    name    | rank | gender |
 +----+------------+------+--------+
 | S1 |   Jacob    |  1   |  boy   |
@@ -642,7 +647,7 @@ class TableOperationsTestCase(unittest.TestCase):
 +----+------------+------+--------+
 | S6 | こんにちは |  2   |  boy   |
 +----+------------+------+--------+"""
-        self.table.rows.append([u"こんにちは", 2, "boy"], header="S6")
+        self.table.rows.append(["こんにちは", 2, "boy"], header="S6")
         self.assertEqual(string, str(self.table))
 
     def test_newline(self):
@@ -686,11 +691,11 @@ class TableOperationsTestCase(unittest.TestCase):
 
     def test_ansi_wrap_mb(self):
         table = BeautifulTable(maxwidth=30)
-        string = u"""+-----------------+---+------+
+        string = """+-----------------+---+------+
 | \x1b[31mこれは非常に長\x1b[0m  | 2 | girl |
 |   \x1b[31mい\x1b[0m\x1b[32m名前です\x1b[0m    |   |      |
 +-----------------+---+------+"""
-        long_string = u"\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
+        long_string = "\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
         table.rows.append([long_string, 2, "girl"])
         self.assertEqual(string, str(table))
 
@@ -707,10 +712,10 @@ class TableOperationsTestCase(unittest.TestCase):
     def test_ansi_ellipsis_mb(self):
         table = BeautifulTable(maxwidth=30)
         table.columns.width_exceed_policy = table.WEP_ELLIPSIS
-        string = u"""+-----------------+---+------+
+        string = """+-----------------+---+------+
 | \x1b[31mこれは非常に\x1b[0m... | 2 | girl |
 +-----------------+---+------+"""
-        long_string = u"\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
+        long_string = "\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
         table.rows.append([long_string, 2, "girl"])
         self.assertEqual(string, str(table))
 
@@ -727,10 +732,10 @@ class TableOperationsTestCase(unittest.TestCase):
     def test_ansi_strip_mb(self):
         table = BeautifulTable(maxwidth=30)
         table.columns.width_exceed_policy = table.WEP_STRIP
-        string = u"""+-----------------+---+------+
+        string = """+-----------------+---+------+
 | \x1b[31mこれは非常に長\x1b[0m  | 2 | girl |
 +-----------------+---+------+"""
-        long_string = u"\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
+        long_string = "\x1b[31mこれは非常に長い\x1b[0m\x1b[32m名前です\x1b[0m"
         table.rows.append([long_string, 2, "girl"])
         self.assertEqual(string, str(table))
 
@@ -801,6 +806,47 @@ class TableOperationsTestCase(unittest.TestCase):
 
         # Teardown step.
         os.remove("beautiful_table.csv")
+
+    def test_df_export(self):
+        df = self.table.to_df()
+        self.assertEqual(self.table.rows.header, df.index)
+        self.assertEqual(self.table.columns.header, list(df.columns))
+        self.assertEqual(
+            [list(row) for row in list(df.values)],
+            [list(row) for row in list(self.table._data)],
+        )
+
+    def test_df_import(self):
+        df = self.create_dataframe()
+        table = BeautifulTable()
+        table = table.from_df(df)
+        self.assertEqual(self.table.rows.header, df.index)
+        self.assertEqual(self.table.columns.header, list(df.columns))
+        self.assertEqual(
+            [list(row) for row in list(df.values)],
+            [list(row) for row in list(self.table.rows)],
+        )
+
+    def test_df_export_scenario1(self):
+        table = BeautifulTable()
+        table.rows.append(["Jacob", 1, "boy"])
+        table.rows.append(["Isabella", 2, "girl"])
+        df = table.to_df()
+        self.assertEqual(table.rows.header, [None, None])
+        self.assertEqual(table.columns.header, [None, None, None])
+        self.assertEqual(list(df.index), [0, 1])
+        self.assertEqual(list(df.columns), [0, 1, 2])
+
+    def test_df_export_scenario2(self):
+        table = BeautifulTable()
+        table.rows.append(["Jacob", 1, "boy"])
+        table.rows.append(["Isabella", 2, "girl"])
+        table.columns.header = [None, "rank", "gender"]
+        df = table.to_df()
+        self.assertEqual(table.rows.header, [None, None])
+        self.assertEqual(table.columns.header, [None, "rank", "gender"])
+        self.assertEqual(list(df.index), [0, 1])
+        self.assertEqual(list(df.columns), [None, "rank", "gender"])
 
 
 if __name__ == "__main__":
