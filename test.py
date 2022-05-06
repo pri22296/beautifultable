@@ -836,7 +836,7 @@ class TableOperationsTestCase(unittest.TestCase):
             [list(row) for row in list(df.values)],
             [list(row) for row in list(table.rows)],
         )
-    
+
     @unittest.skipUnless(PANDAS_INSTALLED, REQUIRED_PANDAS_MESSAGE)
     def test_df_export_scenario1(self):
         table = BeautifulTable()
@@ -847,7 +847,7 @@ class TableOperationsTestCase(unittest.TestCase):
         self.assertEqual(table.columns.header, [None, None, None])
         self.assertEqual(list(df.index), [0, 1])
         self.assertEqual(list(df.columns), [0, 1, 2])
-    
+
     @unittest.skipUnless(PANDAS_INSTALLED, REQUIRED_PANDAS_MESSAGE)
     def test_df_export_scenario2(self):
         table = BeautifulTable()
