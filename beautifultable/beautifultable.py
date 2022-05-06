@@ -1217,20 +1217,22 @@ class BeautifulTable(object):
     def to_df(self):
         """Export table to dataframe.
 
-        Parameters
-        ----------
-        table : BeautifulTable
+        This method requires that you have `pandas` already installed in your machine.
 
+        Returns
+        -------
+        pandas.Dataframe:
+            The exported dataframe
         """
         try:
             import pandas as pd
         except ImportError:
-            pd = None
+            warnings.warn(
+                "This method requires that 'pandas' is installed.", RuntimeWarning
+            )
+            raise
 
-        if pd is None:
-            raise ("Please Install pandas to use this API")
-
-        # If there are column headers then it will act as a column of datafarme
+        # If there are column headers then it will act as a column of dataframe
         headers = list(self.columns.header)
         if headers.count(None) == len(headers):
             headers = None
@@ -1250,6 +1252,7 @@ class BeautifulTable(object):
         Parameters
         ----------
         df : pandas.Dataframe
+            input dataframe
         """
         data = df.to_dict()
 
@@ -1264,4 +1267,5 @@ class BeautifulTable(object):
                 [data[header][indx] for indx in row_header], header=str(header)
             )
 
+        self.rows.header = row_header
         return self

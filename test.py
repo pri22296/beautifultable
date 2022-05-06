@@ -5,9 +5,17 @@ import os
 import unittest
 import itertools
 
-import pandas as pd
-
 from beautifultable import BeautifulTable
+
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
+    PANDAS_INSTALLED = False
+else:
+    PANDAS_INSTALLED = True
+
+REQUIRED_PANDAS_MESSAGE = "requires 'pandas' to be installed"
 
 
 class TableOperationsTestCase(unittest.TestCase):
@@ -807,6 +815,7 @@ class TableOperationsTestCase(unittest.TestCase):
         # Teardown step.
         os.remove("beautiful_table.csv")
 
+    @unittest.skipUnless(PANDAS_INSTALLED, REQUIRED_PANDAS_MESSAGE)
     def test_df_export(self):
         df = self.table.to_df()
         self.assertEqual(self.table.rows.header, df.index)
@@ -816,17 +825,19 @@ class TableOperationsTestCase(unittest.TestCase):
             [list(row) for row in list(self.table._data)],
         )
 
+    @unittest.skipUnless(PANDAS_INSTALLED, REQUIRED_PANDAS_MESSAGE)
     def test_df_import(self):
         df = self.create_dataframe()
         table = BeautifulTable()
         table = table.from_df(df)
-        self.assertEqual(self.table.rows.header, df.index)
-        self.assertEqual(self.table.columns.header, list(df.columns))
+        self.assertEqual(table.rows.header, df.index)
+        self.assertEqual(table.columns.header, list(df.columns))
         self.assertEqual(
             [list(row) for row in list(df.values)],
-            [list(row) for row in list(self.table.rows)],
+            [list(row) for row in list(table.rows)],
         )
-
+    
+    @unittest.skipUnless(PANDAS_INSTALLED, REQUIRED_PANDAS_MESSAGE)
     def test_df_export_scenario1(self):
         table = BeautifulTable()
         table.rows.append(["Jacob", 1, "boy"])
@@ -836,7 +847,8 @@ class TableOperationsTestCase(unittest.TestCase):
         self.assertEqual(table.columns.header, [None, None, None])
         self.assertEqual(list(df.index), [0, 1])
         self.assertEqual(list(df.columns), [0, 1, 2])
-
+    
+    @unittest.skipUnless(PANDAS_INSTALLED, REQUIRED_PANDAS_MESSAGE)
     def test_df_export_scenario2(self):
         table = BeautifulTable()
         table.rows.append(["Jacob", 1, "boy"])

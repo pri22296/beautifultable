@@ -134,9 +134,16 @@ Changelog
 Development
 ===========
 
+
+==========
+v1.1.0
+==========
+
 * Drop support for Python 3.4, 3.5 and 3.6
-* Add python 3.9 and 3.10
+* Add official for python 3.9 and 3.10
 * Added `asdict` and `aslist` method on the row object. (Thanks to `@Agent-Hellboy <https://github.com/Agent-Hellboy>`_)
+* Added `from_csv` and `to_csv` methods to export/import a csv file. (Thanks to `@Agent-Hellboy <https://github.com/Agent-Hellboy>`_)
+* Added `from_df` and `to_df` methods to export/import a dataframe. (Thanks to `@Agent-Hellboy <https://github.com/Agent-Hellboy>`_)
 
 ==========
 v1.0.1

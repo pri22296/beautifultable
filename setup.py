@@ -1,10 +1,18 @@
 import os
 import codecs
+import itertools
 
 from setuptools import setup
 
 install_requires = ["wcwidth"]
-extras_require = {}
+
+extras_require = {
+    "dev": ["pandas"],
+}
+
+extras_require["all"] = list(
+    set(itertools.chain.from_iterable(extras_require.values()))
+)
 
 this_dir = os.path.abspath(os.path.dirname(__file__))
 version_path = os.path.join(this_dir, "beautifultable", "__version__.py")
