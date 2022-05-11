@@ -29,7 +29,9 @@ from __future__ import division, unicode_literals
 
 import copy
 import csv
+import pandas
 import warnings
+from typing import Optional, Dict, List, Union
 
 from . import enums
 
@@ -61,7 +63,7 @@ __all__ = [
 ]
 
 
-class BTBorder(object):
+class BTBorder:
     """Class to control how each section of the table's border is rendered.
 
     To disable a behaviour, just set its corresponding attribute
@@ -115,20 +117,20 @@ class BTBorder(object):
 
     def __init__(
         self,
-        top,
-        left,
-        bottom,
-        right,
-        top_left,
-        bottom_left,
-        bottom_right,
-        top_right,
-        header_left,
-        header_right,
-        top_junction,
-        left_junction,
-        bottom_junction,
-        right_junction,
+        top: str,
+        left: str,
+        bottom: str,
+        right: str,
+        top_left: str,
+        bottom_left: str,
+        bottom_right: str,
+        top_right: str,
+        header_left: str,
+        header_right: str,
+        top_junction: str,
+        left_junction: str,
+        bottom_junction: str,
+        right_junction: str,
     ):
         self.top = top
         self.left = left
@@ -186,14 +188,14 @@ class BTTableData(BTBaseList):
         self._table = table
         self._value = value
 
-    def _get_canonical_key(self, key):
+    def _get_canonical_key(self, key: int):
         return self._table.rows._canonical_key(key)
 
     def _get_ideal_length(self):
         pass
 
 
-class BeautifulTable(object):
+class BeautifulTable:
     """Utility Class to print data in tabular format to terminal.
 
     Parameters
@@ -244,15 +246,15 @@ class BeautifulTable(object):
     @deprecated_param("1.0.0", "1.2.0", "serialno_header")
     def __init__(
         self,
-        maxwidth=80,
-        default_alignment=enums.ALIGN_CENTER,
-        default_padding=1,
-        precision=3,
-        serialno=False,
-        serialno_header="SN",
-        detect_numerics=True,
-        sign=enums.SM_MINUS,
-        **kwargs
+        maxwidth: Optional[int] = 80,
+        default_alignment: Optional[int] = enums.ALIGN_CENTER,
+        default_padding: Optional[int] = 1,
+        precision: Optional[int] = 3,
+        serialno: Optional[bool] = False,
+        serialno_header: Optional[str] = "SN",
+        detect_numerics: Optional[bool] = True,
+        sign: Optional[enums.SignMode] = enums.SM_MINUS,
+        **kwargs,
     ):
 
         kwargs.setdefault("max_width", None)
@@ -308,7 +310,7 @@ class BeautifulTable(object):
 
         return obj
 
-    def __deepcopy__(self, memo):
+    def __deepcopy__(self, memo: Dict):
         obj = type(self)()
         obj.__dict__.update(
             {k: copy.deepcopy(v, memo) for k, v in self.__dict__.items()}
@@ -383,15 +385,13 @@ class BeautifulTable(object):
         BTColumnCollection.__contains__,
         details="Use ''value' in BeautifulTable.{columns|rows}' instead.",
     )
-    def __contains__(self, key):  # pragma: no cover
+    def __contains__(self, key: Union[str, Iterable]):  # pragma: no cover
         if isinstance(key, basestring):
             return key in self.columns
         elif isinstance(key, Iterable):
             return key in self.rows
         else:
-            raise TypeError(
-                ("'key' must be str or Iterable, " "not {}").format(type(key).__name__)
-            )
+            raise TypeError(f"'key' must be str or Iterable, not {type(key).__name__}")
 
     def __repr__(self):
         return repr(self._data)
@@ -433,11 +433,9 @@ class BeautifulTable(object):
         return self._sign
 
     @sign.setter
-    def sign(self, value):
+    def sign(self, value: enums.SignMode):
         if not isinstance(value, enums.SignMode):
-            allowed = (
-                "{}.{}".format(type(self).__name__, i.name) for i in enums.SignMode
-            )
+            allowed = (f"{type(self).__name__}.{i.name}" for i in enums.SignMode)
             error_msg = "allowed values for sign are: " + ", ".join(allowed)
             raise ValueError(error_msg)
         self._sign = value
@@ -736,7 +734,7 @@ class BeautifulTable(object):
     def update_column(self, header, column):  # pragma: no cover
         self.columns.update(header, column)
 
-    def set_style(self, style):
+    def set_style(self, style: enums.Style):
         """Set the style of the table from a predefined set of styles.
 
         Parameters
@@ -759,7 +757,7 @@ class BeautifulTable(object):
             * beautifultable.STYLE_GRID
         """
         if not isinstance(style, enums.Style):
-            allowed = ("{}.{}".format(type(self).__name__, i.name) for i in enums.Style)
+            allowed = (f"{type(self).__name__}.{i.name}" for i in enums.Style)
             error_msg = "allowed values for style are: " + ", ".join(allowed)
             raise ValueError(error_msg)
         style_template = style.value
@@ -792,7 +790,7 @@ class BeautifulTable(object):
         table_width = self._width
         lpw, rpw = self.columns.padding_left, self.columns.padding_right
         pad_widths = [(lpw[i] + rpw[i]) for i in range(len(self.columns))]
-        maxwidths = [0 for index in range(len(self.columns))]
+        maxwidths = [0 for _ in range(len(self.columns))]
         offset = table_width - sum(self.columns.width) + sum(pad_widths)
         self._maxwidth = max(self._maxwidth, offset + len(self.columns))
 
@@ -901,7 +899,12 @@ class BeautifulTable(object):
             self.columns.clear()
 
     def _get_horizontal_line(
-        self, char, intersect_left, intersect_mid, intersect_right, mask=None
+        self,
+        char: str,
+        intersect_left,
+        intersect_mid,
+        intersect_right,
+        mask: Optional[List] = None,
     ):
         """Get a horizontal line for the table.
 
@@ -986,7 +989,7 @@ class BeautifulTable(object):
             self.border.top_junction,
             self.border.top_right,
             *args,
-            **kwargs
+            **kwargs,
         )
 
     def _get_header_separator(self, *args, **kwargs):
@@ -996,7 +999,7 @@ class BeautifulTable(object):
             self.columns.header.junction,
             self.border.header_right,
             *args,
-            **kwargs
+            **kwargs,
         )
 
     def _get_row_separator(self, *args, **kwargs):
@@ -1006,7 +1009,7 @@ class BeautifulTable(object):
             self.junction,
             self.border.right_junction,
             *args,
-            **kwargs
+            **kwargs,
         )
 
     def _get_bottom_border(self, *args, **kwargs):
@@ -1016,7 +1019,7 @@ class BeautifulTable(object):
             self.border.bottom_junction,
             self.border.bottom_right,
             *args,
-            **kwargs
+            **kwargs,
         )
 
     @property
@@ -1042,7 +1045,12 @@ class BeautifulTable(object):
     def get_table_width(self):  # pragma: no cover
         return self._width
 
-    def _get_string(self, rows=None, append=False, recalculate_width=True):
+    def _get_string(
+        self,
+        rows: Optional[List] = None,
+        append: Optional[bool] = False,
+        recalculate_width: Optional[bool] = True,
+    ):
         row_header_visible = bool(
             "".join(x if x is not None else "" for x in self.rows.header).strip()
         ) and (len(self.columns) > 0)
@@ -1128,7 +1136,7 @@ class BeautifulTable(object):
                     self.columns.pop(0)
         return
 
-    def stream(self, rows, append=False):
+    def stream(self, rows: Iterable, append: Optional[bool] = False):
         """Get a generator for the table.
 
         This should be used in cases where data takes time to retrieve and it
@@ -1156,7 +1164,7 @@ class BeautifulTable(object):
     def get_string(self):
         return str(self)
 
-    def to_csv(self, file_name, *args, **kwargs):
+    def to_csv(self, file_name: str, *args, **kwargs):
         """Export table to CSV format.
 
         Parameters
@@ -1200,9 +1208,7 @@ class BeautifulTable(object):
 
         if not isinstance(file_name, str):
             raise ValueError(
-                ("Expected 'file_name' to be string, got {}").format(
-                    type(file_name).__name__
-                )
+                f"Expected 'file_name' to be string, got {type(file_name).__name__}"
             )
 
         with open(file_name, mode="rt", newline="") as csv_file:
@@ -1246,7 +1252,7 @@ class BeautifulTable(object):
             [list(row) for row in self.rows], columns=headers, index=index
         )
 
-    def from_df(self, df):
+    def from_df(self, df: pandas.DataFrame):
         """Import table from dataframe.
 
         Parameters

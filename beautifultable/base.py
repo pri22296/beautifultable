@@ -2,7 +2,7 @@ import abc
 import weakref
 
 
-class BTBaseList(object, metaclass=abc.ABCMeta):
+class BTBaseList(metaclass=abc.ABCMeta):
     def __init__(self, table, value):
         self._table = table
         self._value = self._validate(list(value))
@@ -74,7 +74,7 @@ class BTBaseList(object, metaclass=abc.ABCMeta):
         try:
             return self._value.index(item, *args)
         except ValueError:
-            raise KeyError("Key {} is not available".format(item))
+            raise KeyError(f"Key {item} is not available")
 
     def __getitem__(self, key):
         """Returns item at index or header `key`"""
@@ -90,10 +90,9 @@ class BTBaseList(object, metaclass=abc.ABCMeta):
     def _validate(self, value):
         if len(value) != self._get_ideal_length():
             raise ValueError(
-                ("'Expected iterable of length {}, " "got {}").format(
-                    self._get_ideal_length(), len(value)
-                )
+                f"'Expected iterable of length {self._get_ideal_length()}, got {len(value)}"
             )
+
         return value
 
     @abc.abstractmethod

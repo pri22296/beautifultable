@@ -1,14 +1,16 @@
+from typing import List
+
 from .base import BTBaseRow
 from .enums import Alignment
 
 
 class MetaData(BTBaseRow):
-    def __init__(self, table, row):
+    def __init__(self, table, row: List):
         for i in row:
             self.validate(i)
         super(MetaData, self).__init__(table, row)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: int, value: int):
         self.validate(value)
         super(MetaData, self).__setitem__(key, value)
 
@@ -17,14 +19,15 @@ class MetaData(BTBaseRow):
 
 
 class AlignmentMetaData(MetaData):
-    def validate(self, value):
+    def validate(self, value: Alignment):
         if not isinstance(value, Alignment):
-            allowed = ("{}.{}".format(type(self).__name__, i.name) for i in Alignment)
+            allowed = (f"{type(self).__name__}.{i.name}" for i in Alignment)
             error_msg = (
                 "allowed values for alignment are: "
                 + ", ".join(allowed)
-                + ", was {}".format(value)
+                + f", was {value}"
             )
+
             raise TypeError(error_msg)
 
 

@@ -13,7 +13,7 @@ except ImportError:  # pragma: no cover
 from .compat import to_unicode
 
 
-class ANSIMultiByteString(object):
+class ANSIMultiByteString:
 
     ANSI_REGEX = re.compile(r"(\x1B(?:[()][AB012]|[@-Z\\-_]|\[[0-?]*[ -/]*[@-~]))")
     ANSI_RESET = "\x1b[0m"
@@ -39,9 +39,7 @@ class ANSIMultiByteString(object):
                         w = wcwidth(char)
                         if w == -1:
                             raise ValueError(
-                                ("Unsupported Literal {} in " "string {}").format(
-                                    repr(char), repr(token)
-                                )
+                                f"Unsupported Literal {repr(char)} in string {repr(token)}"
                             )
                         self._termwidth += w
                         self._string.append(char)
@@ -59,9 +57,7 @@ class ANSIMultiByteString(object):
         if isinstance(key, slice):
             return self._slice(key)
         raise TypeError(
-            ("table indices must be integers or slices, " "not {}").format(
-                type(key).__name__
-            )
+            f"table indices must be integers or slices, not {type(key).__name__}"
         )
 
     def _slice(self, key):
@@ -85,7 +81,7 @@ class ANSIMultiByteString(object):
         """Returns the width of string as when printed to a terminal"""
         return self._termwidth
 
-    def wrap(self, width):
+    def wrap(self, width: int):
         """Returns a partition of the string based on `width`"""
         res = []
         prev_state = set()
