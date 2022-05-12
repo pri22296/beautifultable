@@ -1,16 +1,13 @@
 """Module containing some utility methods"""
 
-
-import contextlib
 import warnings
 import functools
-from typing import Union
 
 from .ansi import ANSIMultiByteString
 from .compat import to_unicode
 
 
-def to_numeric(item: Union[str, int, float]):
+def to_numeric(item):
     """
     Helper method to convert a string to float or int if possible.
 
@@ -43,13 +40,14 @@ def ensure_type(value, *types, varname="value"):
     if not isinstance(value, types):
         expected_types_str = "/".join([t.__name__ for t in types])
         raise TypeError(
-            f"Expected '{varname}' to be of type '{expected_types_str}', got '{type(value).__name__}'"
+            ("Expected '{}' to be of type '{}', " "got '{}'").format(
+                varname, expected_types_str, type(value).__name__
+            )
         )
-
     return value
 
 
-def pre_process(item, detect_numerics, precision: int, sign_value: int):
+def pre_process(item, detect_numerics, precision, sign_value):
     """Returns the final string which should be displayed"""
     if item is None:
         return ""
@@ -57,8 +55,10 @@ def pre_process(item, detect_numerics, precision: int, sign_value: int):
         item = to_numeric(item)
     if isinstance(item, float):
         item = round(item, precision)
-    with contextlib.suppress(ValueError, TypeError):
+    try:
         item = "{:{sign}}".format(item, sign=sign_value)
+    except (ValueError, TypeError):
+        pass
     return to_unicode(item)
 
 
@@ -76,7 +76,10 @@ def textwrap(item, width):
 def deprecation_message(
     old_name, deprecated_in, removed_in, extra_msg
 ):  # pragma: no cover
-    return f"'{old_name}' has been deprecated in 'v{deprecated_in}' and will be removed in 'v{removed_in}'. {extra_msg}"
+    return (
+        "'{}' has been deprecated in 'v{}' and will be removed in 'v{}'. "
+        "{}".format(old_name, deprecated_in, removed_in, extra_msg)
+    )
 
 
 def deprecated(
@@ -108,7 +111,7 @@ def deprecated(
                         "BTRowHeader",
                         "BeautifulTable.rows.header",
                     )
-                    details = f"Use '{details}' instead."
+                    details = "Use '{}' instead.".format(details)
                 else:
                     details = ""
             message = deprecation_message(
@@ -139,7 +142,7 @@ def deprecated_param(
         def wrapper(*args, **kwargs):
             nonlocal details
             if not details:
-                details = f"Use '{new_name}' instead." if new_name else ""
+                details = "Use '{}' instead.".format(new_name) if new_name else ""
             message = deprecation_message(
                 old_name,
                 deprecated_in,
