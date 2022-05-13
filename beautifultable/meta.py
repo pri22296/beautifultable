@@ -19,12 +19,13 @@ class MetaData(BTBaseRow):
 class AlignmentMetaData(MetaData):
     def validate(self, value):
         if not isinstance(value, Alignment):
-            allowed = ("{}.{}".format(type(self).__name__, i.name) for i in Alignment)
+            allowed = (f"{type(self).__name__}.{i.name}" for i in Alignment)
             error_msg = (
                 "allowed values for alignment are: "
                 + ", ".join(allowed)
-                + ", was {}".format(value)
+                + f", was {value}"
             )
+
             raise TypeError(error_msg)
 
 

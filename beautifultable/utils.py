@@ -76,10 +76,7 @@ def textwrap(item, width):
 def deprecation_message(
     old_name, deprecated_in, removed_in, extra_msg
 ):  # pragma: no cover
-    return (
-        "'{}' has been deprecated in 'v{}' and will be removed in 'v{}'. "
-        "{}".format(old_name, deprecated_in, removed_in, extra_msg)
-    )
+    return f"'{old_name}' has been deprecated in 'v{deprecated_in}' and will be removed in 'v{removed_in}'. {extra_msg}"
 
 
 def deprecated(
@@ -111,7 +108,7 @@ def deprecated(
                         "BTRowHeader",
                         "BeautifulTable.rows.header",
                     )
-                    details = "Use '{}' instead.".format(details)
+                    details = f"Use '{details}' instead."
                 else:
                     details = ""
             message = deprecation_message(
@@ -142,7 +139,7 @@ def deprecated_param(
         def wrapper(*args, **kwargs):
             nonlocal details
             if not details:
-                details = "Use '{}' instead.".format(new_name) if new_name else ""
+                details = f"Use '{new_name}' instead." if new_name else ""
             message = deprecation_message(
                 old_name,
                 deprecated_in,

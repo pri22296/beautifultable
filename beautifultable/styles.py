@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 
-class NoStyle(object):
+class NoStyle:
     left_border_char = ""
     right_border_char = ""
     top_border_char = ""

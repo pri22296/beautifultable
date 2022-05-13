@@ -61,7 +61,7 @@ __all__ = [
 ]
 
 
-class BTBorder(object):
+class BTBorder:
     """Class to control how each section of the table's border is rendered.
 
     To disable a behaviour, just set its corresponding attribute
@@ -193,7 +193,7 @@ class BTTableData(BTBaseList):
         pass
 
 
-class BeautifulTable(object):
+class BeautifulTable:
     """Utility Class to print data in tabular format to terminal.
 
     Parameters
@@ -252,7 +252,7 @@ class BeautifulTable(object):
         serialno_header="SN",
         detect_numerics=True,
         sign=enums.SM_MINUS,
-        **kwargs
+        **kwargs,
     ):
 
         kwargs.setdefault("max_width", None)
@@ -389,9 +389,7 @@ class BeautifulTable(object):
         elif isinstance(key, Iterable):
             return key in self.rows
         else:
-            raise TypeError(
-                ("'key' must be str or Iterable, " "not {}").format(type(key).__name__)
-            )
+            raise TypeError(f"'key' must be str or Iterable, not {type(key).__name__}")
 
     def __repr__(self):
         return repr(self._data)
@@ -435,9 +433,7 @@ class BeautifulTable(object):
     @sign.setter
     def sign(self, value):
         if not isinstance(value, enums.SignMode):
-            allowed = (
-                "{}.{}".format(type(self).__name__, i.name) for i in enums.SignMode
-            )
+            allowed = (f"{type(self).__name__}.{i.name}" for i in enums.SignMode)
             error_msg = "allowed values for sign are: " + ", ".join(allowed)
             raise ValueError(error_msg)
         self._sign = value
@@ -635,9 +631,7 @@ class BeautifulTable(object):
         details="Use 'BeautifulTable.{columns|rows}[key]' instead.",
     )
     def __getitem__(self, key):  # pragma: no cover
-        if isinstance(key, basestring):
-            return self.columns[key]
-        return self.rows[key]
+        return self.columns[key] if isinstance(key, basestring) else self.rows[key]
 
     @deprecated(
         "1.0.0",
@@ -759,7 +753,7 @@ class BeautifulTable(object):
             * beautifultable.STYLE_GRID
         """
         if not isinstance(style, enums.Style):
-            allowed = ("{}.{}".format(type(self).__name__, i.name) for i in enums.Style)
+            allowed = (f"{type(self).__name__}.{i.name}" for i in enums.Style)
             error_msg = "allowed values for style are: " + ", ".join(allowed)
             raise ValueError(error_msg)
         style_template = style.value
@@ -986,7 +980,7 @@ class BeautifulTable(object):
             self.border.top_junction,
             self.border.top_right,
             *args,
-            **kwargs
+            **kwargs,
         )
 
     def _get_header_separator(self, *args, **kwargs):
@@ -996,7 +990,7 @@ class BeautifulTable(object):
             self.columns.header.junction,
             self.border.header_right,
             *args,
-            **kwargs
+            **kwargs,
         )
 
     def _get_row_separator(self, *args, **kwargs):
@@ -1006,7 +1000,7 @@ class BeautifulTable(object):
             self.junction,
             self.border.right_junction,
             *args,
-            **kwargs
+            **kwargs,
         )
 
     def _get_bottom_border(self, *args, **kwargs):
@@ -1016,7 +1010,7 @@ class BeautifulTable(object):
             self.border.bottom_junction,
             self.border.bottom_right,
             *args,
-            **kwargs
+            **kwargs,
         )
 
     @property
@@ -1167,9 +1161,7 @@ class BeautifulTable(object):
 
         if not isinstance(file_name, str):
             raise ValueError(
-                ("Expected 'file_name' to be string, got {}").format(
-                    type(file_name).__name__
-                )
+                f"Expected 'file_name' to be string, got {type(file_name).__name__}"
             )
 
         with open(file_name, mode="wt", newline="") as csv_file:
@@ -1200,9 +1192,7 @@ class BeautifulTable(object):
 
         if not isinstance(file_name, str):
             raise ValueError(
-                ("Expected 'file_name' to be string, got {}").format(
-                    type(file_name).__name__
-                )
+                f"Expected 'file_name' to be string, got {type(file_name).__name__}"
             )
 
         with open(file_name, mode="rt", newline="") as csv_file:

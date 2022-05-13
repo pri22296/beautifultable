@@ -39,9 +39,7 @@ class ANSIMultiByteString(object):
                         w = wcwidth(char)
                         if w == -1:
                             raise ValueError(
-                                ("Unsupported Literal {} in " "string {}").format(
-                                    repr(char), repr(token)
-                                )
+                                f"Unsupported Literal {repr(char)} in string {repr(token)}"
                             )
                         self._termwidth += w
                         self._string.append(char)
@@ -59,9 +57,7 @@ class ANSIMultiByteString(object):
         if isinstance(key, slice):
             return self._slice(key)
         raise TypeError(
-            ("table indices must be integers or slices, " "not {}").format(
-                type(key).__name__
-            )
+            f"table indices must be integers or slices, not {type(key).__name__}"
         )
 
     def _slice(self, key):

@@ -21,9 +21,7 @@ class BTRowHeader(BTBaseColumn):
 
     def _validate_item(self, value):
         if not (isinstance(value, basestring) or value is None):
-            raise TypeError(
-                ("header must be of type 'str', " "got {}").format(type(value).__name__)
-            )
+            raise TypeError(f"header must be of type 'str', got {type(value).__name__}")
 
 
 class BTColumnHeader(BTBaseRow):
@@ -78,9 +76,7 @@ class BTColumnHeader(BTBaseRow):
 
     def _validate_item(self, value):
         if not (isinstance(value, basestring) or value is None):
-            raise TypeError(
-                ("header must be of type 'str', " "got {}").format(type(value).__name__)
-            )
+            raise TypeError(f"header must be of type 'str', got {type(value).__name__}")
 
 
 class BTRowData(BTBaseRow):
@@ -145,7 +141,7 @@ class BTRowData(BTBaseRow):
                     row_item_list.append(left_pad + row_item + right_pad)
                 result.append(row_item_list)
 
-        return [[""] * len(table.columns)] if len(result) == 0 else result
+        return result or [[""] * len(table.columns)]
 
     def _clamp_string(self, row_item, index, delimiter=""):
         """Clamp `row_item` to fit in column referred by index.
@@ -290,7 +286,7 @@ class BTRowData(BTBaseRow):
         header_rowval_map = {}
         for header, row_val in zip(self._table.columns.header, self.value):
             if header is None or header == "":
-                raise Warning(f"Column header is not provided or invalid")
+                raise Warning("Column header is not provided or invalid")
             header_rowval_map[header] = row_val
         return header_rowval_map
 
@@ -304,7 +300,7 @@ class BTColumnData(BTBaseColumn):
         """
         Raise a NotImplementedError as currently it is not implemented
         """
-        raise NotImplementedError(f"Currently supported for rows only")
+        raise NotImplementedError("Currently supported for rows only")
 
 
 class BTRowCollection(object):
@@ -350,9 +346,7 @@ class BTRowCollection(object):
         elif isinstance(key, basestring):
             return self.header.index(key)
         raise TypeError(
-            ("row indices must be int, str or slices, not {}").format(
-                type(key).__name__
-            )
+            f"row indices must be int, str or slices, not {type(key).__name__}"
         )
 
     def __len__(self):
@@ -387,9 +381,7 @@ class BTRowCollection(object):
         if isinstance(key, (int, basestring)):
             return self._table._data[key]
         raise TypeError(
-            ("row indices must be int, str or a slice object, not {}").format(
-                type(key).__name__
-            )
+            f"row indices must be int, str or a slice object, not {type(key).__name__}"
         )
 
     def __delitem__(self, key):
@@ -416,9 +408,7 @@ class BTRowCollection(object):
             del self.header[key]
         else:
             raise TypeError(
-                ("row indices must be int, str or " "a slice object, not {}").format(
-                    type(key).__name__
-                )
+                f"row indices must be int, str or a slice object, not {type(key).__name__}"
             )
 
     def __setitem__(self, key, value):
@@ -456,9 +446,7 @@ class BTRowCollection(object):
         elif isinstance(key, Iterable):
             return key in self._table._data
         else:
-            raise TypeError(
-                ("'key' must be str or Iterable, " "not {}").format(type(key).__name__)
-            )
+            raise TypeError(f"'key' must be str or Iterable, not {type(key).__name__}")
 
     def __iter__(self):
         return BTCollectionIterator(self)
@@ -482,9 +470,7 @@ class BTRowCollection(object):
             index or heading of the row. Normal list rules apply.
         """
         if not isinstance(index, (int, basestring)):
-            raise TypeError(
-                ("row index must be int or str, " "not {}").format(type(index).__name__)
-            )
+            raise TypeError(f"row index must be int or str, not {type(index).__name__}")
         if len(self._table._data) == 0:
             raise IndexError("pop from empty table")
         else:
@@ -680,9 +666,7 @@ class BTColumnCollection(object):
         elif isinstance(key, basestring):
             return self.header.index(key)
         raise TypeError(
-            ("column indices must be int, str or slices, not {}").format(
-                type(key).__name__
-            )
+            f"column indices must be int, str or slices, not {type(key).__name__}"
         )
 
     @property
@@ -734,7 +718,7 @@ class BTColumnCollection(object):
             if value == "auto":
                 self._auto_width = True
                 return
-            raise ValueError("Invalid value '{}'".format(value))
+            raise ValueError(f"Invalid value '{value}'")
         if isinstance(value, int):
             value = [value] * len(self)
         self._width = NonNegativeIntegerMetaData(self._table, value)
@@ -795,8 +779,7 @@ class BTColumnCollection(object):
     def width_exceed_policy(self, value):
         if not isinstance(value, enums.WidthExceedPolicy):
             allowed = (
-                "{}.{}".format(type(self).__name__, i.name)
-                for i in enums.WidthExceedPolicy
+                f"{type(self).__name__}.{i.name}" for i in enums.WidthExceedPolicy
             )
             error_msg = "allowed values for width_exceed_policy are: " + ", ".join(
                 allowed
@@ -825,9 +808,7 @@ class BTColumnCollection(object):
     @default_alignment.setter
     def default_alignment(self, value):
         if not isinstance(value, enums.Alignment):
-            allowed = (
-                "{}.{}".format(type(self).__name__, i.name) for i in enums.Alignment
-            )
+            allowed = (f"{type(self).__name__}.{i.name}" for i in enums.Alignment)
             error_msg = "allowed values for default_alignment are: " + ", ".join(
                 allowed
             )
@@ -900,10 +881,9 @@ class BTColumnCollection(object):
             key = self.header.index(key)
         else:
             raise TypeError(
-                (
-                    "column indices must be integers, strings or " "slices, not {}"
-                ).format(type(key).__name__)
+                f"column indices must be integers, strings or slices, not {type(key).__name__}"
             )
+
         return BTColumnData(self._table, [row[key] for row in self._table._data])
 
     def __delitem__(self, key):
@@ -944,9 +924,7 @@ class BTColumnCollection(object):
                 del self._table.rows[:]
         else:
             raise TypeError(
-                ("table indices must be int, str or " "slices, not {}").format(
-                    type(key).__name__
-                )
+                f"table indices must be int, str or slices, not {type(key).__name__}"
             )
 
     def __setitem__(self, key, value):
@@ -982,9 +960,7 @@ class BTColumnCollection(object):
             key = list(key)
             return any(key == column for column in self)
         else:
-            raise TypeError(
-                ("'key' must be str or Iterable, " "not {}").format(type(key).__name__)
-            )
+            raise TypeError(f"'key' must be str or Iterable, not {type(key).__name__}")
 
     def __iter__(self):
         return BTCollectionIterator(self)
@@ -1017,9 +993,7 @@ class BTColumnCollection(object):
         """
         if not isinstance(index, (int, basestring)):
             raise TypeError(
-                ("column index must be int or str, " "not {}").format(
-                    type(index).__name__
-                )
+                f"column index must be int or str, not {type(index).__name__}"
             )
         if self._table._ncol == 0:
             raise IndexError("pop from empty table")
@@ -1117,21 +1091,17 @@ class BTColumnCollection(object):
         alignment = self.default_alignment if alignment is None else alignment
         if not isinstance(padding_left, int):
             raise TypeError(
-                "'padding_left' should be of type 'int' not '{}'".format(
-                    type(padding_left).__name__
-                )
+                f"'padding_left' should be of type 'int' not '{type(padding_left).__name__}'"
             )
+
         if not isinstance(padding_right, int):
             raise TypeError(
-                "'padding_right' should be of type 'int' not '{}'".format(
-                    type(padding_right).__name__
-                )
+                f"'padding_right' should be of type 'int' not '{type(padding_right).__name__}'"
             )
+
         if not isinstance(alignment, enums.Alignment):
             raise TypeError(
-                "alignment should be of type '{}' not '{}'".format(
-                    enums.Alignment.__name__, type(alignment).__name__
-                )
+                f"alignment should be of type '{enums.Alignment.__name__}' not '{type(alignment).__name__}'"
             )
 
         if self._table._ncol == 0:
@@ -1145,9 +1115,7 @@ class BTColumnCollection(object):
         else:
             if (not isinstance(header, basestring)) and (header is not None):
                 raise TypeError(
-                    "header must be of type 'str' not '{}'".format(
-                        type(header).__name__
-                    )
+                    f"header must be of type 'str' not '{type(header).__name__}'"
                 )
             column_length = 0
             for row, new_item in zip(self._table.rows, column):
@@ -1167,9 +1135,7 @@ class BTColumnCollection(object):
                 for j in range(column_length, -1, -1):
                     self._table.rows[j]._pop(index)
                 raise ValueError(
-                    ("length of 'column' should be atleast {}, " "got {}").format(
-                        len(self._table.rows), column_length
-                    )
+                    f"length of 'column' should be atleast {len(self._table.rows)}, got {column_length}"
                 )
 
     def append(
